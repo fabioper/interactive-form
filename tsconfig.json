@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "outFile": "./app.js",
+        "sourceMap": true,
+        "removeComments": true,
+        "watch": true
+    },
+    "compileOnSave": true,
+    "include": ["src/*.ts"]
+}
