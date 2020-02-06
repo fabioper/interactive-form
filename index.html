@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,137 @@
     <title>Interactive Form</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
 <body>
-    <div class="container">
-        <h1>Interactive Form</h1>
-    </div>
+    <main class="main">
+        <aside class="container">
+            <section data-container="filtro" class="active">
+                <h2>
+                    Orçamento por:
+                </h2>
+                <div>
+                    <button data-type="industria">Indústria</button>
+                    <button data-type="residuos">Resíduos</button>
+                    <button data-type="servicos">Serviços</button>
+                </div>
+            </section>
+
+            <section data-container="seletor-industria">
+                <h2>Escolha uma indústria</h2>
+                <form>
+                    <select name="industria" id="industria">
+                        <option value="" selected>Escolha uma indústria</option>
+                        <option value="alimenticia">Alimentícia</option>
+                        <option value="construcao-civil">Construção Civil</option>
+                        <option value="educacao">Educação</option>
+                        <option value="empresarial">Empresarial</option>
+                        <option value="outras">Outras</option>
+                    </select>
+                </form>
+            </section>
+            
+            <section data-container="seletor-servico">
+                <h2>Escolha um serviço</h2>
+                <form>
+                    <select name="servico" id="servico">
+                        <option value="" selected>Escolha um serviço</option>
+                        <option value="gestao-de-residuos">Gestão de Resíduos</option>
+                        <option value="tratamento-de-residuos">Tratamento de resíduos</option>
+                        <option value="pgrs">PGRS</option>
+                        <option value="remocao-de-lodo">Remoção de Lodo e Descarte de Efluentes</option>
+                        <option value="limpeza-de-fossa-septica">Limpeza de fossa séptica</option>
+                    </select>
+                </form>
+            </section>
+
+            <section data-container="residuos">
+                <h2>Escolha o resíduo</h2>
+                <div class="residuos-grid">
+                    <div class="residuo" data-residuo="comuns">
+                        <h3>Comuns</h3>
+                    </div>
+                    <div class="residuo" data-residuo="reciclaveis">
+                        <h3>Recicláveis</h3>
+                    </div>
+                    <div class="residuo" data-residuo="entulho-de-construcao">
+                        <h3>Entulho de Construção</h3>
+                    </div>
+                    <div class="residuo" data-residuo="medicamentos-vencidos">
+                        <h3>Medicamentos vencidos</h3>
+                    </div>
+                    <div class="residuo" data-residuo="lixo-eletronico">
+                        <h3>Lixo eletrônico</h3>
+                    </div>
+                    <div class="residuo" data-residuo="pilhas">
+                        <h3>Pilhas</h3>
+                    </div>
+                    <div class="residuo" data-residuo="lampadas">
+                        <h3>Lâmpadas</h3>
+                    </div>
+                    <div class="residuo" data-residuo="perfurocortantes">
+                        <h3>Perfurocortantes</h3>
+                    </div>
+                    <div class="residuo" data-residuo="lodo">
+                        <h3>Lodo</h3>
+                    </div>
+                    <div class="residuo" data-residuo="quimicos">
+                        <h3>Químico</h3>
+                    </div>
+                    <div class="residuo" data-residuo="lixos-infectantes">
+                        <h3>Lixos infectantes</h3>
+                    </div>
+                    <div class="residuo" data-residuo="perigoso-classe-i">
+                        <h3>Perigoso (Classe I)</h3>
+                    </div>
+                    <div class="residuo" data-residuo="outros">
+                        <h3>Outros</h3>
+                    </div>
+                </div>
+            </section>
+
+            <section data-container="calculo-montante" class="modal">
+                <aside class="residuo-info">
+                    <h2 class="residuo-info__titulo"></h2>
+                    <ul class="residuo-info__exemplos"></ul>
+                    <p class="residuo-info__destinacao"></p>
+                </aside>
+
+                <div class="form-wrapper">
+                    <h2>Cálculo do Montante</h2>
+                    <form action="">
+                        <label for="frequencia">Frequência:</label>
+                        <input type="number" name="frequencia" id="frequencia"> por 
+                        <select name="frequencia-periodo" id="frequencia-periodo">
+                            <option value="semana">Semana</option>
+                            <option value="mes">Mês</option>
+                            <option value="trimestre">Trimestre</option>
+                            <option value="semestre">Semestre</option>
+                        </select>
+
+                        <label for="acondicionamento">Acondicionamento (recipiente(s)):</label>
+                        <select name="acondicionamento" id="acondicionamento">
+                            <option value="">Escolha um recipiente</option>
+                        </select>
+
+                        <label for="quantidade-recipiente">Quantidade de recipientes por coleta:</label>
+                        <input type="range" name="quantidade-recipiente" id="quantidade-recipiente">
+
+                        <input type="submit" value="Avançar">
+                    </form>
+                </div>
+            </section>
+
+            <section data-container="informacoes-usuario" class="modal">
+                <aside class="residuo-info">
+                    <h2 class="residuo-info__titulo"></h2>
+                    <ul class="residuo-info__exemplos"></ul>
+                    <p class="residuo-info__destinacao"></p>
+                </aside>
+            </section>
+        </div>
+    </main>
+
     <script src="./app.js"></script>
 </body>
+
 </html>

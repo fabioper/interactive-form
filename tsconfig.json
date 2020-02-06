@@ -1,11 +1,8 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "outFile": "./app.js",
         "sourceMap": true,
-        "removeComments": true,
-        "watch": true
+        "removeComments": true
     },
-    "compileOnSave": true,
-    "include": ["src/*.ts"]
+    "include": ["src/*.ts", "src/helpers/residuos.ts", "src/helpers/constants.ts", "src/helpers/state.ts", "src/helpers/helpers.ts"]
 }
