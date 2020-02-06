@@ -1,25 +1,27 @@
 import { State } from './helpers/state'
-// import { types } from './helpers/constants'
-import { show, hide, getDOMElements, slug, transformToList, removeAllChildren } from './helpers/helpers'
 import { types } from './helpers/constants'
-
-const {
+import {
+    addActiveClass,
+    removeActiveClass,
+    transformToList,
+    removeAllChildren,
     filterContainer,
     industriaSeletorContainer,
     servicoSeletorContainer,
-    residuosContainer,
     calculoMontanteContainer,
-    residuosItems,
+    informacoesUsuarioContainer,
+    residuosContainer,
     asideResiduoInfo,
-    informacoesUsuarioContainer
-} = getDOMElements()
+    residuosItems,
+    slug
+} from './helpers/helpers'
 
 export function handleContainerVisibility(condition: (state: State) => boolean) {
     return function(currentState: State): void {
         if (condition(currentState)) {
-            return show(this)
+            return addActiveClass(this)
         }
-        hide(this)
+        removeActiveClass(this)
     }
 }
 
@@ -34,21 +36,21 @@ export default () => [
 
     handleContainerVisibility(
         state => isFilteredBy(types.RESIDUOS, state) ||
-        (Boolean(state.industry) || Boolean(state.service))
+        (Boolean(state.industria) || Boolean(state.servico))
     ).bind(residuosContainer),
 
-    handleContainerVisibility(state => Boolean(state.residue))
+    handleContainerVisibility(state => Boolean(state.residuo))
         .bind(calculoMontanteContainer),
 
     handleIndustrias,
 
     // eslint-disable-next-line max-statements
     (state: State): void => {
-        if (state.residue) {
+        if (state.residuo) {
             const asideTitle = asideResiduoInfo.querySelector('.residuo-info__titulo')
             const asideExemplosList = asideResiduoInfo.querySelector('.residuo-info__exemplos')
             const asideDestinacaoList = asideResiduoInfo.querySelector('.residuo-info__destinacao')
-            const residuo = getResiduo(state.residue, state)
+            const residuo = getResiduo(state.residuo, state)
 
             asideTitle.textContent = residuo.nome
             removeAllChildren(asideExemplosList)
@@ -62,7 +64,7 @@ export default () => [
     },
 
     (state: State): void => {
-        if (state.service === types.TRATAMENTO_RESIDUOS) {
+        if (state.servico === types.TRATAMENTO_RESIDUOS) {
             residuosItems.forEach(residuo => {
                 const data = getResiduo(residuo.dataset.residuo, state)
                 if (data && data.tratamento) {
@@ -75,21 +77,21 @@ export default () => [
     },
 
     (state: State): void => {
-        switch (state.service) {
+        switch (state.servico) {
             case types.REMOCAO_LODO:
             case types.LIMPEZA_FOSSA_SEPTICA:
             case types.PGRS:
-                show(informacoesUsuarioContainer)
+                addActiveClass(informacoesUsuarioContainer)
                 break
             default:
-                hide(informacoesUsuarioContainer)
+                removeActiveClass(informacoesUsuarioContainer)
         }
     },
 
     (state: State): void => {
-        if (state.residue) {
+        if (state.residuo) {
             const select = calculoMontanteContainer.querySelector('select#acondicionamento')
-            const residuo = getResiduo(state.residue, state)
+            const residuo = getResiduo(state.residuo, state)
             const options = residuo.containers[0].container.map(generateContainerOptions)
             removeAllChildren(select)
             select.append(...options)
@@ -107,8 +109,10 @@ function generateContainerOptions(container: string): HTMLOptionElement {
 function handleIndustrias(state: State): void {
     residuosItems.forEach(residuo => {
         const data = getResiduo(residuo.dataset.residuo, state)
+
         const industrias = data ? data.industrias.map((i: string) => slug(i)) : []
-        if (data && state.industry && industrias.includes(state.industry)) {
+
+        if (data && state.industria && industrias.includes(state.industria)) {
             residuo.classList.add(types.ATIVO)
         } else {
             residuo.classList.remove(types.ATIVO)
@@ -117,13 +121,13 @@ function handleIndustrias(state: State): void {
 }
 
 function getResiduo(residuo: string, state: State) {
-    return state.data.find(r => slug(r.nome) === residuo)
+    return state.dados.find(r => slug(r.nome) === residuo)
 }
 
 function dataLoaded(): (state: State) => boolean {
-    return (state: State): boolean => Boolean(state.data)
+    return (state: State): boolean => Boolean(state.dados)
 }
 
 function isFilteredBy(filter: string, state: State): boolean {
-    return state.selectedFilter && state.selectedFilter === filter
+    return state.filtro && state.filtro === filter
 }

@@ -12,18 +12,18 @@
 <body>
     <main class="main">
         <aside class="container">
-            <section data-container="filtro" class="active">
+            <section data-secao="modo">
                 <h2>
                     Orçamento por:
                 </h2>
                 <div>
-                    <button data-type="industria">Indústria</button>
-                    <button data-type="residuos">Resíduos</button>
-                    <button data-type="servicos">Serviços</button>
+                    <button data-modo="industria">Indústria</button>
+                    <button data-modo="residuos">Resíduos</button>
+                    <button data-modo="servicos">Serviços</button>
                 </div>
             </section>
 
-            <section data-container="seletor-industria">
+            <section data-secao="seletor-industria">
                 <h2>Escolha uma indústria</h2>
                 <form>
                     <select name="industria" id="industria">
@@ -36,8 +36,8 @@
                     </select>
                 </form>
             </section>
-            
-            <section data-container="seletor-servico">
+
+            <section data-secao="seletor-servico">
                 <h2>Escolha um serviço</h2>
                 <form>
                     <select name="servico" id="servico">
@@ -51,7 +51,7 @@
                 </form>
             </section>
 
-            <section data-container="residuos">
+            <section data-secao="residuos">
                 <h2>Escolha o resíduo</h2>
                 <div class="residuos-grid">
                     <div class="residuo" data-residuo="comuns">
@@ -96,7 +96,7 @@
                 </div>
             </section>
 
-            <section data-container="calculo-montante" class="modal">
+            <section data-secao="calculo-montante" class="modal">
                 <aside class="residuo-info">
                     <h2 class="residuo-info__titulo"></h2>
                     <ul class="residuo-info__exemplos"></ul>
@@ -128,7 +128,7 @@
                 </div>
             </section>
 
-            <section data-container="informacoes-usuario" class="modal">
+            <section data-secao="informacoes-usuario" class="modal">
                 <aside class="residuo-info">
                     <h2 class="residuo-info__titulo"></h2>
                     <ul class="residuo-info__exemplos"></ul>

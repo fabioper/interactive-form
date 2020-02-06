@@ -1,25 +1,39 @@
-export type State = {
-    selectedFilter: string;
-    industry: string;
-    service: string;
-    residue: string;
-    data: any;
+export type Residuo = {
+    nome: string;
+    descricao: string;
+    icone: string;
+    exemplos: [{ exemplo: string }];
+    destinacao: string;
+    tratamento: boolean;
+    industrias: string[];
+    containers: [{
+        container: string[];
+        observacao: string;
+    }];
 }
 
-export function onChange(callbacks: ((currentState: {}) => void)[]): State {
+export type State = {
+    filtro: string;
+    industria: string;
+    servico: string;
+    residuo: string;
+    dados: Residuo[];
+}
+
+export function onChange(callbacks: ((state: {}) => void)[]): State {
     const state: State = {
-        selectedFilter: '',
-        industry: '',
-        residue: '',
-        service: '',
-        data: []
+        filtro: '',
+        industria: '',
+        residuo: '',
+        servico: '',
+        dados: []
     }
 
     return new Proxy(state, {
-        set(currentState, key, value): boolean {
-            currentState[key] = value
-            callbacks.forEach((cb: (currentState: {}) => void) => {
-                cb(currentState)
+        set(state, key, value): boolean {
+            state[key] = value
+            callbacks.forEach((cb: (state: {}) => void) => {
+                cb(state)
             })
             return true
         }
