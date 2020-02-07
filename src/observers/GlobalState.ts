@@ -30,8 +30,9 @@ export class GlobalState {
     }
 
     updateState(data: any): void {
-        // TODO: Toggle elements when clicked on an item already clicked
-        this.state = { ...this.state, ...data }
+        Object.keys(data).forEach(field => {
+            this.state[field] = this.state[field] ? '' : data[field]
+        })
         this.notify()
         console.log(this.state)
     }

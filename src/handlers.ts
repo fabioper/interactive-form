@@ -20,19 +20,6 @@ export default () => [
     },
 
     (state: State): void => {
-        if (state.servico === types.TRATAMENTO_RESIDUOS) {
-            residuosItems.forEach(residuo => {
-                const data = getResiduo(residuo.dataset.residuo, state)
-                if (data && data.tratamento) {
-                    residuo.classList.add(types.ATIVO)
-                } else {
-                    residuo.classList.remove(types.ATIVO)
-                }
-            })
-        }
-    },
-
-    (state: State): void => {
         if (state.residuo) {
             const select = calculoMontanteContainer.querySelector('select#acondicionamento')
             const residuo = getResiduo(state.residuo, state)
@@ -49,4 +36,4 @@ function generateContainerOptions(container: string): HTMLOptionElement {
     opt.textContent = container
     return opt
 }
- */
+*/

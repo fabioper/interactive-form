@@ -247,7 +247,9 @@ class GlobalState {
             .catch(err => console.log(err));
     }
     updateState(data) {
-        this.state = { ...this.state, ...data };
+        Object.keys(data).forEach(field => {
+            this.state[field] = this.state[field] ? '' : data[field];
+        });
         this.notify();
         console.log(this.state);
     }
