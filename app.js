@@ -95,179 +95,49 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _handlers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handlers */ "./src/handlers.ts");
-/* harmony import */ var _helpers_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers/state */ "./src/helpers/state.ts");
-/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers/helpers */ "./src/helpers/helpers.ts");
+/* harmony import */ var _observers_InformacoesUsuarioObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./observers/InformacoesUsuarioObserver */ "./src/observers/InformacoesUsuarioObserver.ts");
+/* harmony import */ var _observers_TratamentoObserver__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./observers/TratamentoObserver */ "./src/observers/TratamentoObserver.ts");
+/* harmony import */ var _observers_CalculoMontanteObserver__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./observers/CalculoMontanteObserver */ "./src/observers/CalculoMontanteObserver.ts");
+/* harmony import */ var _observers_ResiduosObserver__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./observers/ResiduosObserver */ "./src/observers/ResiduosObserver.ts");
+/* harmony import */ var _observers_ServicoSelectorObserver__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./observers/ServicoSelectorObserver */ "./src/observers/ServicoSelectorObserver.ts");
+/* harmony import */ var _observers_IndustriaSelectorObserver__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./observers/IndustriaSelectorObserver */ "./src/observers/IndustriaSelectorObserver.ts");
+/* harmony import */ var _observers_ModeObserver__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./observers/ModeObserver */ "./src/observers/ModeObserver.ts");
+/* harmony import */ var _observers_GlobalState__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./observers/GlobalState */ "./src/observers/GlobalState.ts");
+/* harmony import */ var _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./observers/IndustriasObserver */ "./src/observers/IndustriasObserver.ts");
 
 
 
-const state = Object(_helpers_state__WEBPACK_IMPORTED_MODULE_1__["onChange"])(Object(_handlers__WEBPACK_IMPORTED_MODULE_0__["default"])());
-window.addEventListener('load', () => {
-    fetch('http://gruporodocon.com.br/residuos2/wp-json/wp/v2/pages/45')
-        .then(res => res.json())
-        .then(data => state.dados = data.acf.card_residuo)
-        .then(() => console.log('Data loaded successfully'))
-        .catch(err => console.log(err));
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["buttons"].forEach(button => button.addEventListener('click', () => {
-    const { modo: modoSelecionado } = button.dataset;
-    Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["reset"])(state);
-    modoSelecionado === state.filtro ?
-        state.filtro = '' :
-        state.filtro = modoSelecionado;
-}));
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["industriasSeletor"].addEventListener('change', () => {
-    state.industria = _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["industriasSeletor"].value;
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["servicosSeletor"].addEventListener('change', () => {
-    state.servico = _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["servicosSeletor"].value;
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["residuosItems"].forEach(residuo => {
-    residuo.addEventListener('click', () => {
-        const { residuo: residuoSelecionado } = residuo.dataset;
-        residuoSelecionado === state.residuo ?
-            state.residuo = '' :
-            state.residuo = residuoSelecionado;
+
+
+
+
+
+
+const state = new _observers_GlobalState__WEBPACK_IMPORTED_MODULE_7__["GlobalState"]();
+const modeObserver = new _observers_ModeObserver__WEBPACK_IMPORTED_MODULE_6__["ModeObserver"]('[data-secao=modo]');
+const industriaSelectorObserver = new _observers_IndustriaSelectorObserver__WEBPACK_IMPORTED_MODULE_5__["IndustriaSelectorObserver"]('[data-secao=seletor-industria]');
+const servicoSelectorObserver = new _observers_ServicoSelectorObserver__WEBPACK_IMPORTED_MODULE_4__["ServicoSelectorObserver"]('[data-secao=seletor-servico]');
+const residuosObserver = new _observers_ResiduosObserver__WEBPACK_IMPORTED_MODULE_3__["ResiduosObserver"]('[data-secao=residuos]');
+const calculoMontanteObserver = new _observers_CalculoMontanteObserver__WEBPACK_IMPORTED_MODULE_2__["CalculoMontanteObserver"]('[data-secao=calculo-montante]');
+const industriasObserver = new _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__["IndustriasObserver"](residuosObserver.section);
+const informacoesUsuarioObserver = new _observers_InformacoesUsuarioObserver__WEBPACK_IMPORTED_MODULE_0__["InformacoesUsuarioObserver"]('[data-secao=informacoes-usuario]');
+const tratamentoObserver = new _observers_TratamentoObserver__WEBPACK_IMPORTED_MODULE_1__["TratamentoObserver"](residuosObserver.section);
+state.addObserver(modeObserver, industriaSelectorObserver, servicoSelectorObserver, residuosObserver, calculoMontanteObserver, industriasObserver, informacoesUsuarioObserver, tratamentoObserver);
+modeObserver.buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        const { modo } = button.dataset;
+        state.reset();
+        state.updateState({ modo });
     });
 });
-
-
-/***/ }),
-
-/***/ "./src/handlers.ts":
-/*!*************************!*\
-  !*** ./src/handlers.ts ***!
-  \*************************/
-/*! exports provided: handleContainerVisibility, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "handleContainerVisibility", function() { return handleContainerVisibility; });
-/* harmony import */ var _helpers_constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers/constants */ "./src/helpers/constants.ts");
-/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers/helpers */ "./src/helpers/helpers.ts");
-
-
-function handleContainerVisibility(condition) {
-    return function (currentState) {
-        if (condition(currentState)) {
-            return Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["addActiveClass"])(this);
-        }
-        Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeActiveClass"])(this);
-    };
-}
-/* harmony default export */ __webpack_exports__["default"] = (() => [
-    handleContainerVisibility(dataLoaded()).bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["filterContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].INDUSTRIA, state))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["industriaSeletorContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].SERVICOS, state))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["servicoSeletorContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].RESIDUOS, state) ||
-        (Boolean(state.industria) || Boolean(state.servico))).bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosContainer"]),
-    handleContainerVisibility(state => Boolean(state.residuo))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["calculoMontanteContainer"]),
-    handleIndustrias,
-    (state) => {
-        if (state.residuo) {
-            const asideTitle = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__titulo');
-            const asideExemplosList = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__exemplos');
-            const asideDestinacaoList = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__destinacao');
-            const residuo = getResiduo(state.residuo, state);
-            asideTitle.textContent = residuo.nome;
-            Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeAllChildren"])(asideExemplosList);
-            if (residuo.exemplos) {
-                asideExemplosList.append(...Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["transformToList"])(residuo.exemplos));
-            }
-            asideDestinacaoList.textContent = residuo.destinacao;
-        }
-    },
-    (state) => {
-        if (state.servico === _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].TRATAMENTO_RESIDUOS) {
-            _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosItems"].forEach(residuo => {
-                const data = getResiduo(residuo.dataset.residuo, state);
-                if (data && data.tratamento) {
-                    residuo.classList.add(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-                }
-                else {
-                    residuo.classList.remove(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-                }
-            });
-        }
-    },
-    (state) => {
-        switch (state.servico) {
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].REMOCAO_LODO:
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].LIMPEZA_FOSSA_SEPTICA:
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].PGRS:
-                Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["addActiveClass"])(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["informacoesUsuarioContainer"]);
-                break;
-            default:
-                Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeActiveClass"])(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["informacoesUsuarioContainer"]);
-        }
-    },
-    (state) => {
-        if (state.residuo) {
-            const select = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["calculoMontanteContainer"].querySelector('select#acondicionamento');
-            const residuo = getResiduo(state.residuo, state);
-            const options = residuo.containers[0].container.map(generateContainerOptions);
-            Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeAllChildren"])(select);
-            select.append(...options);
-        }
-    }
-]);
-function generateContainerOptions(container) {
-    const opt = document.createElement('option');
-    opt.value = Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(container);
-    opt.textContent = container;
-    return opt;
-}
-function handleIndustrias(state) {
-    _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosItems"].forEach(residuo => {
-        const data = getResiduo(residuo.dataset.residuo, state);
-        const industrias = data ? data.industrias.map((i) => Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(i)) : [];
-        if (data && state.industria && industrias.includes(state.industria)) {
-            residuo.classList.add(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-        }
-        else {
-            residuo.classList.remove(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-        }
-    });
-}
-function getResiduo(residuo, state) {
-    return state.dados.find(r => Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(r.nome) === residuo);
-}
-function dataLoaded() {
-    return (state) => Boolean(state.dados);
-}
-function isFilteredBy(filter, state) {
-    return state.filtro && state.filtro === filter;
-}
-
-
-/***/ }),
-
-/***/ "./src/helpers/constants.ts":
-/*!**********************************!*\
-  !*** ./src/helpers/constants.ts ***!
-  \**********************************/
-/*! exports provided: types */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "types", function() { return types; });
-var types;
-(function (types) {
-    types["INDUSTRIA"] = "industria";
-    types["RESIDUOS"] = "residuos";
-    types["SERVICOS"] = "servicos";
-    types["ATIVO"] = "active";
-    types["GESTAO_RESIDUOS"] = "gestao-de-residuos";
-    types["TRATAMENTO_RESIDUOS"] = "tratamento-de-residuos";
-    types["PGRS"] = "pgrs";
-    types["REMOCAO_LODO"] = "remocao-de-lodo";
-    types["LIMPEZA_FOSSA_SEPTICA"] = "limpeza-de-fossa-septica";
-})(types || (types = {}));
+industriaSelectorObserver.selectElement.addEventListener('change', function () {
+    const industria = this.value;
+    state.updateState({ industria });
+});
+servicoSelectorObserver.selectElement.addEventListener('change', function () {
+    const servico = this.value;
+    state.updateState({ servico });
+});
 
 
 /***/ }),
@@ -276,7 +146,7 @@ var types;
 /*!********************************!*\
   !*** ./src/helpers/helpers.ts ***!
   \********************************/
-/*! exports provided: removeActiveClass, addActiveClass, filterContainer, industriaSeletorContainer, servicoSeletorContainer, residuosContainer, calculoMontanteContainer, informacoesUsuarioContainer, asideResiduoInfo, industriasSeletor, servicosSeletor, buttons, residuosItems, slug, transformToList, removeAllChildren, reset */
+/*! exports provided: removeActiveClass, addActiveClass, filterContainer, industriaSeletorContainer, servicoSeletorContainer, residuosContainer, calculoMontanteContainer, informacoesUsuarioContainer, asideResiduoInfo, industriasSeletor, servicosSeletor, residuosItems, slug, transformToList, removeAllChildren */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -292,12 +162,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "asideResiduoInfo", function() { return asideResiduoInfo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "industriasSeletor", function() { return industriasSeletor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "servicosSeletor", function() { return servicosSeletor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buttons", function() { return buttons; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "residuosItems", function() { return residuosItems; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformToList", function() { return transformToList; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeAllChildren", function() { return removeAllChildren; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reset", function() { return reset; });
 function removeActiveClass(element) {
     element.classList.remove('active');
 }
@@ -313,7 +181,6 @@ const informacoesUsuarioContainer = document.querySelector('[data-secao=informac
 const asideResiduoInfo = document.querySelector('aside.residuo-info');
 const industriasSeletor = document.querySelector('[data-secao=seletor-industria] select');
 const servicosSeletor = document.querySelector('[data-secao=seletor-servico] select');
-const buttons = Array.from(document.querySelectorAll('[data-secao] button'));
 const residuosItems = Array.from(document.querySelectorAll('[data-residuo]'));
 function slug(str) {
     let result = str.replace(/^\s+|\s+$/g, '');
@@ -345,42 +212,342 @@ function removeAllChildren(asideExemplosList) {
         }
     }
 }
-function reset(state) {
-    state.industria = '';
-    state.servico = '';
-    state.residuo = '';
+
+
+/***/ }),
+
+/***/ "./src/observers/CalculoMontanteObserver.ts":
+/*!**************************************************!*\
+  !*** ./src/observers/CalculoMontanteObserver.ts ***!
+  \**************************************************/
+/*! exports provided: CalculoMontanteObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CalculoMontanteObserver", function() { return CalculoMontanteObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class CalculoMontanteObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        if (state.residuo) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
 }
 
 
 /***/ }),
 
-/***/ "./src/helpers/state.ts":
-/*!******************************!*\
-  !*** ./src/helpers/state.ts ***!
-  \******************************/
-/*! exports provided: onChange */
+/***/ "./src/observers/GenericObserver.ts":
+/*!******************************************!*\
+  !*** ./src/observers/GenericObserver.ts ***!
+  \******************************************/
+/*! exports provided: GenericObserver */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onChange", function() { return onChange; });
-function onChange(callbacks) {
-    const state = {
-        filtro: '',
-        industria: '',
-        residuo: '',
-        servico: '',
-        dados: []
-    };
-    return new Proxy(state, {
-        set(state, key, value) {
-            state[key] = value;
-            callbacks.forEach((cb) => {
-                cb(state);
-            });
-            return true;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GenericObserver", function() { return GenericObserver; });
+class GenericObserver {
+    update(state) { }
+    addActiveClass(element) {
+        console.log(element);
+        element.classList.add('active');
+    }
+    removeActiveClass(element) {
+        element.classList.remove('active');
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/GlobalState.ts":
+/*!**************************************!*\
+  !*** ./src/observers/GlobalState.ts ***!
+  \**************************************/
+/*! exports provided: GlobalState */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalState", function() { return GlobalState; });
+/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/helpers */ "./src/helpers/helpers.ts");
+
+class GlobalState {
+    constructor() {
+        this.state = {
+            modo: '',
+            industria: '',
+            residuo: null,
+            servico: '',
+            dados: []
+        };
+        this.observers = [];
+        this.getDataFromApi();
+    }
+    getDataFromApi() {
+        fetch('http://gruporodocon.com.br/residuos2/wp-json/wp/v2/pages/45')
+            .then(res => res.json())
+            .then(data => data.acf.card_residuo)
+            .then(data => data.map(residuo => ({ ...residuo, slug: Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_0__["slug"])(residuo.nome) })))
+            .then(data => this.state.dados = data)
+            .then(() => console.log('Data loaded successfully'))
+            .then(() => this.notify())
+            .catch(err => console.log(err));
+    }
+    updateState(data) {
+        this.state = { ...this.state, ...data };
+        this.notify();
+        console.log(this.state);
+    }
+    addObserver(...observers) {
+        this.observers.push(...observers);
+    }
+    notify() {
+        this.observers.forEach(observer => observer.update(this.state));
+    }
+    reset() {
+        this.state.industria = '';
+        this.state.servico = '';
+        this.state.residuo = null;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/IndustriaSelectorObserver.ts":
+/*!****************************************************!*\
+  !*** ./src/observers/IndustriaSelectorObserver.ts ***!
+  \****************************************************/
+/*! exports provided: IndustriaSelectorObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IndustriaSelectorObserver", function() { return IndustriaSelectorObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class IndustriaSelectorObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(seletor) {
+        super();
+        this.section = document.querySelector(seletor);
+        this.selectElement = this.section.querySelector('select');
+    }
+    update(state) {
+        if (state.modo === 'industria') {
+            this.addActiveClass(this.section);
         }
-    });
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/IndustriasObserver.ts":
+/*!*********************************************!*\
+  !*** ./src/observers/IndustriasObserver.ts ***!
+  \*********************************************/
+/*! exports provided: IndustriasObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IndustriasObserver", function() { return IndustriasObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/helpers */ "./src/helpers/helpers.ts");
+
+
+class IndustriasObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(residuosSection) {
+        super();
+        this.residuosCards = Array.from(residuosSection.querySelectorAll('[data-residuo]'));
+    }
+    update(state) {
+        this.residuosCards.forEach(card => {
+            var _a;
+            const residuo = state.dados.find(res => res.slug === card.dataset.residuo);
+            const industrias = (_a = residuo) === null || _a === void 0 ? void 0 : _a.industrias.map(industria => Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(industria));
+            if (residuo && state.industria && industrias.includes(state.industria)) {
+                this.addActiveClass(card);
+            }
+            else {
+                this.removeActiveClass(card);
+            }
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/InformacoesUsuarioObserver.ts":
+/*!*****************************************************!*\
+  !*** ./src/observers/InformacoesUsuarioObserver.ts ***!
+  \*****************************************************/
+/*! exports provided: InformacoesUsuarioObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InformacoesUsuarioObserver", function() { return InformacoesUsuarioObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class InformacoesUsuarioObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        switch (state.servico) {
+            case 'remocao-de-lodo':
+            case 'limpeza-de-fossa-septica':
+            case 'pgrs':
+                this.addActiveClass(this.section);
+                break;
+            default:
+                this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/ModeObserver.ts":
+/*!***************************************!*\
+  !*** ./src/observers/ModeObserver.ts ***!
+  \***************************************/
+/*! exports provided: ModeObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ModeObserver", function() { return ModeObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ModeObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+        this.buttons = Array.from(this.section.querySelectorAll('[data-modo]'));
+    }
+    update(state) {
+        if (state.dados) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/ResiduosObserver.ts":
+/*!*******************************************!*\
+  !*** ./src/observers/ResiduosObserver.ts ***!
+  \*******************************************/
+/*! exports provided: ResiduosObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ResiduosObserver", function() { return ResiduosObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ResiduosObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        if (state.modo === 'residuos' || (state.industria || state.servico)) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/ServicoSelectorObserver.ts":
+/*!**************************************************!*\
+  !*** ./src/observers/ServicoSelectorObserver.ts ***!
+  \**************************************************/
+/*! exports provided: ServicoSelectorObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ServicoSelectorObserver", function() { return ServicoSelectorObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ServicoSelectorObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+        this.selectElement = this.section.querySelector('select');
+    }
+    update(state) {
+        if (state.modo === 'servicos') {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/TratamentoObserver.ts":
+/*!*********************************************!*\
+  !*** ./src/observers/TratamentoObserver.ts ***!
+  \*********************************************/
+/*! exports provided: TratamentoObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TratamentoObserver", function() { return TratamentoObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class TratamentoObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(residuosSection) {
+        super();
+        this.residuosCards = Array.from(residuosSection.querySelectorAll('[data-residuo]'));
+    }
+    update(state) {
+        if (state.servico === 'tratamento-de-residuos') {
+            this.residuosCards.forEach(residuo => {
+                const data = state.dados.find(res => res.slug === residuo.dataset.residuo);
+                if (data && data.tratamento) {
+                    this.addActiveClass(residuo);
+                }
+                else {
+                    this.removeActiveClass(residuo);
+                }
+            });
+        }
+    }
 }
 
 

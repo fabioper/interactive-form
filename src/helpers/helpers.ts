@@ -1,4 +1,4 @@
-import { State } from './state'
+import { State } from '../State'
 
 export function removeActiveClass(element: HTMLElement): void {
     element.classList.remove('active')
@@ -17,7 +17,6 @@ export const informacoesUsuarioContainer = document.querySelector('[data-secao=i
 export const asideResiduoInfo = document.querySelector('aside.residuo-info') as HTMLElement
 export const industriasSeletor = document.querySelector('[data-secao=seletor-industria] select') as HTMLSelectElement
 export const servicosSeletor = document.querySelector('[data-secao=seletor-servico] select') as HTMLSelectElement
-export const buttons = Array.from(document.querySelectorAll('[data-secao] button') as NodeListOf<HTMLButtonElement>)
 export const residuosItems = Array.from(document.querySelectorAll('[data-residuo]') as NodeListOf<HTMLDivElement>)
 
 export function slug(str: string): string {
@@ -58,8 +57,3 @@ export function removeAllChildren(asideExemplosList: Element) {
     }
 }
 
-export function reset(state: State) {
-    state.industria = ''
-    state.servico = ''
-    state.residuo = ''
-}
