@@ -224,9 +224,12 @@ class AsideObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["Gener
             this.title.textContent = residuo.nome;
             this.destination.textContent = residuo.destinacao;
             if (residuo.exemplos) {
-                this.examples.insertAdjacentHTML('beforeend', this.examplesToList(residuo.exemplos).join(' '));
+                this.addExamplesFrom(residuo);
             }
         }
+    }
+    addExamplesFrom(residuo) {
+        this.examples.insertAdjacentHTML('beforeend', this.examplesToList(residuo.exemplos).join(' '));
     }
     examplesToList(arr) {
         return arr.map(item => `<li>${item.exemplo}</li>`);
@@ -292,7 +295,7 @@ class GlobalState {
         this.getDataFromApi();
     }
     getDataFromApi() {
-        fetch('http://gruporodocon.com.br/residuos2/wp-json/wp/v2/pages/45')
+        fetch('http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45')
             .then(res => res.json())
             .then(data => data.acf.card_residuo)
             .then(data => data.map(residuo => ({ ...residuo, slug: Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_0__["slug"])(residuo.nome) })))
@@ -423,14 +426,17 @@ class CalculoMontanteSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_
     update(state) {
         if (state.residuo) {
             this.addActiveClass(this.section);
-            const residuo = state.dados.find(res => res.slug === state.residuo);
-            const options = residuo.containers[0].container.map(this.generateContainerOptions);
-            this.removeAllChildren(this.acondicionamentoSelect);
-            this.acondicionamentoSelect.append(...options);
+            this.addSelectOptions(state);
         }
         else {
             this.removeActiveClass(this.section);
         }
+    }
+    addSelectOptions(state) {
+        const residuo = state.dados.find(res => res.slug === state.residuo);
+        const options = residuo.containers[0].container.map(this.generateContainerOptions);
+        this.removeAllChildren(this.acondicionamentoSelect);
+        this.acondicionamentoSelect.append(...options);
     }
     generateContainerOptions(container) {
         const opt = document.createElement('option');

@@ -1,5 +1,6 @@
 import { GenericObserver } from './GenericObserver'
 import { State } from '../State'
+import { Residuo } from '../Residuo'
 
 export class AsideObserver extends GenericObserver {
     section: HTMLElement;
@@ -21,13 +22,12 @@ export class AsideObserver extends GenericObserver {
             this.removeAllChildren(this.examples)
             this.title.textContent = residuo.nome
             this.destination.textContent = residuo.destinacao
-            if (residuo.exemplos) {
-                this.examples.insertAdjacentHTML(
-                    'beforeend',
-                    this.examplesToList(residuo.exemplos).join(' ')
-                )
-            }
+            if (residuo.exemplos) { this.addExamplesFrom(residuo) }
         }
+    }
+
+    private addExamplesFrom(residuo: Residuo): void {
+        this.examples.insertAdjacentHTML('beforeend', this.examplesToList(residuo.exemplos).join(' '))
     }
 
     private examplesToList(arr): string[] {

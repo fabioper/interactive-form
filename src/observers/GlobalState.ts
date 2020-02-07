@@ -19,7 +19,7 @@ export class GlobalState {
     }
 
     private getDataFromApi(): void {
-        fetch('http://gruporodocon.com.br/residuos2/wp-json/wp/v2/pages/45')
+        fetch('http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45')
             .then(res => res.json())
             .then(data => data.acf.card_residuo)
             .then(data => data.map(residuo => ({ ...residuo, slug: slug(residuo.nome) })))

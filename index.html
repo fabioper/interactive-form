@@ -13,7 +13,8 @@
     <main class="main">
         <div class="container">
             <section data-secao="modo">
-                <h2>Orçamento por:</h2>
+                <h2>Solicitar orçamento</h2>
+                <p>Você pode optar por fazer o seu orçamento por:</p>
                 <div>
                     <button data-modo="industria">Indústria</button>
                     <button data-modo="residuos">Resíduos</button>
@@ -23,30 +24,12 @@
 
             <section data-secao="seletor-industria">
                 <h2>Escolha uma indústria</h2>
-                <form>
-                    <select name="industria" id="industria">
-                        <option value="" selected>Escolha uma indústria</option>
-                        <option value="alimenticia">Alimentícia</option>
-                        <option value="construcao-civil">Construção Civil</option>
-                        <option value="educacao">Educação</option>
-                        <option value="empresarial">Empresarial</option>
-                        <option value="outras">Outras</option>
-                    </select>
-                </form>
+                <div class="industrias"></div>
             </section>
 
             <section data-secao="seletor-servico">
                 <h2>Escolha um serviço</h2>
-                <form>
-                    <select name="servico" id="servico">
-                        <option value="" selected>Escolha um serviço</option>
-                        <option value="gestao-de-residuos">Gestão de Resíduos</option>
-                        <option value="tratamento-de-residuos">Tratamento de resíduos</option>
-                        <option value="pgrs">PGRS</option>
-                        <option value="remocao-de-lodo">Remoção de Lodo e Descarte de Efluentes</option>
-                        <option value="limpeza-de-fossa-septica">Limpeza de fossa séptica</option>
-                    </select>
-                </form>
+                <div class="servicos"></div>
             </section>
 
             <section data-secao="residuos">
@@ -142,7 +125,7 @@
                         <input type="text" name="empresa" id="empresa" placeholder="Nome da empresa">
 
                         <label for="telefone-ddd">Telefone:</label>
-                        <input type="number" name="ddd" id="telefone-ddd">
+                        <input type="tel" name="ddd" id="telefone-ddd">
                         <input type="tel" name="telefone" id="telefone">
 
                         <label for="CNPJ">CNPJ</label>

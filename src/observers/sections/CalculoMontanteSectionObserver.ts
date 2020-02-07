@@ -20,13 +20,17 @@ export class CalculoMontanteSectionObserver extends GenericObserver {
     update(state: State): void {
         if (state.residuo) {
             this.addActiveClass(this.section)
-            const residuo = state.dados.find(res => res.slug === state.residuo)
-            const options = residuo.containers[0].container.map(this.generateContainerOptions)
-            this.removeAllChildren(this.acondicionamentoSelect)
-            this.acondicionamentoSelect.append(...options)
+            this.addSelectOptions(state)
         } else {
             this.removeActiveClass(this.section)
         }
+    }
+
+    private addSelectOptions(state: State): void {
+        const residuo = state.dados.find(res => res.slug === state.residuo)
+        const options = residuo.containers[0].container.map(this.generateContainerOptions)
+        this.removeAllChildren(this.acondicionamentoSelect)
+        this.acondicionamentoSelect.append(...options)
     }
 
     generateContainerOptions(container: string): HTMLOptionElement {

@@ -13,7 +13,7 @@ export abstract class GenericObserver implements Observer {
         element.classList.remove('active')
     }
 
-    removeAllChildren(asideExemplosList: Element) {
+    removeAllChildren(asideExemplosList: Element): void {
         if (asideExemplosList.hasChildNodes) {
             while (asideExemplosList.firstChild) {
                 asideExemplosList.removeChild(asideExemplosList.firstChild)
