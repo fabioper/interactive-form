@@ -1,22 +1,22 @@
-import { InformacoesUsuarioObserver } from './observers/InformacoesUsuarioObserver'
+import { InformacoesUsuarioSectionObserver } from './observers/sections/InformacoesUsuarioSectionObserver'
 import { TratamentoObserver } from './observers/TratamentoObserver'
-import { CalculoMontanteObserver } from './observers/CalculoMontanteObserver'
-import { ResiduosObserver } from './observers/ResiduosObserver'
-import { ServicoSelectorObserver } from './observers/ServicoSelectorObserver'
-import { IndustriaSelectorObserver } from './observers/IndustriaSelectorObserver'
-import { ModeObserver } from './observers/ModeObserver'
+import { CalculoMontanteSectionObserver } from './observers/sections/CalculoMontanteSectionObserver'
+import { ResiduosCardsSectionObserver } from './observers/sections/ResiduosCardsSectionObserver'
+import { ServicoSelectorSectionObserver } from './observers/sections/ServicoSelectorSectionObserver'
+import { IndustriaSelectorSectionObserver } from './observers/sections/IndustriaSelectorSectionObserver'
+import { ModeSelectorSectionObserver } from './observers/sections/ModeSelectorSectionObserver'
 import { GlobalState } from './observers/GlobalState'
 import { IndustriasObserver } from './observers/IndustriasObserver'
 
 const state = new GlobalState()
 
-const modeObserver = new ModeObserver('[data-secao=modo]')
-const industriaSelectorObserver = new IndustriaSelectorObserver('[data-secao=seletor-industria]')
-const servicoSelectorObserver = new ServicoSelectorObserver('[data-secao=seletor-servico]')
-const residuosObserver = new ResiduosObserver('[data-secao=residuos]')
-const calculoMontanteObserver = new CalculoMontanteObserver('[data-secao=calculo-montante]')
+const modeObserver = new ModeSelectorSectionObserver('[data-secao=modo]')
+const industriaSelectorObserver = new IndustriaSelectorSectionObserver('[data-secao=seletor-industria]')
+const servicoSelectorObserver = new ServicoSelectorSectionObserver('[data-secao=seletor-servico]')
+const residuosObserver = new ResiduosCardsSectionObserver('[data-secao=residuos]')
+const calculoMontanteObserver = new CalculoMontanteSectionObserver('[data-secao=calculo-montante]')
 const industriasObserver = new IndustriasObserver(residuosObserver.section)
-const informacoesUsuarioObserver = new InformacoesUsuarioObserver('[data-secao=informacoes-usuario]')
+const informacoesUsuarioObserver = new InformacoesUsuarioSectionObserver('[data-secao=informacoes-usuario]')
 const tratamentoObserver = new TratamentoObserver(residuosObserver.section)
 
 state.addObserver(

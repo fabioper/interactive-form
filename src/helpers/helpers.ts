@@ -1,24 +1,3 @@
-import { State } from '../State'
-
-export function removeActiveClass(element: HTMLElement): void {
-    element.classList.remove('active')
-}
-
-export function addActiveClass(element: HTMLElement): void {
-    element.classList.add('active')
-}
-
-export const filterContainer = document.querySelector('[data-secao=modo]') as HTMLElement
-export const industriaSeletorContainer = document.querySelector('[data-secao=seletor-industria]') as HTMLElement
-export const servicoSeletorContainer = document.querySelector('[data-secao=seletor-servico]') as HTMLElement
-export const residuosContainer = document.querySelector('[data-secao=residuos]') as HTMLElement
-export const calculoMontanteContainer = document.querySelector('[data-secao=calculo-montante]') as HTMLElement
-export const informacoesUsuarioContainer = document.querySelector('[data-secao=informacoes-usuario]') as HTMLElement
-export const asideResiduoInfo = document.querySelector('aside.residuo-info') as HTMLElement
-export const industriasSeletor = document.querySelector('[data-secao=seletor-industria] select') as HTMLSelectElement
-export const servicosSeletor = document.querySelector('[data-secao=seletor-servico] select') as HTMLSelectElement
-export const residuosItems = Array.from(document.querySelectorAll('[data-residuo]') as NodeListOf<HTMLDivElement>)
-
 export function slug(str: string): string {
     let result = str.replace(/^\s+|\s+$/g, '')
     result = result.toLowerCase()

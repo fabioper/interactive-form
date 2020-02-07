@@ -95,13 +95,13 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _observers_InformacoesUsuarioObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./observers/InformacoesUsuarioObserver */ "./src/observers/InformacoesUsuarioObserver.ts");
+/* harmony import */ var _observers_sections_InformacoesUsuarioSectionObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./observers/sections/InformacoesUsuarioSectionObserver */ "./src/observers/sections/InformacoesUsuarioSectionObserver.ts");
 /* harmony import */ var _observers_TratamentoObserver__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./observers/TratamentoObserver */ "./src/observers/TratamentoObserver.ts");
-/* harmony import */ var _observers_CalculoMontanteObserver__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./observers/CalculoMontanteObserver */ "./src/observers/CalculoMontanteObserver.ts");
-/* harmony import */ var _observers_ResiduosObserver__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./observers/ResiduosObserver */ "./src/observers/ResiduosObserver.ts");
-/* harmony import */ var _observers_ServicoSelectorObserver__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./observers/ServicoSelectorObserver */ "./src/observers/ServicoSelectorObserver.ts");
-/* harmony import */ var _observers_IndustriaSelectorObserver__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./observers/IndustriaSelectorObserver */ "./src/observers/IndustriaSelectorObserver.ts");
-/* harmony import */ var _observers_ModeObserver__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./observers/ModeObserver */ "./src/observers/ModeObserver.ts");
+/* harmony import */ var _observers_sections_CalculoMontanteSectionObserver__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./observers/sections/CalculoMontanteSectionObserver */ "./src/observers/sections/CalculoMontanteSectionObserver.ts");
+/* harmony import */ var _observers_sections_ResiduosCardsSectionObserver__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./observers/sections/ResiduosCardsSectionObserver */ "./src/observers/sections/ResiduosCardsSectionObserver.ts");
+/* harmony import */ var _observers_sections_ServicoSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./observers/sections/ServicoSelectorSectionObserver */ "./src/observers/sections/ServicoSelectorSectionObserver.ts");
+/* harmony import */ var _observers_sections_IndustriaSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./observers/sections/IndustriaSelectorSectionObserver */ "./src/observers/sections/IndustriaSelectorSectionObserver.ts");
+/* harmony import */ var _observers_sections_ModeSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./observers/sections/ModeSelectorSectionObserver */ "./src/observers/sections/ModeSelectorSectionObserver.ts");
 /* harmony import */ var _observers_GlobalState__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./observers/GlobalState */ "./src/observers/GlobalState.ts");
 /* harmony import */ var _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./observers/IndustriasObserver */ "./src/observers/IndustriasObserver.ts");
 
@@ -114,13 +114,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const state = new _observers_GlobalState__WEBPACK_IMPORTED_MODULE_7__["GlobalState"]();
-const modeObserver = new _observers_ModeObserver__WEBPACK_IMPORTED_MODULE_6__["ModeObserver"]('[data-secao=modo]');
-const industriaSelectorObserver = new _observers_IndustriaSelectorObserver__WEBPACK_IMPORTED_MODULE_5__["IndustriaSelectorObserver"]('[data-secao=seletor-industria]');
-const servicoSelectorObserver = new _observers_ServicoSelectorObserver__WEBPACK_IMPORTED_MODULE_4__["ServicoSelectorObserver"]('[data-secao=seletor-servico]');
-const residuosObserver = new _observers_ResiduosObserver__WEBPACK_IMPORTED_MODULE_3__["ResiduosObserver"]('[data-secao=residuos]');
-const calculoMontanteObserver = new _observers_CalculoMontanteObserver__WEBPACK_IMPORTED_MODULE_2__["CalculoMontanteObserver"]('[data-secao=calculo-montante]');
+const modeObserver = new _observers_sections_ModeSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_6__["ModeSelectorSectionObserver"]('[data-secao=modo]');
+const industriaSelectorObserver = new _observers_sections_IndustriaSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_5__["IndustriaSelectorSectionObserver"]('[data-secao=seletor-industria]');
+const servicoSelectorObserver = new _observers_sections_ServicoSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_4__["ServicoSelectorSectionObserver"]('[data-secao=seletor-servico]');
+const residuosObserver = new _observers_sections_ResiduosCardsSectionObserver__WEBPACK_IMPORTED_MODULE_3__["ResiduosCardsSectionObserver"]('[data-secao=residuos]');
+const calculoMontanteObserver = new _observers_sections_CalculoMontanteSectionObserver__WEBPACK_IMPORTED_MODULE_2__["CalculoMontanteSectionObserver"]('[data-secao=calculo-montante]');
 const industriasObserver = new _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__["IndustriasObserver"](residuosObserver.section);
-const informacoesUsuarioObserver = new _observers_InformacoesUsuarioObserver__WEBPACK_IMPORTED_MODULE_0__["InformacoesUsuarioObserver"]('[data-secao=informacoes-usuario]');
+const informacoesUsuarioObserver = new _observers_sections_InformacoesUsuarioSectionObserver__WEBPACK_IMPORTED_MODULE_0__["InformacoesUsuarioSectionObserver"]('[data-secao=informacoes-usuario]');
 const tratamentoObserver = new _observers_TratamentoObserver__WEBPACK_IMPORTED_MODULE_1__["TratamentoObserver"](residuosObserver.section);
 state.addObserver(modeObserver, industriaSelectorObserver, servicoSelectorObserver, residuosObserver, calculoMontanteObserver, industriasObserver, informacoesUsuarioObserver, tratamentoObserver);
 modeObserver.buttons.forEach(button => {
@@ -146,42 +146,14 @@ servicoSelectorObserver.selectElement.addEventListener('change', function () {
 /*!********************************!*\
   !*** ./src/helpers/helpers.ts ***!
   \********************************/
-/*! exports provided: removeActiveClass, addActiveClass, filterContainer, industriaSeletorContainer, servicoSeletorContainer, residuosContainer, calculoMontanteContainer, informacoesUsuarioContainer, asideResiduoInfo, industriasSeletor, servicosSeletor, residuosItems, slug, transformToList, removeAllChildren */
+/*! exports provided: slug, transformToList, removeAllChildren */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeActiveClass", function() { return removeActiveClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addActiveClass", function() { return addActiveClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterContainer", function() { return filterContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "industriaSeletorContainer", function() { return industriaSeletorContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "servicoSeletorContainer", function() { return servicoSeletorContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "residuosContainer", function() { return residuosContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculoMontanteContainer", function() { return calculoMontanteContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "informacoesUsuarioContainer", function() { return informacoesUsuarioContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "asideResiduoInfo", function() { return asideResiduoInfo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "industriasSeletor", function() { return industriasSeletor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "servicosSeletor", function() { return servicosSeletor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "residuosItems", function() { return residuosItems; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformToList", function() { return transformToList; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeAllChildren", function() { return removeAllChildren; });
-function removeActiveClass(element) {
-    element.classList.remove('active');
-}
-function addActiveClass(element) {
-    element.classList.add('active');
-}
-const filterContainer = document.querySelector('[data-secao=modo]');
-const industriaSeletorContainer = document.querySelector('[data-secao=seletor-industria]');
-const servicoSeletorContainer = document.querySelector('[data-secao=seletor-servico]');
-const residuosContainer = document.querySelector('[data-secao=residuos]');
-const calculoMontanteContainer = document.querySelector('[data-secao=calculo-montante]');
-const informacoesUsuarioContainer = document.querySelector('[data-secao=informacoes-usuario]');
-const asideResiduoInfo = document.querySelector('aside.residuo-info');
-const industriasSeletor = document.querySelector('[data-secao=seletor-industria] select');
-const servicosSeletor = document.querySelector('[data-secao=seletor-servico] select');
-const residuosItems = Array.from(document.querySelectorAll('[data-residuo]'));
 function slug(str) {
     let result = str.replace(/^\s+|\s+$/g, '');
     result = result.toLowerCase();
@@ -209,36 +181,6 @@ function removeAllChildren(asideExemplosList) {
     if (asideExemplosList.hasChildNodes) {
         while (asideExemplosList.firstChild) {
             asideExemplosList.removeChild(asideExemplosList.firstChild);
-        }
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/observers/CalculoMontanteObserver.ts":
-/*!**************************************************!*\
-  !*** ./src/observers/CalculoMontanteObserver.ts ***!
-  \**************************************************/
-/*! exports provided: CalculoMontanteObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CalculoMontanteObserver", function() { return CalculoMontanteObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class CalculoMontanteObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(selector) {
-        super();
-        this.section = document.querySelector(selector);
-    }
-    update(state) {
-        if (state.residuo) {
-            this.addActiveClass(this.section);
-        }
-        else {
-            this.removeActiveClass(this.section);
         }
     }
 }
@@ -325,37 +267,6 @@ class GlobalState {
 
 /***/ }),
 
-/***/ "./src/observers/IndustriaSelectorObserver.ts":
-/*!****************************************************!*\
-  !*** ./src/observers/IndustriaSelectorObserver.ts ***!
-  \****************************************************/
-/*! exports provided: IndustriaSelectorObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IndustriaSelectorObserver", function() { return IndustriaSelectorObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class IndustriaSelectorObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(seletor) {
-        super();
-        this.section = document.querySelector(seletor);
-        this.selectElement = this.section.querySelector('select');
-    }
-    update(state) {
-        if (state.modo === 'industria') {
-            this.addActiveClass(this.section);
-        }
-        else {
-            this.removeActiveClass(this.section);
-        }
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/observers/IndustriasObserver.ts":
 /*!*********************************************!*\
   !*** ./src/observers/IndustriasObserver.ts ***!
@@ -393,131 +304,6 @@ class IndustriasObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["
 
 /***/ }),
 
-/***/ "./src/observers/InformacoesUsuarioObserver.ts":
-/*!*****************************************************!*\
-  !*** ./src/observers/InformacoesUsuarioObserver.ts ***!
-  \*****************************************************/
-/*! exports provided: InformacoesUsuarioObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InformacoesUsuarioObserver", function() { return InformacoesUsuarioObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class InformacoesUsuarioObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(selector) {
-        super();
-        this.section = document.querySelector(selector);
-    }
-    update(state) {
-        switch (state.servico) {
-            case 'remocao-de-lodo':
-            case 'limpeza-de-fossa-septica':
-            case 'pgrs':
-                this.addActiveClass(this.section);
-                break;
-            default:
-                this.removeActiveClass(this.section);
-        }
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/observers/ModeObserver.ts":
-/*!***************************************!*\
-  !*** ./src/observers/ModeObserver.ts ***!
-  \***************************************/
-/*! exports provided: ModeObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ModeObserver", function() { return ModeObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class ModeObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(selector) {
-        super();
-        this.section = document.querySelector(selector);
-        this.buttons = Array.from(this.section.querySelectorAll('[data-modo]'));
-    }
-    update(state) {
-        if (state.dados) {
-            this.addActiveClass(this.section);
-        }
-        else {
-            this.removeActiveClass(this.section);
-        }
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/observers/ResiduosObserver.ts":
-/*!*******************************************!*\
-  !*** ./src/observers/ResiduosObserver.ts ***!
-  \*******************************************/
-/*! exports provided: ResiduosObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ResiduosObserver", function() { return ResiduosObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class ResiduosObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(selector) {
-        super();
-        this.section = document.querySelector(selector);
-    }
-    update(state) {
-        if (state.modo === 'residuos' || (state.industria || state.servico)) {
-            this.addActiveClass(this.section);
-        }
-        else {
-            this.removeActiveClass(this.section);
-        }
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/observers/ServicoSelectorObserver.ts":
-/*!**************************************************!*\
-  !*** ./src/observers/ServicoSelectorObserver.ts ***!
-  \**************************************************/
-/*! exports provided: ServicoSelectorObserver */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ServicoSelectorObserver", function() { return ServicoSelectorObserver; });
-/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
-
-class ServicoSelectorObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
-    constructor(selector) {
-        super();
-        this.section = document.querySelector(selector);
-        this.selectElement = this.section.querySelector('select');
-    }
-    update(state) {
-        if (state.modo === 'servicos') {
-            this.addActiveClass(this.section);
-        }
-        else {
-            this.removeActiveClass(this.section);
-        }
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/observers/TratamentoObserver.ts":
 /*!*********************************************!*\
   !*** ./src/observers/TratamentoObserver.ts ***!
@@ -546,6 +332,192 @@ class TratamentoObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["
                     this.removeActiveClass(residuo);
                 }
             });
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/CalculoMontanteSectionObserver.ts":
+/*!******************************************************************!*\
+  !*** ./src/observers/sections/CalculoMontanteSectionObserver.ts ***!
+  \******************************************************************/
+/*! exports provided: CalculoMontanteSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CalculoMontanteSectionObserver", function() { return CalculoMontanteSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class CalculoMontanteSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        if (state.residuo) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/IndustriaSelectorSectionObserver.ts":
+/*!********************************************************************!*\
+  !*** ./src/observers/sections/IndustriaSelectorSectionObserver.ts ***!
+  \********************************************************************/
+/*! exports provided: IndustriaSelectorSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IndustriaSelectorSectionObserver", function() { return IndustriaSelectorSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class IndustriaSelectorSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(seletor) {
+        super();
+        this.section = document.querySelector(seletor);
+        this.selectElement = this.section.querySelector('select');
+    }
+    update(state) {
+        if (state.modo === 'industria') {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/InformacoesUsuarioSectionObserver.ts":
+/*!*********************************************************************!*\
+  !*** ./src/observers/sections/InformacoesUsuarioSectionObserver.ts ***!
+  \*********************************************************************/
+/*! exports provided: InformacoesUsuarioSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InformacoesUsuarioSectionObserver", function() { return InformacoesUsuarioSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class InformacoesUsuarioSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        switch (state.servico) {
+            case 'remocao-de-lodo':
+            case 'limpeza-de-fossa-septica':
+            case 'pgrs':
+                this.addActiveClass(this.section);
+                break;
+            default:
+                this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/ModeSelectorSectionObserver.ts":
+/*!***************************************************************!*\
+  !*** ./src/observers/sections/ModeSelectorSectionObserver.ts ***!
+  \***************************************************************/
+/*! exports provided: ModeSelectorSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ModeSelectorSectionObserver", function() { return ModeSelectorSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ModeSelectorSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+        this.buttons = Array.from(this.section.querySelectorAll('[data-modo]'));
+    }
+    update(state) {
+        if (state.dados) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/ResiduosCardsSectionObserver.ts":
+/*!****************************************************************!*\
+  !*** ./src/observers/sections/ResiduosCardsSectionObserver.ts ***!
+  \****************************************************************/
+/*! exports provided: ResiduosCardsSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ResiduosCardsSectionObserver", function() { return ResiduosCardsSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ResiduosCardsSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+    }
+    update(state) {
+        if (state.modo === 'residuos' || (state.industria || state.servico)) {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/observers/sections/ServicoSelectorSectionObserver.ts":
+/*!******************************************************************!*\
+  !*** ./src/observers/sections/ServicoSelectorSectionObserver.ts ***!
+  \******************************************************************/
+/*! exports provided: ServicoSelectorSectionObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ServicoSelectorSectionObserver", function() { return ServicoSelectorSectionObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class ServicoSelectorSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+        this.selectElement = this.section.querySelector('select');
+    }
+    update(state) {
+        if (state.modo === 'servicos') {
+            this.addActiveClass(this.section);
+        }
+        else {
+            this.removeActiveClass(this.section);
         }
     }
 }

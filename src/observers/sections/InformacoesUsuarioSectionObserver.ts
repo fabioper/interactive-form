@@ -1,7 +1,7 @@
-import { GenericObserver } from './GenericObserver'
-import { State } from '../State'
+import { GenericObserver } from '../GenericObserver'
+import { State } from '../../State'
 
-export class InformacoesUsuarioObserver extends GenericObserver {
+export class InformacoesUsuarioSectionObserver extends GenericObserver {
     section: HTMLElement;
 
     constructor(selector: string) {

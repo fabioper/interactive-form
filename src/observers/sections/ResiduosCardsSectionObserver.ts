@@ -1,18 +1,16 @@
-import { GenericObserver } from './GenericObserver'
-import { State } from '../State'
+import { GenericObserver } from '../GenericObserver'
+import { State } from '../../State'
 
-export class ModeObserver extends GenericObserver {
-    buttons: HTMLButtonElement[];
+export class ResiduosCardsSectionObserver extends GenericObserver {
     section: HTMLElement;
 
     constructor(selector: string) {
         super()
         this.section = document.querySelector(selector)
-        this.buttons = Array.from(this.section.querySelectorAll('[data-modo]'))
     }
 
     update(state: State): void {
-        if (state.dados) {
+        if (state.modo === 'residuos' || (state.industria || state.servico)) {
             this.addActiveClass(this.section)
         } else {
             this.removeActiveClass(this.section)
