@@ -104,6 +104,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _observers_sections_ModeSelectorSectionObserver__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./observers/sections/ModeSelectorSectionObserver */ "./src/observers/sections/ModeSelectorSectionObserver.ts");
 /* harmony import */ var _observers_GlobalState__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./observers/GlobalState */ "./src/observers/GlobalState.ts");
 /* harmony import */ var _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./observers/IndustriasObserver */ "./src/observers/IndustriasObserver.ts");
+/* harmony import */ var _observers_AsideObserver__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./observers/AsideObserver */ "./src/observers/AsideObserver.ts");
+
 
 
 
@@ -122,7 +124,14 @@ const calculoMontanteObserver = new _observers_sections_CalculoMontanteSectionOb
 const industriasObserver = new _observers_IndustriasObserver__WEBPACK_IMPORTED_MODULE_8__["IndustriasObserver"](residuosObserver.section);
 const informacoesUsuarioObserver = new _observers_sections_InformacoesUsuarioSectionObserver__WEBPACK_IMPORTED_MODULE_0__["InformacoesUsuarioSectionObserver"]('[data-secao=informacoes-usuario]');
 const tratamentoObserver = new _observers_TratamentoObserver__WEBPACK_IMPORTED_MODULE_1__["TratamentoObserver"](residuosObserver.section);
-state.addObserver(modeObserver, industriaSelectorObserver, servicoSelectorObserver, residuosObserver, calculoMontanteObserver, industriasObserver, informacoesUsuarioObserver, tratamentoObserver);
+const asideObserver = new _observers_AsideObserver__WEBPACK_IMPORTED_MODULE_9__["AsideObserver"]('[data-secao] aside');
+state.addObserver(modeObserver, industriaSelectorObserver, servicoSelectorObserver, residuosObserver, calculoMontanteObserver, industriasObserver, informacoesUsuarioObserver, tratamentoObserver, asideObserver);
+residuosObserver.cards.forEach(card => {
+    card.addEventListener('click', () => {
+        const { residuo } = card.dataset;
+        state.updateState({ residuo });
+    });
+});
 modeObserver.buttons.forEach(button => {
     button.addEventListener('click', () => {
         const { modo } = button.dataset;
@@ -188,6 +197,45 @@ function removeAllChildren(asideExemplosList) {
 
 /***/ }),
 
+/***/ "./src/observers/AsideObserver.ts":
+/*!****************************************!*\
+  !*** ./src/observers/AsideObserver.ts ***!
+  \****************************************/
+/*! exports provided: AsideObserver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AsideObserver", function() { return AsideObserver; });
+/* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GenericObserver */ "./src/observers/GenericObserver.ts");
+
+class AsideObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
+    constructor(selector) {
+        super();
+        this.section = document.querySelector(selector);
+        this.title = this.section.querySelector('.residuo-info__titulo');
+        this.examples = this.section.querySelector('.residuo-info__exemplos');
+        this.destination = this.section.querySelector('.residuo-info__destinacao');
+    }
+    update(state) {
+        if (state.residuo) {
+            const residuo = state.dados.find(res => res.slug === state.residuo);
+            this.removeAllChildren(this.examples);
+            this.title.textContent = residuo.nome;
+            this.destination.textContent = residuo.destinacao;
+            if (residuo.exemplos) {
+                this.examples.insertAdjacentHTML('beforeend', this.examplesToList(residuo.exemplos).join(' '));
+            }
+        }
+    }
+    examplesToList(arr) {
+        return arr.map(item => `<li>${item.exemplo}</li>`);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/observers/GenericObserver.ts":
 /*!******************************************!*\
   !*** ./src/observers/GenericObserver.ts ***!
@@ -206,6 +254,13 @@ class GenericObserver {
     }
     removeActiveClass(element) {
         element.classList.remove('active');
+    }
+    removeAllChildren(asideExemplosList) {
+        if (asideExemplosList.hasChildNodes) {
+            while (asideExemplosList.firstChild) {
+                asideExemplosList.removeChild(asideExemplosList.firstChild);
+            }
+        }
     }
 }
 
@@ -229,7 +284,7 @@ class GlobalState {
         this.state = {
             modo: '',
             industria: '',
-            residuo: null,
+            residuo: '',
             servico: '',
             dados: []
         };
@@ -248,7 +303,7 @@ class GlobalState {
     }
     updateState(data) {
         Object.keys(data).forEach(field => {
-            this.state[field] = this.state[field] ? '' : data[field];
+            this.state[field] = this.state[field] === data[field] ? '' : data[field];
         });
         this.notify();
         console.log(this.state);
@@ -352,19 +407,36 @@ class TratamentoObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CalculoMontanteSectionObserver", function() { return CalculoMontanteSectionObserver; });
 /* harmony import */ var _GenericObserver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../GenericObserver */ "./src/observers/GenericObserver.ts");
+/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../helpers/helpers */ "./src/helpers/helpers.ts");
+
 
 class CalculoMontanteSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MODULE_0__["GenericObserver"] {
     constructor(selector) {
         super();
         this.section = document.querySelector(selector);
+        this.acondicionamentoSelect = this.section.querySelector('select#acondicionamento');
+        this.form = this.section.querySelector('form');
+        this.form.addEventListener('submit', event => {
+            event.preventDefault();
+        });
     }
     update(state) {
         if (state.residuo) {
             this.addActiveClass(this.section);
+            const residuo = state.dados.find(res => res.slug === state.residuo);
+            const options = residuo.containers[0].container.map(this.generateContainerOptions);
+            this.removeAllChildren(this.acondicionamentoSelect);
+            this.acondicionamentoSelect.append(...options);
         }
         else {
             this.removeActiveClass(this.section);
         }
+    }
+    generateContainerOptions(container) {
+        const opt = document.createElement('option');
+        opt.value = Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(container);
+        opt.textContent = container;
+        return opt;
     }
 }
 
@@ -482,6 +554,7 @@ class ResiduosCardsSectionObserver extends _GenericObserver__WEBPACK_IMPORTED_MO
     constructor(selector) {
         super();
         this.section = document.querySelector(selector);
+        this.cards = Array.from(this.section.querySelectorAll('[data-residuo]'));
     }
     update(state) {
         if (state.modo === 'residuos' || (state.industria || state.servico)) {

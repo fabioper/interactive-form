@@ -12,4 +12,12 @@ export abstract class GenericObserver implements Observer {
     removeActiveClass(element: HTMLElement): void {
         element.classList.remove('active')
     }
+
+    removeAllChildren(asideExemplosList: Element) {
+        if (asideExemplosList.hasChildNodes) {
+            while (asideExemplosList.firstChild) {
+                asideExemplosList.removeChild(asideExemplosList.firstChild)
+            }
+        }
+    }
 }

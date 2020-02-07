@@ -10,7 +10,7 @@ export class GlobalState {
         this.state = {
             modo: '',
             industria: '',
-            residuo: null,
+            residuo: '',
             servico: '',
             dados: []
         }
@@ -31,7 +31,7 @@ export class GlobalState {
 
     updateState(data: any): void {
         Object.keys(data).forEach(field => {
-            this.state[field] = this.state[field] ? '' : data[field]
+            this.state[field] = this.state[field] === data[field] ? '' : data[field]
         })
         this.notify()
         console.log(this.state)

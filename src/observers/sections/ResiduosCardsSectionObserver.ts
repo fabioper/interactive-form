@@ -3,10 +3,14 @@ import { State } from '../../State'
 
 export class ResiduosCardsSectionObserver extends GenericObserver {
     section: HTMLElement;
+    cards: HTMLElement[]
 
     constructor(selector: string) {
         super()
         this.section = document.querySelector(selector)
+        this.cards = Array.from(
+            this.section.querySelectorAll('[data-residuo]')
+        )
     }
 
     update(state: State): void {

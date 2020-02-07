@@ -4,6 +4,6 @@ export type State = {
     modo: string;
     industria: string;
     servico: string;
-    residuo: Residuo;
+    residuo: string;
     dados: Residuo[];
 };

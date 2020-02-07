@@ -7,6 +7,7 @@ import { IndustriaSelectorSectionObserver } from './observers/sections/Industria
 import { ModeSelectorSectionObserver } from './observers/sections/ModeSelectorSectionObserver'
 import { GlobalState } from './observers/GlobalState'
 import { IndustriasObserver } from './observers/IndustriasObserver'
+import { AsideObserver } from './observers/AsideObserver'
 
 const state = new GlobalState()
 
@@ -18,6 +19,7 @@ const calculoMontanteObserver = new CalculoMontanteSectionObserver('[data-secao=
 const industriasObserver = new IndustriasObserver(residuosObserver.section)
 const informacoesUsuarioObserver = new InformacoesUsuarioSectionObserver('[data-secao=informacoes-usuario]')
 const tratamentoObserver = new TratamentoObserver(residuosObserver.section)
+const asideObserver = new AsideObserver('[data-secao] aside')
 
 state.addObserver(
     modeObserver,
@@ -27,8 +29,16 @@ state.addObserver(
     calculoMontanteObserver,
     industriasObserver,
     informacoesUsuarioObserver,
-    tratamentoObserver
+    tratamentoObserver,
+    asideObserver
 )
+
+residuosObserver.cards.forEach(card => {
+    card.addEventListener('click', () => {
+        const { residuo } = card.dataset
+        state.updateState({ residuo })
+    })
+})
 
 modeObserver.buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -47,12 +57,3 @@ servicoSelectorObserver.selectElement.addEventListener('change', function() {
     const servico = this.value
     state.updateState({ servico })
 })
-
-/* residuosItems.forEach(residuo => {
-    residuo.addEventListener('click', () => {
-        const { residuo: residuoSelecionado } = residuo.dataset
-        residuoSelecionado === state.residuo ?
-            state.residuo = '' :
-            state.residuo = residuoSelecionado
-    })
-}) */
