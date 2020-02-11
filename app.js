@@ -90,52 +90,24 @@
 /*!********************!*\
   !*** ./src/app.ts ***!
   \********************/
-/*! no exports provided */
+/*! exports provided: State, FormSection */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ "./src/state.ts");
-
-const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["onChange"])();
-
-
-/***/ }),
-
-/***/ "./src/state.ts":
-/*!**********************!*\
-  !*** ./src/state.ts ***!
-  \**********************/
-/*! exports provided: onChange */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onChange", function() { return onChange; });
-const onChange = (...handlers) => {
-    const initialState = {
-        industry: '',
-        residue: '',
-        search: '',
-        service: ''
-    };
-    const state = createState(initialState, handlers);
-    return setState(state);
-};
-function createState(initialState, cb) {
-    const stateConfig = {
-        set(currentState, key, value) {
-            currentState[key] = value;
-            cb.forEach(callback => callback(currentState));
-            return true;
-        }
-    };
-    const state = new Proxy(initialState, stateConfig);
-    return state;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormSection", function() { return FormSection; });
+class State {
 }
-const setState = (state) => (values) => Object.keys(values).forEach(key => {
-    state[key] = state[key] === values[key] ? '' : values[key];
-});
+class FormSection {
+    constructor(initialState) {
+        this.sections = Array.from(document.querySelectorAll('[data-step]'));
+        this.changeState(initialState);
+    }
+    changeState(state) {
+        this.state = state;
+    }
+}
 
 
 /***/ })
