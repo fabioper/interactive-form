@@ -88,7 +88,7 @@
         "no-new-wrappers": "error",
         "no-param-reassign": "error",
         "no-path-concat": "error",
-        "no-plusplus": "error",
+        "no-plusplus": "off",
         "no-proto": "error",
         "no-return-await": "warn",
         "no-shadow-restricted-names": "error",

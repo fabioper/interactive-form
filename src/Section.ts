@@ -6,10 +6,10 @@ abstract class Section {
 
     constructor(sectionName: string) {
         this.name = sectionName
-        this.section = this.getSection(this.name)
+        this.section = Section.find(this.name)
     }
 
-    private getSection(name: string): HTMLElement {
+    private static find(name: string): HTMLElement {
         return document.querySelector(`[data-section=${name}]`) as HTMLElement
     }
 

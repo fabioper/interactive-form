@@ -2,7 +2,7 @@ import Section from './Section'
 import InteractiveForm from './InteractiveForm'
 
 class InformacoesPessoais extends Section {
-    onInit(form: InteractiveForm): void {
+    onInit(): void {
     }
 }
 

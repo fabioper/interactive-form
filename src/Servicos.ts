@@ -2,7 +2,7 @@ import Section from './Section'
 import InteractiveForm from './InteractiveForm'
 
 class Servicos extends Section {
-    onInit(form: InteractiveForm): void {
+    onInit(): void {
 
     }
 }
