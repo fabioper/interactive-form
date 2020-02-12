@@ -15,7 +15,22 @@ abstract class Section {
 
     beforeInit(form: InteractiveForm): void {
         this.section.classList.add('active')
+        const buttons = this.getActionButtons()
+        this.addActionEvents(buttons, form)
         this.onInit(form)
+    }
+
+    private addActionEvents(buttons: NodeListOf<HTMLAnchorElement>, form: InteractiveForm): void {
+        buttons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault()
+                form.moveSection(button.dataset.sectionAction)
+            })
+        })
+    }
+
+    private getActionButtons(): NodeListOf<HTMLAnchorElement> {
+        return document.querySelectorAll('[data-section-action]') as NodeListOf<HTMLAnchorElement>
     }
 
     abstract onInit(form: InteractiveForm): void;

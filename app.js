@@ -86,6 +86,26 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/CalculoMontante.ts":
+/*!********************************!*\
+  !*** ./src/CalculoMontante.ts ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class CalculoMontante extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (CalculoMontante);
+
+
+/***/ }),
+
 /***/ "./src/Industrias.ts":
 /*!***************************!*\
   !*** ./src/Industrias.ts ***!
@@ -102,6 +122,26 @@ class Industrias extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Industrias);
+
+
+/***/ }),
+
+/***/ "./src/InformacoesPessoais.ts":
+/*!************************************!*\
+  !*** ./src/InformacoesPessoais.ts ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class InformacoesPessoais extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (InformacoesPessoais);
 
 
 /***/ }),
@@ -145,6 +185,46 @@ class InteractiveForm {
 
 /***/ }),
 
+/***/ "./src/Residuos.ts":
+/*!*************************!*\
+  !*** ./src/Residuos.ts ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class Residuos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Residuos);
+
+
+/***/ }),
+
+/***/ "./src/Revisao.ts":
+/*!************************!*\
+  !*** ./src/Revisao.ts ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class Revisao extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Revisao);
+
+
+/***/ }),
+
 /***/ "./src/SearchMode.ts":
 /*!***************************!*\
   !*** ./src/SearchMode.ts ***!
@@ -158,13 +238,6 @@ __webpack_require__.r(__webpack_exports__);
 
 class SearchMode extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onInit(form) {
-        const buttons = document.querySelectorAll('[data-section-action]');
-        buttons.forEach(button => {
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                form.moveSection(button.dataset.sectionAction);
-            });
-        });
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (SearchMode);
@@ -191,7 +264,20 @@ class Section {
     }
     beforeInit(form) {
         this.section.classList.add('active');
+        const buttons = this.getActionButtons();
+        this.addActionEvents(buttons, form);
         this.onInit(form);
+    }
+    addActionEvents(buttons, form) {
+        buttons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                form.moveSection(button.dataset.sectionAction);
+            });
+        });
+    }
+    getActionButtons() {
+        return document.querySelectorAll('[data-section-action]');
     }
     onExit() {
         this.section.classList.remove('active');
@@ -235,6 +321,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _SearchMode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SearchMode */ "./src/SearchMode.ts");
 /* harmony import */ var _Industrias__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Industrias */ "./src/Industrias.ts");
 /* harmony import */ var _Servicos__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Servicos */ "./src/Servicos.ts");
+/* harmony import */ var _Residuos__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Residuos */ "./src/Residuos.ts");
+/* harmony import */ var _CalculoMontante__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./CalculoMontante */ "./src/CalculoMontante.ts");
+/* harmony import */ var _InformacoesPessoais__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./InformacoesPessoais */ "./src/InformacoesPessoais.ts");
+/* harmony import */ var _Revisao__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Revisao */ "./src/Revisao.ts");
+
+
+
+
 
 
 
@@ -243,7 +337,11 @@ const form = new _InteractiveForm__WEBPACK_IMPORTED_MODULE_0__["default"]();
 const searchMode = new _SearchMode__WEBPACK_IMPORTED_MODULE_1__["default"]('modo-de-pesquisa');
 const industrias = new _Industrias__WEBPACK_IMPORTED_MODULE_2__["default"]('industrias');
 const servicos = new _Servicos__WEBPACK_IMPORTED_MODULE_3__["default"]('servicos');
-form.addSection(searchMode, industrias, servicos);
+const residuos = new _Residuos__WEBPACK_IMPORTED_MODULE_4__["default"]('residuos');
+const calculoMontante = new _CalculoMontante__WEBPACK_IMPORTED_MODULE_5__["default"]('calculo-montante');
+const informacoesPessoais = new _InformacoesPessoais__WEBPACK_IMPORTED_MODULE_6__["default"]('informacoes-pessoais');
+const revisao = new _Revisao__WEBPACK_IMPORTED_MODULE_7__["default"]('revisao');
+form.addSection(searchMode, industrias, servicos, residuos, calculoMontante, informacoesPessoais, revisao);
 form.moveSection(searchMode.name);
 
 
