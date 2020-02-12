@@ -98,8 +98,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class CalculoMontante extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (CalculoMontante);
 
@@ -119,6 +117,10 @@ __webpack_require__.r(__webpack_exports__);
 
 class Industrias extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onInit(form) {
+        super.onInit(form);
+        this.onclick(this.buttons, button => {
+            form.state.setState({ industria: button.dataset.stateIndustria });
+        });
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Industrias);
@@ -138,8 +140,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class InformacoesPessoais extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (InformacoesPessoais);
 
@@ -155,29 +155,47 @@ class InformacoesPessoais extends _Section__WEBPACK_IMPORTED_MODULE_0__["default
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StateManager */ "./src/StateManager.ts");
+
 class InteractiveForm {
     constructor() {
         this.sections = [];
+        this.state = new _StateManager__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this.state.addListener(this);
     }
     get activeSection() {
         return this._activeSection;
     }
     set activeSection(section) {
-        if (this.activeSection) {
-            this.activeSection.onExit();
-        }
-        section.beforeInit(this);
+        this.moveActiveSectionToPrevious();
         this._activeSection = section;
     }
+    set previousSection(section) {
+        this._previousSection = section;
+    }
     moveSection(name) {
-        const found = this.sections.find(section => section.name === name);
-        if (!found) {
-            throw new Error(`Section ${name} not found`);
-        }
+        const found = this.findSectionBy(name);
         this.activeSection = found;
+        found.onInit(this);
     }
     addSection(...sections) {
         this.sections.push(...sections);
+    }
+    update(state) {
+        this.activeSection.onUpdate(state);
+    }
+    findSectionBy(name) {
+        const section = this.sections.find(section => section.name === name);
+        if (!section) {
+            throw new Error(`Section ${name} not found`);
+        }
+        return section;
+    }
+    moveActiveSectionToPrevious() {
+        if (this.activeSection) {
+            this.previousSection = this.activeSection;
+            this._previousSection.onExit();
+        }
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (InteractiveForm);
@@ -198,6 +216,10 @@ __webpack_require__.r(__webpack_exports__);
 
 class Residuos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onInit(form) {
+        super.onInit(form);
+        this.onclick(this.buttons, button => {
+            form.state.setState({ residuo: button.dataset.stateResiduo });
+        });
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Residuos);
@@ -217,8 +239,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class Revisao extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Revisao);
 
@@ -238,6 +258,10 @@ __webpack_require__.r(__webpack_exports__);
 
 class SearchMode extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onInit(form) {
+        super.onInit(form);
+        this.onclick(this.buttons, button => {
+            form.state.setState({ modo: button.dataset.stateModo });
+        });
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (SearchMode);
@@ -257,27 +281,34 @@ __webpack_require__.r(__webpack_exports__);
 class Section {
     constructor(sectionName) {
         this.name = sectionName;
-        this.section = this.getSection(this.name);
+        this.section = Section.find(this.name);
     }
-    getSection(name) {
+    static find(name) {
         return document.querySelector(`[data-section=${name}]`);
     }
-    beforeInit(form) {
+    onInit(form) {
         this.section.classList.add('active');
-        const buttons = this.getActionButtons();
-        this.addActionEvents(buttons, form);
-        this.onInit(form);
+        this.buttons = this.getActionButtons();
+        this.addActionEvents(form);
     }
-    addActionEvents(buttons, form) {
-        buttons.forEach(button => {
-            button.addEventListener('click', event => {
+    addActionEvents(form) {
+        this.onclick(this.buttons, button => {
+            form.moveSection(button.dataset.sectionAction);
+        });
+    }
+    onclick(elements, callback) {
+        elements.forEach(el => {
+            el.addEventListener('click', event => {
                 event.preventDefault();
-                form.moveSection(button.dataset.sectionAction);
+                callback(el);
             });
         });
     }
     getActionButtons() {
-        return document.querySelectorAll('[data-section-action]');
+        return this.section.querySelectorAll('[data-section-action]');
+    }
+    onUpdate(state) {
+        console.log(state);
     }
     onExit() {
         this.section.classList.remove('active');
@@ -301,9 +332,56 @@ __webpack_require__.r(__webpack_exports__);
 
 class Servicos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onInit(form) {
+        super.onInit(form);
+        this.onclick(this.buttons, button => {
+            form.state.setState({ servico: button.dataset.stateServico });
+        });
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Servicos);
+
+
+/***/ }),
+
+/***/ "./src/StateManager.ts":
+/*!*****************************!*\
+  !*** ./src/StateManager.ts ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+
+class StateManager {
+    constructor() {
+        this.listeners = [];
+        this.state = {
+            modo: '',
+            industria: '',
+            servico: '',
+            residuo: null,
+            dados: []
+        };
+        Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getResiduos"])('http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45')
+            .then(dados => this.setState({ dados }));
+    }
+    setState(values) {
+        if (values.residuo) {
+            values.residuo = this.state.dados.find(residuo => residuo.slug === values.residuo);
+        }
+        this.state = { ...this.state, ...values };
+        this.notifyListeners();
+    }
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+    notifyListeners() {
+        this.listeners.forEach(listener => listener.update(this.state));
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (StateManager);
 
 
 /***/ }),
@@ -343,6 +421,47 @@ const informacoesPessoais = new _InformacoesPessoais__WEBPACK_IMPORTED_MODULE_6_
 const revisao = new _Revisao__WEBPACK_IMPORTED_MODULE_7__["default"]('revisao');
 form.addSection(searchMode, industrias, servicos, residuos, calculoMontante, informacoesPessoais, revisao);
 form.moveSection(searchMode.name);
+
+
+/***/ }),
+
+/***/ "./src/helpers.ts":
+/*!************************!*\
+  !*** ./src/helpers.ts ***!
+  \************************/
+/*! exports provided: slug, slugObject, getResiduos */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slugObject", function() { return slugObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getResiduos", function() { return getResiduos; });
+function slug(text) {
+    let str = text.replace(/^\s+|\s+$/g, '');
+    str = str.toLowerCase();
+    const from = 'ãàáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+    const to = 'aaaaaeeeeiiiioooouuuunc------';
+    for (let i = 0, l = from.length; i < l; i++) {
+        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+    }
+    str = str.replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    return str;
+}
+function slugObject(value) {
+    return ({ [slug(value)]: value });
+}
+async function getResiduos(uri) {
+    const response = await fetch(uri);
+    const data = await response.json();
+    return data.acf.card_residuo.map(residuo => {
+        residuo.slug = slug(residuo.nome);
+        residuo.industrias = residuo.industrias.map(slugObject);
+        return residuo;
+    });
+}
 
 
 /***/ })

@@ -1,8 +1,10 @@
 import InteractiveForm from './InteractiveForm'
+import { State } from './StateManager'
 
 abstract class Section {
     section: HTMLElement;
     name: string;
+    buttons: NodeListOf<HTMLAnchorElement>;
 
     constructor(sectionName: string) {
         this.name = sectionName
@@ -13,27 +15,34 @@ abstract class Section {
         return document.querySelector(`[data-section=${name}]`) as HTMLElement
     }
 
-    beforeInit(form: InteractiveForm): void {
+    onInit(form: InteractiveForm): void {
         this.section.classList.add('active')
-        const buttons = this.getActionButtons()
-        this.addActionEvents(buttons, form)
-        this.onInit(form)
+        this.buttons = this.getActionButtons()
+        this.addActionEvents(form)
     }
 
-    private addActionEvents(buttons: NodeListOf<HTMLAnchorElement>, form: InteractiveForm): void {
-        buttons.forEach(button => {
-            button.addEventListener('click', event => {
+    private addActionEvents(form: InteractiveForm): void {
+        this.onclick(this.buttons, button => {
+            form.moveSection(button.dataset.sectionAction)
+        })
+    }
+
+    protected onclick(elements: HTMLElement[] | NodeList, callback): void {
+        elements.forEach(el => {
+            el.addEventListener('click', event => {
                 event.preventDefault()
-                form.moveSection(button.dataset.sectionAction)
+                callback(el)
             })
         })
     }
 
     private getActionButtons(): NodeListOf<HTMLAnchorElement> {
-        return document.querySelectorAll('[data-section-action]') as NodeListOf<HTMLAnchorElement>
+        return this.section.querySelectorAll('[data-section-action]') as NodeListOf<HTMLAnchorElement>
     }
 
-    abstract onInit(form: InteractiveForm): void;
+    onUpdate(state: State): void {
+        console.log(state)
+    }
 
     onExit(): void {
         this.section.classList.remove('active')

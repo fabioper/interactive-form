@@ -26,5 +26,9 @@ export function slugObject(value: string) {
 export async function getResiduos(uri: string): Promise<Residuo[]> {
     const response = await fetch(uri)
     const data = await response.json()
-    return data.acf.card_residuo.map(this.addSlugsTo)
+    return data.acf.card_residuo.map(residuo => {
+        residuo.slug = slug(residuo.nome)
+        residuo.industrias = residuo.industrias.map(slugObject)
+        return residuo
+    })
 }
