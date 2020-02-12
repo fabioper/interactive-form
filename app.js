@@ -86,28 +86,165 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/app.ts":
-/*!********************!*\
-  !*** ./src/app.ts ***!
-  \********************/
-/*! exports provided: State, FormSection */
+/***/ "./src/Industrias.ts":
+/*!***************************!*\
+  !*** ./src/Industrias.ts ***!
+  \***************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormSection", function() { return FormSection; });
-class State {
-}
-class FormSection {
-    constructor(initialState) {
-        this.sections = Array.from(document.querySelectorAll('[data-step]'));
-        this.changeState(initialState);
-    }
-    changeState(state) {
-        this.state = state;
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class Industrias extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
     }
 }
+/* harmony default export */ __webpack_exports__["default"] = (Industrias);
+
+
+/***/ }),
+
+/***/ "./src/InteractiveForm.ts":
+/*!********************************!*\
+  !*** ./src/InteractiveForm.ts ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class InteractiveForm {
+    constructor() {
+        this.sections = [];
+    }
+    get activeSection() {
+        return this._activeSection;
+    }
+    set activeSection(section) {
+        if (this.activeSection) {
+            this.activeSection.onExit();
+        }
+        section.beforeInit(this);
+        this._activeSection = section;
+    }
+    moveSection(name) {
+        const found = this.sections.find(section => section.name === name);
+        if (!found) {
+            throw new Error(`Section ${name} not found`);
+        }
+        this.activeSection = found;
+    }
+    addSection(...sections) {
+        this.sections.push(...sections);
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (InteractiveForm);
+
+
+/***/ }),
+
+/***/ "./src/SearchMode.ts":
+/*!***************************!*\
+  !*** ./src/SearchMode.ts ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class SearchMode extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+        const buttons = document.querySelectorAll('[data-section-action]');
+        buttons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                form.moveSection(button.dataset.sectionAction);
+            });
+        });
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (SearchMode);
+
+
+/***/ }),
+
+/***/ "./src/Section.ts":
+/*!************************!*\
+  !*** ./src/Section.ts ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class Section {
+    constructor(sectionName) {
+        this.name = sectionName;
+        this.section = this.getSection(this.name);
+    }
+    getSection(name) {
+        return document.querySelector(`[data-section=${name}]`);
+    }
+    beforeInit(form) {
+        this.section.classList.add('active');
+        this.onInit(form);
+    }
+    onExit() {
+        this.section.classList.remove('active');
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Section);
+
+
+/***/ }),
+
+/***/ "./src/Servicos.ts":
+/*!*************************!*\
+  !*** ./src/Servicos.ts ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class Servicos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    onInit(form) {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Servicos);
+
+
+/***/ }),
+
+/***/ "./src/app.ts":
+/*!********************!*\
+  !*** ./src/app.ts ***!
+  \********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _InteractiveForm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractiveForm */ "./src/InteractiveForm.ts");
+/* harmony import */ var _SearchMode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SearchMode */ "./src/SearchMode.ts");
+/* harmony import */ var _Industrias__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Industrias */ "./src/Industrias.ts");
+/* harmony import */ var _Servicos__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Servicos */ "./src/Servicos.ts");
+
+
+
+
+const form = new _InteractiveForm__WEBPACK_IMPORTED_MODULE_0__["default"]();
+const searchMode = new _SearchMode__WEBPACK_IMPORTED_MODULE_1__["default"]('modo-de-pesquisa');
+const industrias = new _Industrias__WEBPACK_IMPORTED_MODULE_2__["default"]('industrias');
+const servicos = new _Servicos__WEBPACK_IMPORTED_MODULE_3__["default"]('servicos');
+form.addSection(searchMode, industrias, servicos);
+form.moveSection(searchMode.name);
 
 
 /***/ })

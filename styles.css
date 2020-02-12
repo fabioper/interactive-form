@@ -52,13 +52,12 @@ body {
     display: flex;
 }
 
-[data-step] {
+[data-section] {
     opacity: 0;
     display: none;
 }
 
-[data-step].active,
-[data-step]:first-child {
+[data-section].active {
     opacity: 1;
     display: block;
     flex: 1 1 70%;
