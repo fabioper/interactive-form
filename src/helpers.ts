@@ -1,5 +1,3 @@
-import { Residuo } from './Residuo'
-
 export function slug(text: string): string {
     let str = text.replace(/^\s+|\s+$/g, '')
     str = str.toLowerCase()
@@ -21,14 +19,4 @@ export function slug(text: string): string {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function slugObject(value: string) {
     return ({ [slug(value)]: value })
-}
-
-export async function getResiduos(uri: string): Promise<Residuo[]> {
-    const response = await fetch(uri)
-    const data = await response.json()
-    return data.acf.card_residuo.map(residuo => {
-        residuo.slug = slug(residuo.nome)
-        residuo.industrias = residuo.industrias.map(slugObject)
-        return residuo
-    })
 }
