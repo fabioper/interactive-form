@@ -4,13 +4,20 @@ export type State = {
     modo: string;
     industria: string;
     servico: string;
-    residuo: Residuo | string;
+    residuo: Residuo;
     dados: Residuo[];
     formData: FormData;
     section: HTMLElement;
 }
 
 export type StateCallback = (currentState: State, previousState: State) => void;
+
+const tryTransformToResiduo = (key: string | number | symbol, value: any, dados: Residuo[]): Residuo | string => {
+    if (key === 'residuo') {
+        return dados.find(res => res.slug === value)
+    }
+    return value
+}
 
 const run = (callbacks: StateCallback[], currentState: State, previousState: State): void => (
     callbacks.forEach(cb => cb(currentState, previousState))
@@ -38,11 +45,3 @@ const createState = (state: State, ...callbacks: StateCallback[]): (data: State 
 }
 
 export default createState
-
-const tryTransformToResiduo = (key: string | number | symbol, value: any, dados: Residuo[]): Residuo | string => {
-    if (key === 'residuo') {
-        return dados.find(res => res.slug === value)
-    }
-    return value
-}
-

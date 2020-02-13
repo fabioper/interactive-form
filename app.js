@@ -113,7 +113,7 @@ const initialState = {
     formData: new FormData(),
     industria: '',
     modo: '',
-    residuo: '',
+    residuo: null,
     servico: '',
     section: null
 };
@@ -124,7 +124,10 @@ const setSectionUsing = (action) => ((event) => {
 });
 const addSlugProps = (residuo) => {
     residuo.slug = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(residuo.nome);
-    residuo.industrias = residuo.industrias.map(_helpers__WEBPACK_IMPORTED_MODULE_1__["slugObject"]);
+    residuo.industrias = residuo.industrias.reduce((acc, curr, i) => {
+        acc[Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(curr)] = curr;
+        return acc;
+    }, {});
     return residuo;
 };
 const fetchData = () => {
@@ -134,7 +137,7 @@ const fetchData = () => {
         .then(dados => setState({ dados }))
         .then(() => setState({ section: sections.item(0) }));
 };
-const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["logState"], _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"]);
+const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"]);
 const onClick = (elements, callback) => {
     elements.forEach(element => (element.addEventListener('click', event => {
         event.preventDefault();
@@ -143,14 +146,9 @@ const onClick = (elements, callback) => {
 };
 window.addEventListener('load', fetchData);
 actions.forEach(action => (action.addEventListener('click', setSectionUsing(action))));
-onClick(actions, action => setSectionUsing(action));
-onClick(industrias, industria => {
-    setState({ industria: industria.dataset.stateIndustria });
-});
-onClick(servicos, servico => (setState({ servico: servico.dataset.stateServico })));
-onClick(residuos, residuo => {
-    setState({ residuo: residuo.dataset.stateResiduo });
-});
+onClick(industrias, industria => setState({ industria: industria.dataset.stateIndustria }));
+onClick(servicos, servico => setState({ servico: servico.dataset.stateServico }));
+onClick(residuos, residuo => setState({ residuo: residuo.dataset.stateResiduo }));
 
 
 /***/ }),
@@ -169,7 +167,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterResiduos", function() { return filterResiduos; });
 /* harmony import */ var _app__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app */ "./src/app.ts");
 
-const logState = (state, previous) => (console.log(state, previous));
+const logState = (state) => (console.log(state));
 const updateActiveSection = (state) => {
     const { section: activeSection } = state;
     _app__WEBPACK_IMPORTED_MODULE_0__["sections"].forEach(section => {
@@ -179,13 +177,34 @@ const updateActiveSection = (state) => {
     });
 };
 const filterResiduos = (state) => {
-    const { dados, industria } = state;
-    const residuos = document.querySelectorAll('.residuo__card');
+    const { dados: residuos, industria, servico } = state;
+    const cards = document.querySelectorAll('[data-state-residuo]');
     if (industria) {
-        residuos.forEach(element => {
-            const residuo = dados.find(res => res.nome === element.dataset.residuo);
-            console.log(residuo);
+        cards.forEach(card => {
+            const residuo = residuos.find(res => res.slug === card.dataset.stateResiduo);
+            if (residuo.industrias[industria]) {
+                card.classList.add('active');
+            }
+            else {
+                card.classList.remove('active');
+            }
         });
+    }
+    if (servico) {
+        if (servico === 'gestao-de-residuos') {
+            cards.forEach(card => card.classList.add('active'));
+        }
+        if (servico === 'tratamento-de-residuos') {
+            cards.forEach(card => {
+                const residuo = residuos.find(res => res.slug === card.dataset.stateResiduo);
+                residuo.tratamento ?
+                    card.classList.add('active') :
+                    card.classList.remove('active');
+            });
+        }
+    }
+    if (!industria && !servico) {
+        cards.forEach(card => card.classList.add('active'));
     }
 };
 
@@ -232,6 +251,12 @@ function slugObject(value) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+const tryTransformToResiduo = (key, value, dados) => {
+    if (key === 'residuo') {
+        return dados.find(res => res.slug === value);
+    }
+    return value;
+};
 const run = (callbacks, currentState, previousState) => (callbacks.forEach(cb => cb(currentState, previousState)));
 const getProxyHandler = (...callbacks) => ({
     set(currentState, key, value) {
@@ -248,12 +273,6 @@ const createState = (state, ...callbacks) => {
     return setState(proxyState);
 };
 /* harmony default export */ __webpack_exports__["default"] = (createState);
-const tryTransformToResiduo = (key, value, dados) => {
-    if (key === 'residuo') {
-        return dados.find(res => res.slug === value);
-    }
-    return value;
-};
 
 
 /***/ })

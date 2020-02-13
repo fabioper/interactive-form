@@ -6,6 +6,6 @@ export type Residuo = {
     exemplos: {exemplo: string}[];
     destinacao: string;
     tratamento: boolean;
-    industrias: object[];
+    industrias: object;
     containers: {container: string[]; observacao: string}[];
 }

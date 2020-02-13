@@ -14,7 +14,7 @@ const initialState: State = {
     formData: new FormData(),
     industria: '',
     modo: '',
-    residuo: '',
+    residuo: null,
     servico: '',
     section: null
 }
@@ -29,7 +29,10 @@ const setSectionUsing = (action: HTMLAnchorElement): (ev: MouseEvent) => void =>
 
 const addSlugProps = (residuo): object => {
     residuo.slug = slug(residuo.nome)
-    residuo.industrias = residuo.industrias.map(slugObject)
+    residuo.industrias = residuo.industrias.reduce((acc, curr, i) => {
+        acc[slug(curr)] = curr
+        return acc
+    }, { })
     return residuo
 }
 
@@ -43,7 +46,7 @@ const fetchData = (): void => {
 
 const setState = createState(
     initialState,
-    logState,
+    // logState,
     updateActiveSection,
     filterResiduos
 )
@@ -63,16 +66,6 @@ actions.forEach(action => (
     action.addEventListener('click', setSectionUsing(action)))
 )
 
-onClick(actions, action => setSectionUsing(action))
-
-onClick(industrias, industria => {
-    setState({ industria: industria.dataset.stateIndustria })
-})
-
-onClick(servicos, servico => (
-    setState({ servico: servico.dataset.stateServico })
-))
-
-onClick(residuos, residuo => {
-    setState({ residuo: residuo.dataset.stateResiduo })
-})
+onClick(industrias, industria => setState({ industria: industria.dataset.stateIndustria }))
+onClick(servicos, servico => setState({ servico: servico.dataset.stateServico }))
+onClick(residuos, residuo => setState({ residuo: residuo.dataset.stateResiduo }))
