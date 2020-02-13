@@ -137,7 +137,7 @@ const fetchData = () => {
         .then(dados => setState({ dados }))
         .then(() => setState({ section: sections.item(0) }));
 };
-const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"]);
+const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"], _handlers__WEBPACK_IMPORTED_MODULE_2__["bindings"]);
 const onClick = (elements, callback) => {
     elements.forEach(element => (element.addEventListener('click', event => {
         event.preventDefault();
@@ -157,7 +157,7 @@ onClick(residuos, residuo => setState({ residuo: residuo.dataset.stateResiduo })
 /*!*************************!*\
   !*** ./src/handlers.ts ***!
   \*************************/
-/*! exports provided: logState, updateActiveSection, filterResiduos */
+/*! exports provided: logState, updateActiveSection, filterResiduos, bindings */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -165,6 +165,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "logState", function() { return logState; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateActiveSection", function() { return updateActiveSection; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterResiduos", function() { return filterResiduos; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bindings", function() { return bindings; });
 /* harmony import */ var _app__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app */ "./src/app.ts");
 
 const logState = (state) => (console.log(state));
@@ -205,6 +206,24 @@ const filterResiduos = (state) => {
     }
     if (!industria && !servico) {
         cards.forEach(card => card.classList.add('active'));
+    }
+};
+const bindings = (state) => {
+    var _a;
+    if (((_a = state.section) === null || _a === void 0 ? void 0 : _a.dataset.section) === 'calculo-montante') {
+        const title = state.section.querySelector('h2');
+        const examples = state.section.querySelector('ul');
+        const dest = state.section.querySelector('h4 + p');
+        if (state.residuo) {
+            if (state.residuo.exemplos) {
+                const examplesMarkup = state.residuo.exemplos.map(({ exemplo }) => `
+                    <li>${exemplo}</li>
+                `).join(' ');
+                examples.innerHTML = examplesMarkup;
+            }
+            title.textContent = state.residuo.nome;
+            dest.textContent = state.residuo.destinacao;
+        }
     }
 };
 

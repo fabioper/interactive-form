@@ -47,3 +47,22 @@ export const filterResiduos = (state: State): void => {
     }
 }
 
+export const bindings = (state: State): void => {
+    if (state.section?.dataset.section === 'calculo-montante') {
+        const title = state.section.querySelector('h2')
+        const examples = state.section.querySelector('ul')
+        const dest = state.section.querySelector('h4 + p')
+
+        if (state.residuo) {
+            if (state.residuo.exemplos) {
+                const examplesMarkup = state.residuo.exemplos.map(({ exemplo }) => `
+                    <li>${exemplo}</li>
+                `).join(' ')
+                examples.innerHTML = examplesMarkup
+            }
+
+            title.textContent = state.residuo.nome
+            dest.textContent = state.residuo.destinacao
+        }
+    }
+}

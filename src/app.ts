@@ -1,6 +1,6 @@
 import createState, { State } from './state'
 import { slug, slugObject } from './helpers'
-import { logState, updateActiveSection, filterResiduos } from './handlers'
+import { logState, updateActiveSection, filterResiduos, bindings } from './handlers'
 
 const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45'
 export const sections = document.querySelectorAll('[data-section]') as NodeListOf<HTMLElement>
@@ -48,7 +48,8 @@ const setState = createState(
     initialState,
     // logState,
     updateActiveSection,
-    filterResiduos
+    filterResiduos,
+    bindings
 )
 
 const onClick = (elements: NodeListOf<HTMLElement>, callback): void => {
