@@ -98,6 +98,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class CalculoMontante extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    oninit(form) {
+        throw new Error('Method not implemented.');
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (CalculoMontante);
 
@@ -116,11 +119,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class Industrias extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-        super.onInit(form);
-        this.onclick(this.buttons, button => {
-            form.state.setState({ industria: button.dataset.stateIndustria });
-        });
+    oninit(form) {
+        throw new Error('Method not implemented.');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Industrias);
@@ -140,6 +140,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class InformacoesPessoais extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    oninit(form) {
+        throw new Error('Method not implemented.');
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (InformacoesPessoais);
 
@@ -155,34 +158,22 @@ class InformacoesPessoais extends _Section__WEBPACK_IMPORTED_MODULE_0__["default
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StateManager */ "./src/StateManager.ts");
-
 class InteractiveForm {
-    constructor() {
+    constructor(stateManager) {
         this.sections = [];
-        this.state = new _StateManager__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this.state = stateManager;
         this.state.addListener(this);
-    }
-    get activeSection() {
-        return this._activeSection;
-    }
-    set activeSection(section) {
-        this.moveActiveSectionToPrevious();
-        this._activeSection = section;
-    }
-    set previousSection(section) {
-        this._previousSection = section;
     }
     moveSection(name) {
         const found = this.findSectionBy(name);
         this.activeSection = found;
-        found.onInit(this);
+        found.init(this);
     }
     addSection(...sections) {
         this.sections.push(...sections);
     }
     update(state) {
-        this.activeSection.onUpdate(state);
+        this.activeSection.update(state);
     }
     findSectionBy(name) {
         const section = this.sections.find(section => section.name === name);
@@ -190,12 +181,6 @@ class InteractiveForm {
             throw new Error(`Section ${name} not found`);
         }
         return section;
-    }
-    moveActiveSectionToPrevious() {
-        if (this.activeSection) {
-            this.previousSection = this.activeSection;
-            this._previousSection.onExit();
-        }
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (InteractiveForm);
@@ -215,11 +200,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class Residuos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-        super.onInit(form);
-        this.onclick(this.buttons, button => {
-            form.state.setState({ residuo: button.dataset.stateResiduo });
-        });
+    oninit(form) {
+        throw new Error('Method not implemented.');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Residuos);
@@ -239,6 +221,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class Revisao extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    oninit(form) {
+        throw new Error('Method not implemented.');
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Revisao);
 
@@ -257,11 +242,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class SearchMode extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-        super.onInit(form);
-        this.onclick(this.buttons, button => {
-            form.state.setState({ modo: button.dataset.stateModo });
-        });
+    oninit(form) {
+        throw new Error('Method not implemented.');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (SearchMode);
@@ -286,31 +268,14 @@ class Section {
     static find(name) {
         return document.querySelector(`[data-section=${name}]`);
     }
-    onInit(form) {
+    init(form) {
         this.section.classList.add('active');
-        this.buttons = this.getActionButtons();
-        this.addActionEvents(form);
+        this.oninit(form);
     }
-    addActionEvents(form) {
-        this.onclick(this.buttons, button => {
-            form.moveSection(button.dataset.sectionAction);
-        });
-    }
-    onclick(elements, callback) {
-        elements.forEach(el => {
-            el.addEventListener('click', event => {
-                event.preventDefault();
-                callback(el);
-            });
-        });
-    }
-    getActionButtons() {
-        return this.section.querySelectorAll('[data-section-action]');
-    }
-    onUpdate(state) {
+    update(state) {
         console.log(state);
     }
-    onExit() {
+    exit() {
         this.section.classList.remove('active');
     }
 }
@@ -331,11 +296,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class Servicos extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    onInit(form) {
-        super.onInit(form);
-        this.onclick(this.buttons, button => {
-            form.state.setState({ servico: button.dataset.stateServico });
-        });
+    oninit(form) {
+        throw new Error('Method not implemented.');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Servicos);
@@ -362,7 +324,8 @@ class StateManager {
             industria: '',
             servico: '',
             residuo: null,
-            dados: []
+            dados: [],
+            formData: new FormData()
         };
         Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["getResiduos"])('http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45')
             .then(dados => this.setState({ dados }));
@@ -403,6 +366,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _CalculoMontante__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./CalculoMontante */ "./src/CalculoMontante.ts");
 /* harmony import */ var _InformacoesPessoais__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./InformacoesPessoais */ "./src/InformacoesPessoais.ts");
 /* harmony import */ var _Revisao__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Revisao */ "./src/Revisao.ts");
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./StateManager */ "./src/StateManager.ts");
 
 
 
@@ -411,7 +375,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const form = new _InteractiveForm__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
+const stateManager = new _StateManager__WEBPACK_IMPORTED_MODULE_8__["default"]();
+const form = new _InteractiveForm__WEBPACK_IMPORTED_MODULE_0__["default"](stateManager);
 const searchMode = new _SearchMode__WEBPACK_IMPORTED_MODULE_1__["default"]('modo-de-pesquisa');
 const industrias = new _Industrias__WEBPACK_IMPORTED_MODULE_2__["default"]('industrias');
 const servicos = new _Servicos__WEBPACK_IMPORTED_MODULE_3__["default"]('servicos');

@@ -1,4 +1,4 @@
-export class Residuo {
+export type Residuo = {
     nome: string;
     descricao: string;
     slug: string;
@@ -7,5 +7,5 @@ export class Residuo {
     destinacao: string;
     tratamento: boolean;
     industrias: object[];
-    containers: {container: string[]; observacao: string}[]
+    containers: {container: string[]; observacao: string}[];
 }

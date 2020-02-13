@@ -6,8 +6,10 @@ import Residuos from './Residuos'
 import CalculoMontante from './CalculoMontante'
 import InformacoesPessoais from './InformacoesPessoais'
 import Revisao from './Revisao'
+import StateManager from './StateManager'
 
-const form = new InteractiveForm()
+const stateManager = new StateManager()
+const form = new InteractiveForm(stateManager)
 
 const searchMode = new SearchMode('modo-de-pesquisa')
 const industrias = new Industrias('industrias')

@@ -11,6 +11,7 @@ export type State = {
     servico: string;
     residuo: Residuo | string;
     dados: Residuo[];
+    formData: FormData;
 }
 
 class StateManager {
@@ -23,7 +24,8 @@ class StateManager {
             industria: '',
             servico: '',
             residuo: null,
-            dados: []
+            dados: [],
+            formData: new FormData()
         }
         getResiduos('http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45')
             .then(dados => this.setState({ dados }))
