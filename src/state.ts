@@ -6,7 +6,7 @@ export type State = {
     servico: string;
     residuo: Residuo;
     dados: Residuo[];
-    formData: FormData;
+    formData: Set<FormData>;
     section: HTMLElement;
 }
 
@@ -39,9 +39,9 @@ const setState = (proxyState: State): (data: object | State) => void => (
     )
 )
 
-const createState = (state: State, ...callbacks: StateCallback[]): (data: State | object) => void => {
+const createState = (state: State, ...callbacks: StateCallback[]): [State, (data: State | object) => void] => {
     const proxyState = new Proxy(state, getProxyHandler(...callbacks))
-    return setState(proxyState)
+    return [proxyState, setState(proxyState)]
 }
 
 export default createState

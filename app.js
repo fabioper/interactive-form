@@ -110,7 +110,7 @@ const servicos = document.querySelectorAll('[data-state-servico]');
 const residuos = document.querySelectorAll('[data-state-residuo]');
 const initialState = {
     dados: [],
-    formData: new FormData(),
+    formData: new Set(),
     industria: '',
     modo: '',
     residuo: null,
@@ -135,9 +135,10 @@ const fetchData = () => {
         .then(data => data.acf.card_residuo)
         .then(cards => cards.map(addSlugProps))
         .then(dados => setState({ dados }))
-        .then(() => setState({ section: sections.item(0) }));
+        .then(() => setState({ section: sections.item(0) }))
+        .catch(console.error);
 };
-const setState = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"], _handlers__WEBPACK_IMPORTED_MODULE_2__["bindings"]);
+const [state, setState] = Object(_state__WEBPACK_IMPORTED_MODULE_0__["default"])(initialState, _handlers__WEBPACK_IMPORTED_MODULE_2__["logState"], _handlers__WEBPACK_IMPORTED_MODULE_2__["updateActiveSection"], _handlers__WEBPACK_IMPORTED_MODULE_2__["filterResiduos"], _handlers__WEBPACK_IMPORTED_MODULE_2__["bindings"]);
 const onClick = (elements, callback) => {
     elements.forEach(element => (element.addEventListener('click', event => {
         event.preventDefault();
@@ -149,6 +150,16 @@ actions.forEach(action => (action.addEventListener('click', setSectionUsing(acti
 onClick(industrias, industria => setState({ industria: industria.dataset.stateIndustria }));
 onClick(servicos, servico => setState({ servico: servico.dataset.stateServico }));
 onClick(residuos, residuo => setState({ residuo: residuo.dataset.stateResiduo }));
+const forms = document.querySelectorAll('form');
+forms.forEach(form => {
+    const formData = new FormData(form);
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        setState({
+            formData: state.formData.add(formData)
+        });
+    });
+});
 
 
 /***/ }),
@@ -289,7 +300,7 @@ const getProxyHandler = (...callbacks) => ({
 const setState = (proxyState) => ((data) => (Object.keys(data).forEach(key => (proxyState[key] = data[key]))));
 const createState = (state, ...callbacks) => {
     const proxyState = new Proxy(state, getProxyHandler(...callbacks));
-    return setState(proxyState);
+    return [proxyState, setState(proxyState)];
 };
 /* harmony default export */ __webpack_exports__["default"] = (createState);
 
