@@ -1,3 +1,14 @@
+import { Residuo } from './Residuo'
+
+export const addSlugProps = (residuo): object => {
+    residuo.slug = slug(residuo.nome)
+    residuo.industrias = residuo.industrias.reduce((acc, curr) => {
+        acc[slug(curr)] = curr
+        return acc
+    }, {})
+    return residuo
+}
+
 export function slug(text: string): string {
     let str = text.replace(/^\s+|\s+$/g, '')
     str = str.toLowerCase()
@@ -16,7 +27,10 @@ export function slug(text: string): string {
     return str
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function slugObject(value: string) {
-    return ({ [slug(value)]: value })
+const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45'
+export const fetchData = async (): Promise<Residuo[]> => {
+    const response = await fetch(endpoint)
+    const data = await response.json()
+    const result = data.acf.card_residuo
+    return result.map(addSlugProps)
 }
