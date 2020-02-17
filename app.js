@@ -86,6 +86,169 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/Form.ts":
+/*!*********************!*\
+  !*** ./src/Form.ts ***!
+  \*********************/
+/*! exports provided: Form */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Form", function() { return Form; });
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
+
+class Form {
+    constructor(dados) {
+        this._state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
+    }
+    setState(state) {
+        Object.keys(state).forEach(key => (this._state[key] = state[key]));
+    }
+    get state() {
+        return this._state;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/FormManager.ts":
+/*!****************************!*\
+  !*** ./src/FormManager.ts ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormManager; });
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class FormManager {
+    constructor() {
+        this.forms = [];
+    }
+    get state() {
+        return this._state;
+    }
+    set state(value) {
+        this._state = value;
+    }
+    add(form) {
+        this.forms.push(form);
+    }
+    setActive(form) {
+        this.active = form;
+        this.state = form.state;
+        this.state.addListener(this);
+    }
+    remove(formToDelete) {
+        this.forms = this.forms.filter(form => form !== formToDelete);
+    }
+    edit(formToEdit) {
+        const form = this.forms.find(form => form !== formToEdit);
+        this.setActive(form);
+    }
+    update() {
+        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].update(this.state);
+    }
+    send(form) {
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/Section.ts":
+/*!************************!*\
+  !*** ./src/Section.ts ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
+class Section {
+    static get currentSection() {
+        return Section._currentSection;
+    }
+    static set currentSection(value) {
+        Section._currentSection = value;
+        Section.currentSection.classList.add('active');
+    }
+    static get previousSection() {
+        return Section._currentSection;
+    }
+    static set previousSection(value) {
+        var _a;
+        Section._previousSection = value;
+        (_a = Section.previousSection) === null || _a === void 0 ? void 0 : _a.classList.remove('active');
+    }
+    static find(key) {
+        return Section.sections.get(key);
+    }
+    static moveTo(key) {
+        Section.previousSection = Section.currentSection;
+        Section.currentSection = Section.sections.get(key);
+    }
+    static add(...keys) {
+        keys.forEach(key => Section.sections.set(key, document.querySelector(`[data-section=${key}]`)));
+    }
+    static update(state) {
+        Section.state = state;
+        Section.stateChangeCallback(state);
+    }
+    static onStateChange(callback) {
+        Section.stateChangeCallback = callback;
+    }
+}
+Section.sections = new Map();
+
+
+/***/ }),
+
+/***/ "./src/State.ts":
+/*!**********************!*\
+  !*** ./src/State.ts ***!
+  \**********************/
+/*! exports provided: State */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
+class State {
+    constructor() {
+        this._residuo = null;
+        this.listeners = [];
+    }
+    set dados(value) {
+        this._dados = value;
+        this.notify();
+    }
+    get data() {
+        return this._dados;
+    }
+    getResiduo() {
+        return this._residuo;
+    }
+    set residuo(value) {
+        this._residuo = this.dados.find(res => res.slug === value);
+        this.notify();
+    }
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+    notify() {
+        this.listeners.forEach(listener => listener.update());
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/app.ts":
 /*!********************!*\
   !*** ./src/app.ts ***!
@@ -95,22 +258,65 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./src/Form.ts");
+/* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
 
-const quoted = new Set();
-let activeForm = null;
-const createForm = (form) => {
-    const sections = new Map();
-    return {
-        addSection(key, section) {
-            sections.set(key, section);
-        }
+
+
+
+const sections = ['modo-de-pesquisa', 'industrias', 'residuos'];
+const getIndustrias = (residuos) => {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
     };
+    return residuos.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
+};
+const addActionsClickEvent = () => {
+    const actions = document.querySelectorAll('[data-section-action]');
+    actions.forEach(action => {
+        action.addEventListener('click', () => {
+            const { sectionAction } = action.dataset;
+            _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo(sectionAction);
+        });
+    });
+};
+const loadIndustriesData = (rediduosData) => {
+    const industriasSection = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
+    const industriasCards = industriasSection.querySelector('.section__cards');
+    const industrias = getIndustrias(rediduosData);
+    const markup = Array.from(industrias).map(([key, value]) => `
+        <a href="#" data-modo="${key}" data-section-action="${key}">
+        ${value}
+        </a>`);
+    industriasCards.insertAdjacentHTML('afterbegin', markup.join(' '));
+};
+const loadResiduesData = (rediduosData) => {
+    const residuosSection = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
+    const residuosCards = residuosSection.querySelector('.section__cards');
+    const residuosMarkup = rediduosData.map(residuo => (`
+                <a href="#" data-residuo="${residuo.slug}" data-section-action="calculo-montante">
+                    ${residuo.nome}
+                </a>
+            `));
+    residuosCards.insertAdjacentHTML('afterbegin', residuosMarkup.join(' '));
 };
 (async () => {
-    const apiData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_0__["fetchData"])();
-    const form = document.querySelector('.form');
-    activeForm = createForm(form);
+    const rediduosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
+    const formManager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"]();
+    const currentForm = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"](rediduosData);
+    formManager.setActive(currentForm);
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].add(...sections);
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
+        loadIndustriesData(rediduosData);
+        loadResiduesData(rediduosData);
+        addActionsClickEvent();
+    });
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('residuos');
+    currentForm.setState({ dados: rediduosData });
 })();
 
 
