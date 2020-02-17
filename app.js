@@ -103,6 +103,7 @@ class Form {
         this._state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
     }
     setState(state) {
+        console.log(state);
         Object.keys(state).forEach(key => (this._state[key] = state[key]));
     }
     get state() {
@@ -264,10 +265,9 @@ class State {
         this._residuo = this.dados.find(res => res.slug === value);
         this.notify();
     }
-    getAsList(data) {
-        return data.map(({ exemplo }) => `
-            <li>${exemplo}</li>
-        `).join(' ');
+    asListItem(data) {
+        return !data ?
+            '' : data.map(({ exemplo }) => `<li>${exemplo}</li>`).join(' ');
     }
     addListener(listener) {
         this.listeners.push(listener);
@@ -306,14 +306,6 @@ const sections = [
     'informacoes-pessoais',
     'revise-seu-pedido'
 ];
-const extractIndustriesFrom = (residuos) => {
-    const extractMap = (acc, curr) => {
-        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
-        return acc;
-    };
-    return residuos.map(residuo => residuo.industrias)
-        .reduce(extractMap, new Map());
-};
 const addActionsClickEvents = () => {
     const actions = document.querySelectorAll('[data-section-action]');
     actions.forEach(action => action.addEventListener('click', () => {
@@ -330,29 +322,27 @@ const renderResiduesWithFilter = (state, residuosData) => {
     }
     renderResidues(residuosData, () => true);
 };
-const addCardsClickEvent = (form, ...keys) => {
-    keys.forEach(key => {
-        const cards = document.querySelectorAll(`[data-${key}]`);
-        cards.forEach(card => card.addEventListener('click', () => (form.setState({ [key]: card.dataset[key] }))));
+const addCardsClickEvent = (form, ...keys) => (keys.forEach(key => {
+    const cards = document.querySelectorAll(`[data-state-${key}]`);
+    const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+    cards.forEach(card => card.addEventListener('click', () => (form.setState({ [key]: card.dataset[`state${capitalizedKey}`] }))));
+}));
+const bindResidue = (state) => {
+    const placeholders = document.querySelectorAll('[data-residuo]');
+    const residue = state.getResiduo();
+    placeholders.forEach(placeholder => {
+        if (placeholder.nodeName !== 'UL') {
+            return placeholder.textContent = residue[placeholder.dataset.residuo];
+        }
+        placeholder.innerHTML = state.asListItem(residue[placeholder.dataset.residuo]);
     });
-};
-const bindResidue = (sidebar, state) => {
-    const title = sidebar.querySelector('[data-residuo-nome]');
-    const examples = sidebar.querySelector('[data-residuo-exemplos]');
-    const destination = sidebar.querySelector('[data-residuo-destinacao]');
-    const { nome, destinacao, exemplos } = state.getResiduo();
-    title.textContent = nome;
-    destination.textContent = destinacao;
-    !exemplos ?
-        examples.previousElementSibling.remove() :
-        examples.innerHTML = state.getAsList(exemplos);
 };
 const renderIndustries = (data) => {
     const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
     const cards = section.querySelector('.section__cards');
-    const industrias = extractIndustriesFrom(data);
+    const industrias = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["extractIndustriesFrom"])(data);
     const markup = Array.from(industrias).map(([key, value]) => `
-        <a href="#" data-industria="${key}" data-section-action="residuos">
+        <a href="#" data-state-industria="${key}" data-section-action="residuos">
             ${value}
         </a>
     `);
@@ -362,7 +352,7 @@ const renderResidues = (data, filtering) => {
     const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
     const cards = section.querySelector('.section__cards');
     const markup = data.filter(filtering).map(residuo => (`
-        <a href="#" data-residuo="${residuo.slug}" data-section-action="calculo-montante">
+        <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
             ${residuo.nome}
         </a>
     `));
@@ -377,7 +367,7 @@ const renderResidues = (data, filtering) => {
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
         renderIndustries(residuosData);
         renderResiduesWithFilter(state, residuosData);
-        state.residuo && bindResidue(_Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('calculo-montante'), state);
+        state.residuo && bindResidue(state);
         addActionsClickEvents();
         addCardsClickEvent(formManager.active, 'modo', 'industria', 'servico', 'residuo');
     });
@@ -392,13 +382,14 @@ const renderResidues = (data, filtering) => {
 /*!************************!*\
   !*** ./src/helpers.ts ***!
   \************************/
-/*! exports provided: addSlugProps, slug, fetchData */
+/*! exports provided: addSlugProps, slug, extractIndustriesFrom, fetchData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addSlugProps", function() { return addSlugProps; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchData", function() { return fetchData; });
 const addSlugProps = (residuo) => {
     residuo.slug = slug(residuo.nome);
@@ -421,6 +412,14 @@ function slug(text) {
         .replace(/-+/g, '-');
     return str;
 }
+const extractIndustriesFrom = (residuos) => {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
+    };
+    return residuos.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
+};
 const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45';
 const fetchData = async () => {
     const response = await fetch(endpoint);

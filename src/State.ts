@@ -58,10 +58,9 @@ export class State {
         this.notify()
     }
 
-    getAsList(data: any[]): string {
-        return data.map(({ exemplo }) => `
-            <li>${exemplo}</li>
-        `).join(' ')
+    asListItem(data: any[]): string {
+        return !data ?
+            '' : data.map(({ exemplo }) => `<li>${exemplo}</li>`).join(' ')
     }
 
     addListener(listener: Listener): void {

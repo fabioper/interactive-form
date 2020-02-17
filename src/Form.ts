@@ -8,6 +8,7 @@ export class Form {
     }
 
     setState(state: State | Partial<State>): void {
+        console.log(state)
         Object.keys(state).forEach(key => (
             this._state[key] = state[key]
         ))

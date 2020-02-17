@@ -1,7 +1,7 @@
 import Section from './Section'
 import { Form } from './Form'
 import FormManager from './FormManager'
-import { fetchData } from './helpers'
+import { fetchData, extractIndustriesFrom } from './helpers'
 import { Residuo } from './Residuo'
 import { State } from './State'
 
@@ -14,15 +14,6 @@ const sections = [
     'informacoes-pessoais',
     'revise-seu-pedido'
 ]
-
-const extractIndustriesFrom = (residuos: Residuo[]): Map<string, string> => {
-    const extractMap = (acc: Map<string, string>, curr: object): Map<string, string> => {
-        Object.keys(curr).forEach(key => (acc.set(key, curr[key])))
-        return acc
-    }
-    return residuos.map(residuo => residuo.industrias)
-        .reduce(extractMap, new Map()) as Map<string, string>
-}
 
 const addActionsClickEvents = (): void => {
     const actions = document.querySelectorAll('[data-section-action]') as NodeListOf<HTMLAnchorElement>
@@ -46,27 +37,27 @@ const renderResiduesWithFilter = (state: State, residuosData: Residuo[]): void =
     renderResidues(residuosData, () => true)
 }
 
-const addCardsClickEvent = (form: Form, ...keys: string[]): void => {
+const addCardsClickEvent = (form: Form, ...keys: string[]): void => (
     keys.forEach(key => {
-        const cards = document.querySelectorAll(`[data-${key}]`) as NodeListOf<HTMLElement>
+        const cards = document.querySelectorAll(`[data-state-${key}]`) as NodeListOf<HTMLElement>
+        const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1)
         cards.forEach(card => card.addEventListener('click', () => (
-            form.setState({ [key]: card.dataset[key] })
+            form.setState({ [key]: card.dataset[`state${capitalizedKey}`] })
         )))
     })
-}
+)
 
-const bindResidue = (sidebar: HTMLElement, state: State): void => {
-    const title = sidebar.querySelector('[data-residuo-nome]')
-    const examples = sidebar.querySelector('[data-residuo-exemplos]')
-    const destination = sidebar.querySelector('[data-residuo-destinacao]')
+const bindResidue = (state: State): void => {
+    const placeholders = document.querySelectorAll('[data-residuo]') as NodeListOf<HTMLElement>
+    const residue = state.getResiduo()
 
-    const { nome, destinacao, exemplos } = state.getResiduo()
-    title.textContent = nome
-    destination.textContent = destinacao
+    placeholders.forEach(placeholder => {
+        if (placeholder.nodeName !== 'UL') {
+            return placeholder.textContent = residue[placeholder.dataset.residuo]
+        }
 
-    !exemplos ?
-        examples.previousElementSibling.remove() :
-        examples.innerHTML = state.getAsList(exemplos)
+        placeholder.innerHTML = state.asListItem(residue[placeholder.dataset.residuo])
+    })
 }
 
 const renderIndustries = (data: Residuo[]): void => {
@@ -74,7 +65,7 @@ const renderIndustries = (data: Residuo[]): void => {
     const cards = section.querySelector('.section__cards')
     const industrias = extractIndustriesFrom(data)
     const markup = Array.from(industrias).map(([key, value]) => `
-        <a href="#" data-industria="${key}" data-section-action="residuos">
+        <a href="#" data-state-industria="${key}" data-section-action="residuos">
             ${value}
         </a>
     `)
@@ -85,7 +76,7 @@ const renderResidues = (data: Residuo[], filtering: (value: Residuo, index: numb
     const section = Section.find('residuos')
     const cards = section.querySelector('.section__cards')
     const markup = data.filter(filtering).map(residuo => (`
-        <a href="#" data-residuo="${residuo.slug}" data-section-action="calculo-montante">
+        <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
             ${residuo.nome}
         </a>
     `))
@@ -104,7 +95,7 @@ const renderResidues = (data: Residuo[], filtering: (value: Residuo, index: numb
     Section.onStateChange(state => {
         renderIndustries(residuosData)
         renderResiduesWithFilter(state, residuosData)
-        state.residuo && bindResidue(Section.find('calculo-montante'), state)
+        state.residuo && bindResidue(state)
         addActionsClickEvents()
         addCardsClickEvent(formManager.active,
             'modo',
