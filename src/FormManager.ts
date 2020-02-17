@@ -6,7 +6,11 @@ import Section from './Section'
 export default class FormManager implements Listener {
     private forms: Form[] = []
     private _state: State
-    private active: Form
+    private _active: Form
+
+    get active(): Form {
+        return this._active
+    }
 
     get state(): State {
         return this._state
@@ -21,7 +25,7 @@ export default class FormManager implements Listener {
     }
 
     setActive(form: Form): void {
-        this.active = form
+        this._active = form
         this.state = form.state
         this.state.addListener(this)
     }

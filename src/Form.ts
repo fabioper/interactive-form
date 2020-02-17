@@ -1,10 +1,9 @@
 import { State } from './State'
-import { Residuo } from './Residuo'
 
 export class Form {
     private _state: State
 
-    constructor(dados: Residuo[]) {
+    constructor() {
         this._state = new State()
     }
 

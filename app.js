@@ -99,7 +99,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
 
 class Form {
-    constructor(dados) {
+    constructor() {
         this._state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
     }
     setState(state) {
@@ -129,6 +129,9 @@ class FormManager {
     constructor() {
         this.forms = [];
     }
+    get active() {
+        return this._active;
+    }
     get state() {
         return this._state;
     }
@@ -139,7 +142,7 @@ class FormManager {
         this.forms.push(form);
     }
     setActive(form) {
-        this.active = form;
+        this._active = form;
         this.state = form.state;
         this.state.addListener(this);
     }
@@ -221,22 +224,50 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
 class State {
     constructor() {
-        this._residuo = null;
         this.listeners = [];
+    }
+    get servico() {
+        return this._servico;
+    }
+    set servico(value) {
+        this._servico = value;
+        this.notify();
+    }
+    get industria() {
+        return this._industria;
+    }
+    set industria(value) {
+        this._industria = value;
+        this.notify();
+    }
+    get modo() {
+        return this._modo;
+    }
+    set modo(value) {
+        this._modo = value;
+        this.notify();
     }
     set dados(value) {
         this._dados = value;
         this.notify();
     }
-    get data() {
+    get dados() {
         return this._dados;
     }
     getResiduo() {
         return this._residuo;
     }
+    get residuo() {
+        return this._residuo;
+    }
     set residuo(value) {
         this._residuo = this.dados.find(res => res.slug === value);
         this.notify();
+    }
+    getAsList(data) {
+        return data.map(({ exemplo }) => `
+            <li>${exemplo}</li>
+        `).join(' ');
     }
     addListener(listener) {
         this.listeners.push(listener);
@@ -266,8 +297,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const sections = ['modo-de-pesquisa', 'industrias', 'residuos'];
-const getIndustrias = (residuos) => {
+const sections = [
+    'modo-de-pesquisa',
+    'industrias',
+    'servicos',
+    'residuos',
+    'calculo-montante',
+    'informacoes-pessoais',
+    'revise-seu-pedido'
+];
+const extractIndustriesFrom = (residuos) => {
     const extractMap = (acc, curr) => {
         Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
         return acc;
@@ -275,48 +314,75 @@ const getIndustrias = (residuos) => {
     return residuos.map(residuo => residuo.industrias)
         .reduce(extractMap, new Map());
 };
-const addActionsClickEvent = () => {
+const addActionsClickEvents = () => {
     const actions = document.querySelectorAll('[data-section-action]');
-    actions.forEach(action => {
-        action.addEventListener('click', () => {
-            const { sectionAction } = action.dataset;
-            _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo(sectionAction);
-        });
+    actions.forEach(action => action.addEventListener('click', () => {
+        const { sectionAction } = action.dataset;
+        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo(sectionAction);
+    }));
+};
+const renderResiduesWithFilter = (state, residuosData) => {
+    if (state.servico === 'tratamento-de-residuos') {
+        return renderResidues(residuosData, (residuo) => residuo.tratamento);
+    }
+    if (state.industria) {
+        return renderResidues(residuosData, (residuo) => (Object.keys(residuo.industrias).includes(state.industria)));
+    }
+    renderResidues(residuosData, () => true);
+};
+const addCardsClickEvent = (form, ...keys) => {
+    keys.forEach(key => {
+        const cards = document.querySelectorAll(`[data-${key}]`);
+        cards.forEach(card => card.addEventListener('click', () => (form.setState({ [key]: card.dataset[key] }))));
     });
 };
-const loadIndustriesData = (rediduosData) => {
-    const industriasSection = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
-    const industriasCards = industriasSection.querySelector('.section__cards');
-    const industrias = getIndustrias(rediduosData);
-    const markup = Array.from(industrias).map(([key, value]) => `
-        <a href="#" data-modo="${key}" data-section-action="${key}">
-        ${value}
-        </a>`);
-    industriasCards.insertAdjacentHTML('afterbegin', markup.join(' '));
+const bindResidue = (sidebar, state) => {
+    const title = sidebar.querySelector('[data-residuo-nome]');
+    const examples = sidebar.querySelector('[data-residuo-exemplos]');
+    const destination = sidebar.querySelector('[data-residuo-destinacao]');
+    const { nome, destinacao, exemplos } = state.getResiduo();
+    title.textContent = nome;
+    destination.textContent = destinacao;
+    !exemplos ?
+        examples.previousElementSibling.remove() :
+        examples.innerHTML = state.getAsList(exemplos);
 };
-const loadResiduesData = (rediduosData) => {
-    const residuosSection = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
-    const residuosCards = residuosSection.querySelector('.section__cards');
-    const residuosMarkup = rediduosData.map(residuo => (`
-                <a href="#" data-residuo="${residuo.slug}" data-section-action="calculo-montante">
-                    ${residuo.nome}
-                </a>
-            `));
-    residuosCards.insertAdjacentHTML('afterbegin', residuosMarkup.join(' '));
+const renderIndustries = (data) => {
+    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
+    const cards = section.querySelector('.section__cards');
+    const industrias = extractIndustriesFrom(data);
+    const markup = Array.from(industrias).map(([key, value]) => `
+        <a href="#" data-industria="${key}" data-section-action="residuos">
+            ${value}
+        </a>
+    `);
+    cards.innerHTML = markup.join(' ');
+};
+const renderResidues = (data, filtering) => {
+    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
+    const cards = section.querySelector('.section__cards');
+    const markup = data.filter(filtering).map(residuo => (`
+        <a href="#" data-residuo="${residuo.slug}" data-section-action="calculo-montante">
+            ${residuo.nome}
+        </a>
+    `));
+    cards.innerHTML = markup.join(' ');
 };
 (async () => {
-    const rediduosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
+    const residuosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
     const formManager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"]();
-    const currentForm = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"](rediduosData);
+    const currentForm = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"]();
     formManager.setActive(currentForm);
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].add(...sections);
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
-        loadIndustriesData(rediduosData);
-        loadResiduesData(rediduosData);
-        addActionsClickEvent();
+        renderIndustries(residuosData);
+        renderResiduesWithFilter(state, residuosData);
+        state.residuo && bindResidue(_Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('calculo-montante'), state);
+        addActionsClickEvents();
+        addCardsClickEvent(formManager.active, 'modo', 'industria', 'servico', 'residuo');
     });
-    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('residuos');
-    currentForm.setState({ dados: rediduosData });
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('modo-de-pesquisa');
+    currentForm.setState({ dados: residuosData });
 })();
 
 
