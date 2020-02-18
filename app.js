@@ -130,20 +130,11 @@ class FormManager {
     constructor() {
         this.forms = [];
     }
-    get active() {
-        return this._active;
-    }
-    get state() {
-        return this._state;
-    }
-    set state(value) {
-        this._state = value;
-    }
     add(form) {
         this.forms.push(form);
     }
     setActive(form) {
-        this._active = form;
+        this.active = form;
         this.state = form.state;
         this.state.addListener(this);
     }

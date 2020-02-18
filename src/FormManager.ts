@@ -5,27 +5,15 @@ import Section from './Section'
 
 export default class FormManager implements Listener {
     private forms: Form[] = []
-    private _state: State
-    private _active: Form
-
-    get active(): Form {
-        return this._active
-    }
-
-    get state(): State {
-        return this._state
-    }
-
-    set state(value: State) {
-        this._state = value
-    }
+    private state: State
+    active: Form
 
     add(form: Form): void {
         this.forms.push(form)
     }
 
     setActive(form: Form): void {
-        this._active = form
+        this.active = form
         this.state = form.state
         this.state.addListener(this)
     }
