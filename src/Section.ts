@@ -1,49 +1,24 @@
-import { State } from './State'
+import State from './State'
 
 export default class Section {
-    private static _currentSection: HTMLElement;
-    private static _previousSection: HTMLElement;
-    private static sections: Map<string, HTMLElement> = new Map<string, HTMLElement>();
-    static stateChangeCallback: (state: State) => void;
+    rootElement: HTMLElement;
+    name: string;
 
-    static get currentSection(): HTMLElement {
-        return Section._currentSection
+    constructor(name: string, render?) {
+        this.name = name
+        this.rootElement = document.querySelector(`[data-section=${this.name}]`) as HTMLElement
+        if (render) { render(this) }
     }
 
-    static set currentSection(value: HTMLElement) {
-        Section._currentSection = value
-        Section.currentSection.classList.add('active')
+    query(selector: string): HTMLElement {
+        return this.rootElement.querySelector(selector) as HTMLElement
     }
 
-    static get previousSection(): HTMLElement {
-        return Section._currentSection
+    queryAll(selector: string): NodeListOf<HTMLElement> {
+        return this.rootElement.querySelectorAll(selector) as NodeListOf<HTMLElement>
     }
 
-    static set previousSection(value: HTMLElement) {
-        Section._previousSection = value
-        Section.previousSection?.classList.remove('active')
-    }
-
-    static find(key: string): HTMLElement {
-        return Section.sections.get(key)
-    }
-
-    static moveTo(key: string): void {
-        Section.previousSection = Section.currentSection
-        Section.currentSection = Section.sections.get(key)
-    }
-
-    static add(...keys: string[]): void {
-        keys.forEach(key => Section.sections.set(key,
-            document.querySelector(`[data-section=${key}]`)
-        ))
-    }
-
-    static update(state: State): void {
-        Section.stateChangeCallback(state)
-    }
-
-    static onStateChange(callback: (state: State) => void): void {
-        Section.stateChangeCallback = callback
+    updateState(state: State): void {
+        console.log(state)
     }
 }
