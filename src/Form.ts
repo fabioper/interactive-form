@@ -1,20 +1,15 @@
 import { State } from './State'
 
 export class Form {
-    private _state: State
+    public state: State
 
     constructor() {
-        this._state = new State()
+        this.state = new State()
     }
 
     setState(state: State | Partial<State>): void {
-        console.log(state)
         Object.keys(state).forEach(key => (
-            this._state[key] = state[key]
+            this.state[key] = state[key]
         ))
-    }
-
-    get state(): State {
-        return this._state
     }
 }

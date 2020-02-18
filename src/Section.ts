@@ -4,7 +4,6 @@ export default class Section {
     private static _currentSection: HTMLElement;
     private static _previousSection: HTMLElement;
     private static sections: Map<string, HTMLElement> = new Map<string, HTMLElement>();
-    private static state: State;
     static stateChangeCallback: (state: State) => void;
 
     static get currentSection(): HTMLElement {
@@ -41,7 +40,6 @@ export default class Section {
     }
 
     static update(state: State): void {
-        Section.state = state
         Section.stateChangeCallback(state)
     }
 

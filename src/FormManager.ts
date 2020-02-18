@@ -8,14 +8,18 @@ export default class FormManager implements Listener {
     private state: State
     active: Form
 
-    add(form: Form): void {
-        this.forms.push(form)
+    constructor(form: Form) {
+        this.setActive(form)
     }
 
     setActive(form: Form): void {
         this.active = form
         this.state = form.state
         this.state.addListener(this)
+    }
+
+    add(form: Form): void {
+        this.forms.push(form)
     }
 
     remove(formToDelete: Form): void {

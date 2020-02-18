@@ -100,14 +100,10 @@ __webpack_require__.r(__webpack_exports__);
 
 class Form {
     constructor() {
-        this._state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
+        this.state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
     }
     setState(state) {
-        console.log(state);
-        Object.keys(state).forEach(key => (this._state[key] = state[key]));
-    }
-    get state() {
-        return this._state;
+        Object.keys(state).forEach(key => (this.state[key] = state[key]));
     }
 }
 
@@ -127,16 +123,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 
 class FormManager {
-    constructor() {
+    constructor(form) {
         this.forms = [];
-    }
-    add(form) {
-        this.forms.push(form);
+        this.setActive(form);
     }
     setActive(form) {
         this.active = form;
         this.state = form.state;
         this.state.addListener(this);
+    }
+    add(form) {
+        this.forms.push(form);
     }
     remove(formToDelete) {
         this.forms = this.forms.filter(form => form !== formToDelete);
@@ -192,7 +189,6 @@ class Section {
         keys.forEach(key => Section.sections.set(key, document.querySelector(`[data-section=${key}]`)));
     }
     static update(state) {
-        Section.state = state;
         Section.stateChangeCallback(state);
     }
     static onStateChange(callback) {
@@ -351,19 +347,18 @@ const renderResidues = (data, filtering) => {
 };
 (async () => {
     const residuosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
-    const formManager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"]();
-    const currentForm = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"]();
-    formManager.setActive(currentForm);
+    const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"]();
+    const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"](form);
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].add(...sections);
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
         renderIndustries(residuosData);
         renderResiduesWithFilter(state, residuosData);
         state.residuo && bindResidue(state);
         addActionsClickEvents();
-        addCardsClickEvent(formManager.active, 'modo', 'industria', 'servico', 'residuo');
+        addCardsClickEvent(manager.active, 'modo', 'industria', 'servico', 'residuo');
     });
     _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('modo-de-pesquisa');
-    currentForm.setState({ dados: residuosData });
+    form.setState({ dados: residuosData });
 })();
 
 

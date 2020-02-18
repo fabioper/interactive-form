@@ -85,10 +85,8 @@ const renderResidues = (data: Residuo[], filtering: (value: Residuo, index: numb
 
 (async (): Promise<void> => {
     const residuosData = await fetchData()
-    const formManager = new FormManager()
-    const currentForm = new Form()
-
-    formManager.setActive(currentForm)
+    const form = new Form()
+    const manager = new FormManager(form)
 
     Section.add(...sections)
 
@@ -97,7 +95,7 @@ const renderResidues = (data: Residuo[], filtering: (value: Residuo, index: numb
         renderResiduesWithFilter(state, residuosData)
         state.residuo && bindResidue(state)
         addActionsClickEvents()
-        addCardsClickEvent(formManager.active,
+        addCardsClickEvent(manager.active,
             'modo',
             'industria',
             'servico',
@@ -107,5 +105,5 @@ const renderResidues = (data: Residuo[], filtering: (value: Residuo, index: numb
 
     Section.moveTo('modo-de-pesquisa')
 
-    currentForm.setState({ dados: residuosData })
+    form.setState({ dados: residuosData })
 })()
