@@ -86,215 +86,48 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/Form.ts":
-/*!*********************!*\
-  !*** ./src/Form.ts ***!
-  \*********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Form; });
-/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
-
-class Form {
-    constructor() {
-        this.localState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/FormController.ts":
-/*!*******************************!*\
-  !*** ./src/FormController.ts ***!
-  \*******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormController; });
-class FormController {
-    constructor() {
-        this.listeners = [];
-    }
-    set active(form) {
-        this.state = form.localState;
-        this.state.setObserver(this);
-        this.update();
-    }
-    onStateChange(...listeners) {
-        listeners.forEach(cb => this.listeners.push(cb));
-    }
-    update() {
-        this.listeners.forEach(cb => cb(this.state));
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/Section.ts":
-/*!************************!*\
-  !*** ./src/Section.ts ***!
-  \************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
-class Section {
-    constructor(name, render) {
-        this.name = name;
-        this.rootElement = document.querySelector(`[data-section=${this.name}]`);
-        if (render) {
-            render(this);
-        }
-    }
-    query(selector) {
-        return this.rootElement.querySelector(selector);
-    }
-    queryAll(selector) {
-        return this.rootElement.querySelectorAll(selector);
-    }
-    updateState(state) {
-        console.log(state);
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/SectionsController.ts":
-/*!***********************************!*\
-  !*** ./src/SectionsController.ts ***!
-  \***********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SectionsController; });
-class SectionsController {
-    constructor() {
-        this.sections = new Map();
-    }
-    set current(value) {
-        this._current = value;
-        this._current.rootElement.classList.add('active');
-    }
-    set previous(value) {
-        var _a;
-        this._previous = value;
-        (_a = this._previous) === null || _a === void 0 ? void 0 : _a.rootElement.classList.remove('active');
-    }
-    moveTo(key) {
-        this.previous = this._current;
-        this.current = this.sections.get(key);
-    }
-    appendSections(...sections) {
-        sections.forEach(section => (this.sections.set(section.name, section)));
-        this.addActionsClickEvents();
-    }
-    observe(form) {
-        this.formController = form;
-        this.formController.onStateChange(state => this.notifySections(state));
-    }
-    notifySections(state) {
-        return this.sections.forEach(section => section.updateState(state));
-    }
-    addActionsClickEvents() {
-        this.sections.forEach(section => {
-            const actions = section.queryAll('[data-section-action]');
-            actions.forEach(action => action.addEventListener('click', event => {
-                event.preventDefault();
-                this.moveTo(action.dataset.sectionAction);
-            }));
-        });
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/SectionsEnum.ts":
-/*!*****************************!*\
-  !*** ./src/SectionsEnum.ts ***!
-  \*****************************/
-/*! exports provided: section */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "section", function() { return section; });
-var section;
-(function (section) {
-    section["MODO_DE_PESQUISA"] = "modo-de-pesquisa";
-    section["INDUSTRIAS"] = "industrias";
-    section["SERVICOS"] = "servicos";
-    section["RESIDUOS"] = "residuos";
-    section["CALCULO_MONTANTE"] = "calculo-montante";
-    section["INFO_PESSOAIS"] = "informacoes-pessoais";
-    section["REVISE_PEDIDO"] = "revise-seu-pedido";
-    section["PEDIDO_ENVIADO"] = "pedido-enviado";
-})(section || (section = {}));
-
-
-/***/ }),
-
-/***/ "./src/State.ts":
-/*!**********************!*\
-  !*** ./src/State.ts ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return State; });
-class State {
-    setObserver(observer) {
-        this.observer = observer;
-    }
-    notify() {
-        this.observer.update();
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/app.ts":
 /*!********************!*\
   !*** ./src/app.ts ***!
   \********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _FormController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FormController */ "./src/FormController.ts");
-/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./src/Form.ts");
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
-/* harmony import */ var _SectionsController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SectionsController */ "./src/SectionsController.ts");
-/* harmony import */ var _SectionsEnum__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SectionsEnum */ "./src/SectionsEnum.ts");
-
-
-
-
-
-const manager = new _FormController__WEBPACK_IMPORTED_MODULE_0__["default"]();
-const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["default"]();
-const sectionsController = new _SectionsController__WEBPACK_IMPORTED_MODULE_3__["default"]();
-manager.active = form;
-sectionsController.observe(manager);
-sectionsController.appendSections(new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].INDUSTRIAS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].RESIDUOS));
-sectionsController.moveTo(_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA);
-manager.active = form;
+const sectionElements = document.querySelectorAll('[data-section]');
+const actions = document.querySelectorAll('[data-action]');
+const sections = new Map();
+let currentSection;
+let previousSection;
+const createState = () => {
+    const state = new Proxy({}, {
+        set(state, key, value) {
+            state[key] = value;
+            console.log(state);
+            return true;
+        }
+    });
+    return (data) => (Object.keys(data).forEach(key => {
+        state[key] = data[key];
+    }));
+};
+const changeState = createState();
+const moveSection = (key, sections) => {
+    var _a;
+    previousSection = currentSection;
+    (_a = previousSection) === null || _a === void 0 ? void 0 : _a.classList.remove('active');
+    currentSection = sections.get(key);
+    currentSection.classList.add('active');
+};
+sectionElements.forEach(section => (sections.set(section.dataset.section, section)));
+actions.forEach(action => (action.addEventListener('click', event => {
+    event.preventDefault();
+    const { action: sectionAction } = action.dataset;
+    Object.keys(action.dataset)
+        .filter(key => key !== sectionAction)
+        .forEach(key => changeState({ [key]: action.dataset[key] }));
+    moveSection(sectionAction, sections);
+})));
+moveSection('modo-de-pesquisa', sections);
 
 
 /***/ })

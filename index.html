@@ -11,21 +11,227 @@
 
 <body>
     <main class="main">
-        <form>
-            <section data-section="modo-de-pesquisa">
-                <h1>Modo de Pesquisa</h1>
-                <button data-section-action="industrias">Go to Industrias</a>
-                <button data-section-action="residuos">Go to Resíduos</a>
-            </section>
-            
-            <section data-section="industrias">
-                <h1>Indústrias</h1>
-                <button data-section-action="modo-de-pesquisa">Go to Modo de Pesquisa</button>
+        <form class="form">
+            <section class="section" data-section="modo-de-pesquisa">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Solicitar orçamento</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <p class="section__description">Você pode optar por fazer o seu orçamento por:</p>
+                        <div class="section__cards">
+                            <a href="#" data-modo="industria" data-action="industrias">Indústria</a>
+                            <a href="#" data-modo="servico" data-action="servicos">Serviço</a>
+                            <a href="#" data-modo="residuo" data-action="residuos">Resíduo</a>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <section data-section="residuos">
-                <h1>Residuos</h1>
-                <button data-section-action="modo-de-pesquisa">Go to Modo de Pesquisa</button>
+            <section class="section" data-section="industrias">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Indústrias</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <p class="section__description"></p>
+                        <div class="section__cards" data-cards="industrias"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="servicos">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Serviços</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <p class="section__description"></p>
+                        <div class="section__cards">
+                            <a href="#" data-servico="gestao-de-residuos" data-action="residuos">
+                                Gestão de Resíduos
+                            </a>
+
+                            <a href="#" data-servico="tratamento-de-residuos" data-action="residuos">
+                                Tratamento de Resíduos
+                            </a>
+
+                            <a href="#" data-servico="pgrs" data-action="residuos">
+                                PGRS
+                            </a>
+
+                            <a href="#" data-servico="remocao-de-lodo" data-action="residuos">
+                                Remoção de Lodo
+                            </a>
+
+                            <a href="#" data-servico="limpeza-de-fossa-septica" data-action="residuos">
+                                Limpeza de Fossa Séptica
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="residuos">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Resíduos</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <div class="section__cards" data-cards="residuos"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="calculo-montante">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title" data-residuo="nome"></h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <div class="form__content">
+                            <h3 class="form__title">Cálculo Montante</h3>
+                            <div class="form__input">
+                                <label for="frequencia">Frequêcia</label>
+                                <input type="number" name="frequencia" id="frequencia"> por
+                                <select name="periodo" id="periodo">
+                                    <option value="">Selecione a frequência de sua coleta</option>
+                                    <option value="semanal">Semana</option>
+                                    <option value="mensal">Mês</option>
+                                    <option value="trimestral">Trimestre</option>
+                                    <option value="semestral">Semestre</option>
+                                    <option value="anual">Ano</option>
+                                </select>
+                                <span class="input__description">Ex: “2” por “semana”</span>
+                            </div>
+                            <div class="form__input">
+                                <label for="recipiente">Recipiente</label>
+                            </div>
+                            <a href="#" data-action="informacoes-pessoais">
+                                Avançar
+                            </a>
+                        </div>
+                        <aside class="form__aside">
+                            <h4 class="aside__title">Exemplos</h4>
+                            <ul class="aside__list" data-residuo="exemplos"></ul>
+
+                            <h3 class="aside__title">Destinação</h3>
+                            <p class="aside__text" data-residuo="destinacao"></p>
+                        </aside>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="informacoes-pessoais">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Informações Pessoais</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <div class="form__content">
+                            <div class="form__input">
+                                <label for="nome">Nome</label>
+                                <input type="text" name="nome" id="nome">
+                            </div>
+
+                            <div class="form__input">
+                                <label for="Empresa">Empresa</label>
+                                <input type="text" name="empresa" id="empresa">
+                            </div>
+
+                            <div class="form__input">
+                                <label for="telefone">Telefone com DDD</label>
+                                <input type="tel" name="telefone" id="telefone">
+                            </div>
+
+                            <div class="form__input">
+                                <label for="cnpj">CNPJ</label>
+                                <input type="number" name="cnpj" id="cnpj" pattern="[0-9]*" required>
+                            </div>
+
+                            <div class="form__input">
+                                <label for="email">E-mail</label>
+                                <input type="email" name="email" id="email" required>
+                            </div>
+
+                            <div class="form__input">
+                                <label for="cep">CEP</label>
+                                <input type="text" name="cep" id="cep" pattern="(d{5}?)" required>
+                            </div>
+
+                            <div class="form__input">
+                                <label for="endereco">Endereço</label>
+                                <input type="text" name="endereco" id="endereco" required>
+                            </div>
+
+                            <div class="form__input">
+                                <label for="numero">Nº</label>
+                                <input type="text" name="numero" id="numero">
+                            </div>
+
+                            <div class="form__input">
+                                <label for="complemento">Complemento</label>
+                                <input type="text" name="complemento" id="complemento">
+                            </div>
+
+                            <a href="#" data-action="revise-seu-pedido">
+                                Avançar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" data-section="revise-seu-pedido">
+                <header class="section__header">
+                    <div class="container">
+                        <h2 class="section__title">Revise seu pedido</h2>
+                    </div>
+                </header>
+                <div class="section__content">
+                    <div class="container">
+                        <div>
+                            <div>
+                                <h3>Indústria:</h3>
+                                <p data-industria></p>
+                            </div>
+                            <div>
+                                <h3>Resíduo:</h3>
+                                <p data-residuo></p>
+                            </div>
+                            <div>
+                                <h3>Frequência:</h3>
+                                <p data-frequencia></p>
+                            </div>
+                            <div>
+                                <h3>Recipiente(s):</h3>
+                                <ul data-frequencia></ul>
+                                <a href="#" data-action="calculo-montante">Editar</a>
+                                <a href="#">Excluir</a>
+                            </div>
+                            <div>
+                                <h3>Informações de Contato:</h3>
+                                <div data-contato></div>
+                                <a href="#" data-action="informacoes-pessoais">Editar</a>
+                            </div>
+
+                            <a href="#">Acrescentar resíduo</a>
+                            <a href="#">Enviar pedido</a>
+                        </div>
+                    </div>
+                </div>
             </section>
         </form>
     </main>
