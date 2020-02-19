@@ -121,16 +121,19 @@ class FormController {
     constructor() {
         this.listeners = [];
     }
+    get state() {
+        return this._state;
+    }
     set active(form) {
-        this.state = form.localState;
-        this.state.setObserver(this);
+        this._state = form.localState;
+        this._state.setObserver(this);
         this.update();
     }
     onStateChange(...listeners) {
-        listeners.forEach(cb => this.listeners.push(cb));
+        listeners.forEach(listener => this.listeners.push(listener));
     }
     update() {
-        this.listeners.forEach(cb => cb(this.state));
+        this.listeners.forEach(cb => cb(this._state));
     }
 }
 
@@ -147,13 +150,14 @@ class FormController {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
+/* harmony import */ var _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SectionsEnum */ "./src/SectionsEnum.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+
+
 class Section {
-    constructor(name, render) {
+    constructor(name) {
         this.name = name;
         this.rootElement = document.querySelector(`[data-section=${this.name}]`);
-        if (render) {
-            render(this);
-        }
     }
     query(selector) {
         return this.rootElement.querySelector(selector);
@@ -162,7 +166,46 @@ class Section {
         return this.rootElement.querySelectorAll(selector);
     }
     updateState(state) {
-        console.log(state);
+        console.log(state.industria);
+    }
+    initilize(data) {
+        switch (this.name) {
+            case _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__["section"].INDUSTRIAS:
+                this.renderIndustriesCards(data);
+                break;
+            case _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__["section"].RESIDUOS:
+                this.renderResiduesCards(data);
+                break;
+            default:
+                break;
+        }
+    }
+    renderIndustriesCards(data) {
+        const cards = this.rootElement.querySelector('.section__cards');
+        const industrias = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extractIndustriesFrom"])(data);
+        const markup = Array.from(industrias).map(([key, value]) => `
+            <a href="#" data-state-industria="${key}" data-section-action="residuos">
+                ${value}
+            </a>
+        `);
+        cards.innerHTML = markup.join(' ');
+    }
+    renderResiduesCards(data) {
+        const cards = this.rootElement.querySelector('.section__cards');
+        const markup = data.map(residuo => (`
+            <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
+                ${residuo.nome}
+            </a>
+        `));
+        cards.innerHTML = markup.join(' ');
+    }
+    extractIndustriesFrom(residuos) {
+        const extractMap = (acc, curr) => {
+            Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+            return acc;
+        };
+        return residuos.map(residuo => residuo.industrias)
+            .reduce(extractMap, new Map());
     }
 }
 
@@ -197,24 +240,46 @@ class SectionsController {
         this.current = this.sections.get(key);
     }
     appendSections(...sections) {
-        sections.forEach(section => (this.sections.set(section.name, section)));
+        sections.forEach(section => {
+            this.sections.set(section.name, section);
+            section.initilize(this.formController.data);
+        });
         this.addActionsClickEvents();
+        this.addCardsClickEvent();
     }
     observe(form) {
         this.formController = form;
         this.formController.onStateChange(state => this.notifySections(state));
     }
     notifySections(state) {
-        return this.sections.forEach(section => section.updateState(state));
+        this.sections.forEach(section => section.updateState(state));
     }
     addActionsClickEvents() {
-        this.sections.forEach(section => {
-            const actions = section.queryAll('[data-section-action]');
-            actions.forEach(action => action.addEventListener('click', event => {
-                event.preventDefault();
-                this.moveTo(action.dataset.sectionAction);
+        const actions = document.querySelectorAll('[data-section-action]');
+        actions.forEach(action => action.addEventListener('click', event => {
+            event.preventDefault();
+            this.moveTo(action.dataset.sectionAction);
+        }));
+    }
+    addCardsClickEvent() {
+        const keys = [
+            'modo',
+            'industria',
+            'servico',
+            'residuo'
+        ];
+        keys.forEach(key => {
+            const cards = document.querySelectorAll(`[data-state-${key}]`);
+            const capitalizedKey = this.capilizeWord(key);
+            cards.forEach(card => card.addEventListener('click', () => {
+                this.formController.state.setState({
+                    [key]: card.dataset[`state${capitalizedKey}`]
+                });
             }));
         });
+    }
+    capilizeWord(key) {
+        return key.charAt(0).toUpperCase() + key.slice(1);
     }
 }
 
@@ -257,6 +322,10 @@ var section;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return State; });
 class State {
+    setState(data) {
+        Object.keys((key) => (this[key] = data[key]));
+        this.notify();
+    }
     setObserver(observer) {
         this.observer = observer;
     }
@@ -282,19 +351,77 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
 /* harmony import */ var _SectionsController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SectionsController */ "./src/SectionsController.ts");
 /* harmony import */ var _SectionsEnum__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SectionsEnum */ "./src/SectionsEnum.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
 
 
 
 
 
-const manager = new _FormController__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
+const controller = new _FormController__WEBPACK_IMPORTED_MODULE_0__["default"]();
 const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["default"]();
 const sectionsController = new _SectionsController__WEBPACK_IMPORTED_MODULE_3__["default"]();
-manager.active = form;
-sectionsController.observe(manager);
-sectionsController.appendSections(new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].INDUSTRIAS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].RESIDUOS));
-sectionsController.moveTo(_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA);
-manager.active = form;
+(async () => {
+    const data = await Object(_helpers__WEBPACK_IMPORTED_MODULE_5__["fetchData"])();
+    controller.data = data;
+    controller.active = form;
+    sectionsController.observe(controller);
+    sectionsController.appendSections(new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].INDUSTRIAS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].SERVICOS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].RESIDUOS));
+    sectionsController.moveTo(_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA);
+})();
+
+
+/***/ }),
+
+/***/ "./src/helpers.ts":
+/*!************************!*\
+  !*** ./src/helpers.ts ***!
+  \************************/
+/*! exports provided: addSlugProps, slug, extractIndustriesFrom, fetchData */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addSlugProps", function() { return addSlugProps; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchData", function() { return fetchData; });
+const addSlugProps = (residuo) => {
+    residuo.slug = slug(residuo.nome);
+    residuo.industrias = residuo.industrias.reduce((acc, curr) => {
+        acc[slug(curr)] = curr;
+        return acc;
+    }, {});
+    return residuo;
+};
+function slug(text) {
+    let str = text.replace(/^\s+|\s+$/g, '');
+    str = str.toLowerCase();
+    const from = 'ãàáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+    const to = 'aaaaaeeeeiiiioooouuuunc------';
+    for (let i = 0, l = from.length; i < l; i++) {
+        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+    }
+    str = str.replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    return str;
+}
+const extractIndustriesFrom = (residuos) => {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
+    };
+    return residuos.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
+};
+const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45';
+const fetchData = async () => {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    const result = data.acf.card_residuo;
+    return result.map(addSlugProps);
+};
 
 
 /***/ })

@@ -3,20 +3,26 @@ import Form from './Form'
 import Section from './Section'
 import SectionsController from './SectionsController'
 import { section } from './SectionsEnum'
+import { fetchData } from './helpers'
 
-const manager = new FormController()
+const controller = new FormController()
 const form = new Form()
 const sectionsController = new SectionsController()
 
-manager.active = form
-sectionsController.observe(manager)
+;(async (): Promise<void> => {
+    const data = await fetchData()
 
-sectionsController.appendSections(
-    new Section(section.MODO_DE_PESQUISA),
-    new Section(section.INDUSTRIAS),
-    new Section(section.RESIDUOS)
-)
+    controller.data = data
+    controller.active = form
+    sectionsController.observe(controller)
 
-sectionsController.moveTo(section.MODO_DE_PESQUISA)
+    sectionsController.appendSections(
+        new Section(section.MODO_DE_PESQUISA),
+        new Section(section.INDUSTRIAS),
+        new Section(section.SERVICOS),
+        new Section(section.RESIDUOS)
+    )
 
-manager.active = form
+    sectionsController.moveTo(section.MODO_DE_PESQUISA)
+})()
+

@@ -1,27 +1,33 @@
 import State, { Observer } from './State'
 import Form from './Form'
+import { Residuo } from './Residuo'
 
 type Listener = (state: State) => void;
 
 export default class FormController implements Observer {
     private listeners: Listener[]
-    private state: State
+    private _state: State
+    public data: Residuo[];
 
     constructor() {
         this.listeners = []
     }
 
+    get state(): State {
+        return this._state
+    }
+
     set active(form: Form) {
-        this.state = form.localState
-        this.state.setObserver(this)
+        this._state = form.localState
+        this._state.setObserver(this)
         this.update()
     }
 
     onStateChange(...listeners: Listener[]): void {
-        listeners.forEach(cb => this.listeners.push(cb))
+        listeners.forEach(listener => this.listeners.push(listener))
     }
 
     update(): void {
-        this.listeners.forEach(cb => cb(this.state))
+        this.listeners.forEach(cb => cb(this._state))
     }
 }
