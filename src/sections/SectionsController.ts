@@ -1,4 +1,4 @@
-import FormController from '../form/FormController'
+import FormController from '../form/FormManager'
 import Section from './Section'
 import { Residuo } from '../utils/Residuo'
 

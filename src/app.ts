@@ -1,22 +1,22 @@
-import FormController from './form/FormController'
+import FormManager from './form/FormManager'
 import Form from './form/Form'
-import RegularSection from './sections/RegularSection'
-import { section } from './sections/SectionsEnum'
+import CardsSection from './sections/CardsSection'
+import { section } from './utils/enums'
 import { fetchData } from './utils/helpers'
 
 ;(async (): Promise<void> => {
-    const controller = new FormController(new Form(), await fetchData())
-    const sectionsController = controller.sectionsController
+    const manager = new FormManager(new Form(), await fetchData())
+    const sectionsController = manager.sectionsController
 
     sectionsController.appendSections(
-        new RegularSection(section.MODO_DE_PESQUISA),
-        new RegularSection(section.INDUSTRIAS),
-        new RegularSection(section.SERVICOS),
-        new RegularSection(section.RESIDUOS),
-        new RegularSection(section.CALCULO_MONTANTE),
-        new RegularSection(section.INFO_PESSOAIS),
-        new RegularSection(section.REVISE_PEDIDO),
-        new RegularSection(section.PEDIDO_ENVIADO)
+        new CardsSection(section.MODO_DE_PESQUISA),
+        new CardsSection(section.INDUSTRIAS),
+        new CardsSection(section.SERVICOS),
+        new CardsSection(section.RESIDUOS),
+        new CardsSection(section.CALCULO_MONTANTE),
+        new CardsSection(section.INFO_PESSOAIS),
+        new CardsSection(section.REVISE_PEDIDO),
+        new CardsSection(section.PEDIDO_ENVIADO)
     )
 
     sectionsController.moveTo(section.MODO_DE_PESQUISA)
