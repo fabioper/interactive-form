@@ -86,76 +86,112 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/Form.ts":
-/*!*********************!*\
-  !*** ./src/Form.ts ***!
-  \*********************/
+/***/ "./src/app.ts":
+/*!********************!*\
+  !*** ./src/app.ts ***!
+  \********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _form_FormController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./form/FormController */ "./src/form/FormController.ts");
+/* harmony import */ var _form_Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./form/Form */ "./src/form/Form.ts");
+/* harmony import */ var _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./sections/RegularSection */ "./src/sections/RegularSection.ts");
+/* harmony import */ var _sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sections/SectionsEnum */ "./src/sections/SectionsEnum.ts");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/helpers */ "./src/utils/helpers.ts");
+
+
+
+
+
+(async () => {
+    const controller = new _form_FormController__WEBPACK_IMPORTED_MODULE_0__["default"](new _form_Form__WEBPACK_IMPORTED_MODULE_1__["default"](), await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_4__["fetchData"])());
+    const sectionsController = controller.sectionsController;
+    sectionsController.appendSections(new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].MODO_DE_PESQUISA), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].INDUSTRIAS), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].SERVICOS), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].RESIDUOS), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].CALCULO_MONTANTE), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].INFO_PESSOAIS), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].REVISE_PEDIDO), new _sections_RegularSection__WEBPACK_IMPORTED_MODULE_2__["default"](_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].PEDIDO_ENVIADO));
+    sectionsController.moveTo(_sections_SectionsEnum__WEBPACK_IMPORTED_MODULE_3__["section"].MODO_DE_PESQUISA);
+})();
+
+
+/***/ }),
+
+/***/ "./src/form/Form.ts":
+/*!**************************!*\
+  !*** ./src/form/Form.ts ***!
+  \**************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Form; });
-/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
-
 class Form {
     constructor() {
-        this.localState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        console.log('Creating [Form]: constructor()');
+        this.formState = new FormData();
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/FormController.ts":
-/*!*******************************!*\
-  !*** ./src/FormController.ts ***!
-  \*******************************/
+/***/ "./src/form/FormController.ts":
+/*!************************************!*\
+  !*** ./src/form/FormController.ts ***!
+  \************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormController; });
+/* harmony import */ var _sections_SectionsController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../sections/SectionsController */ "./src/sections/SectionsController.ts");
+
 class FormController {
-    constructor() {
-        this.listeners = [];
+    constructor(initialForm, data) {
+        console.log('Creating [FormController]: constructor()');
+        this.sectionsController = new _sections_SectionsController__WEBPACK_IMPORTED_MODULE_0__["default"](this, data);
+        this.setActive(initialForm);
     }
-    get state() {
-        return this._state;
-    }
-    set active(form) {
-        this._state = form.localState;
-        this._state.setObserver(this);
-        this.update();
-    }
-    onStateChange(...listeners) {
-        listeners.forEach(listener => this.listeners.push(listener));
-    }
-    update() {
-        this.listeners.forEach(cb => cb(this._state));
+    setActive(form) {
+        this.formState = form.formState;
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/Section.ts":
-/*!************************!*\
-  !*** ./src/Section.ts ***!
-  \************************/
+/***/ "./src/sections/RegularSection.ts":
+/*!****************************************!*\
+  !*** ./src/sections/RegularSection.ts ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RegularSection; });
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/sections/Section.ts");
+
+class RegularSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
+}
+
+
+/***/ }),
+
+/***/ "./src/sections/Section.ts":
+/*!*********************************!*\
+  !*** ./src/sections/Section.ts ***!
+  \*********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
-/* harmony import */ var _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SectionsEnum */ "./src/SectionsEnum.ts");
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
-
-
 class Section {
     constructor(name) {
+        console.log(`Creating [Section]: constructor() -> ${name}`);
         this.name = name;
         this.rootElement = document.querySelector(`[data-section=${this.name}]`);
     }
@@ -165,57 +201,34 @@ class Section {
     queryAll(selector) {
         return this.rootElement.querySelectorAll(selector);
     }
-    updateState(state) {
-        console.log(state.industria);
+    mount() {
+        console.log(`\tRunning: mount() -> ${this.name}`);
+        this.rootElement.classList.add('active');
+        this.onMount();
     }
-    initilize(data) {
-        switch (this.name) {
-            case _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__["section"].INDUSTRIAS:
-                this.renderIndustriesCards(data);
-                break;
-            case _SectionsEnum__WEBPACK_IMPORTED_MODULE_0__["section"].RESIDUOS:
-                this.renderResiduesCards(data);
-                break;
-            default:
-                break;
-        }
+    unmount() {
+        console.log(`\tRunning: unmount() -> ${this.name}`);
+        this.rootElement.classList.remove('active');
+        this.onUnmount();
     }
-    renderIndustriesCards(data) {
-        const cards = this.rootElement.querySelector('.section__cards');
-        const industrias = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extractIndustriesFrom"])(data);
-        const markup = Array.from(industrias).map(([key, value]) => `
-            <a href="#" data-state-industria="${key}" data-section-action="residuos">
-                ${value}
-            </a>
-        `);
-        cards.innerHTML = markup.join(' ');
+    onMount() {
+        console.log(`\tRunning: onMount() -> ${this.name}`);
     }
-    renderResiduesCards(data) {
-        const cards = this.rootElement.querySelector('.section__cards');
-        const markup = data.map(residuo => (`
-            <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
-                ${residuo.nome}
-            </a>
-        `));
-        cards.innerHTML = markup.join(' ');
+    onUnmount() {
+        console.log(`\tRunning: onUnmount() -> ${this.name}`);
     }
-    extractIndustriesFrom(residuos) {
-        const extractMap = (acc, curr) => {
-            Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
-            return acc;
-        };
-        return residuos.map(residuo => residuo.industrias)
-            .reduce(extractMap, new Map());
+    setController(controller) {
+        this.controller = controller;
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/SectionsController.ts":
-/*!***********************************!*\
-  !*** ./src/SectionsController.ts ***!
-  \***********************************/
+/***/ "./src/sections/SectionsController.ts":
+/*!********************************************!*\
+  !*** ./src/sections/SectionsController.ts ***!
+  \********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -223,73 +236,46 @@ class Section {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SectionsController; });
 class SectionsController {
-    constructor() {
+    constructor(form, data) {
         this.sections = new Map();
+        console.log('Creating [SectionsController]: constructor()');
+        this.state = form.formState;
+        this.setData(data);
     }
-    set current(value) {
-        this._current = value;
-        this._current.rootElement.classList.add('active');
+    set current(section) {
+        console.log(`\tRunning: current() setter -> ${section.name}`);
+        this._current = section;
+        this._current.mount();
     }
-    set previous(value) {
+    set previous(section) {
         var _a;
-        this._previous = value;
-        (_a = this._previous) === null || _a === void 0 ? void 0 : _a.rootElement.classList.remove('active');
+        this._previous = section;
+        (_a = this._previous) === null || _a === void 0 ? void 0 : _a.unmount();
     }
-    moveTo(key) {
+    moveTo(sectionName) {
+        console.log(`\tRunning: moveTo() -> ${sectionName}`);
         this.previous = this._current;
-        this.current = this.sections.get(key);
+        this.current = this.sections.get(sectionName);
     }
     appendSections(...sections) {
+        console.log(`\tRunning: appendSections() -> size(${sections.length})`);
         sections.forEach(section => {
+            section.setController(this);
             this.sections.set(section.name, section);
-            section.initilize(this.formController.data);
-        });
-        this.addActionsClickEvents();
-        this.addCardsClickEvent();
-    }
-    observe(form) {
-        this.formController = form;
-        this.formController.onStateChange(state => this.notifySections(state));
-    }
-    notifySections(state) {
-        this.sections.forEach(section => section.updateState(state));
-    }
-    addActionsClickEvents() {
-        const actions = document.querySelectorAll('[data-section-action]');
-        actions.forEach(action => action.addEventListener('click', event => {
-            event.preventDefault();
-            this.moveTo(action.dataset.sectionAction);
-        }));
-    }
-    addCardsClickEvent() {
-        const keys = [
-            'modo',
-            'industria',
-            'servico',
-            'residuo'
-        ];
-        keys.forEach(key => {
-            const cards = document.querySelectorAll(`[data-state-${key}]`);
-            const capitalizedKey = this.capilizeWord(key);
-            cards.forEach(card => card.addEventListener('click', () => {
-                this.formController.state.setState({
-                    [key]: card.dataset[`state${capitalizedKey}`]
-                });
-            }));
         });
     }
-    capilizeWord(key) {
-        return key.charAt(0).toUpperCase() + key.slice(1);
+    setData(data) {
+        this.data = data;
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/SectionsEnum.ts":
-/*!*****************************!*\
-  !*** ./src/SectionsEnum.ts ***!
-  \*****************************/
+/***/ "./src/sections/SectionsEnum.ts":
+/*!**************************************!*\
+  !*** ./src/sections/SectionsEnum.ts ***!
+  \**************************************/
 /*! exports provided: section */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -311,72 +297,10 @@ var section;
 
 /***/ }),
 
-/***/ "./src/State.ts":
-/*!**********************!*\
-  !*** ./src/State.ts ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return State; });
-class State {
-    setState(data) {
-        Object.keys((key) => (this[key] = data[key]));
-        this.notify();
-    }
-    setObserver(observer) {
-        this.observer = observer;
-    }
-    notify() {
-        this.observer.update();
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/app.ts":
-/*!********************!*\
-  !*** ./src/app.ts ***!
-  \********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _FormController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FormController */ "./src/FormController.ts");
-/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./src/Form.ts");
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
-/* harmony import */ var _SectionsController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SectionsController */ "./src/SectionsController.ts");
-/* harmony import */ var _SectionsEnum__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SectionsEnum */ "./src/SectionsEnum.ts");
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
-
-
-
-
-
-
-const controller = new _FormController__WEBPACK_IMPORTED_MODULE_0__["default"]();
-const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["default"]();
-const sectionsController = new _SectionsController__WEBPACK_IMPORTED_MODULE_3__["default"]();
-(async () => {
-    const data = await Object(_helpers__WEBPACK_IMPORTED_MODULE_5__["fetchData"])();
-    controller.data = data;
-    controller.active = form;
-    sectionsController.observe(controller);
-    sectionsController.appendSections(new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].INDUSTRIAS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].SERVICOS), new _Section__WEBPACK_IMPORTED_MODULE_2__["default"](_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].RESIDUOS));
-    sectionsController.moveTo(_SectionsEnum__WEBPACK_IMPORTED_MODULE_4__["section"].MODO_DE_PESQUISA);
-})();
-
-
-/***/ }),
-
-/***/ "./src/helpers.ts":
-/*!************************!*\
-  !*** ./src/helpers.ts ***!
-  \************************/
+/***/ "./src/utils/helpers.ts":
+/*!******************************!*\
+  !*** ./src/utils/helpers.ts ***!
+  \******************************/
 /*! exports provided: addSlugProps, slug, extractIndustriesFrom, fetchData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 

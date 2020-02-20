@@ -1,26 +1,22 @@
-import FormController from './FormController'
-import Form from './Form'
-import Section from './Section'
-import SectionsController from './SectionsController'
-import { section } from './SectionsEnum'
-import { fetchData } from './helpers'
-
-const controller = new FormController()
-const form = new Form()
-const sectionsController = new SectionsController()
+import FormController from './form/FormController'
+import Form from './form/Form'
+import RegularSection from './sections/RegularSection'
+import { section } from './sections/SectionsEnum'
+import { fetchData } from './utils/helpers'
 
 ;(async (): Promise<void> => {
-    const data = await fetchData()
-
-    controller.data = data
-    controller.active = form
-    sectionsController.observe(controller)
+    const controller = new FormController(new Form(), await fetchData())
+    const sectionsController = controller.sectionsController
 
     sectionsController.appendSections(
-        new Section(section.MODO_DE_PESQUISA),
-        new Section(section.INDUSTRIAS),
-        new Section(section.SERVICOS),
-        new Section(section.RESIDUOS)
+        new RegularSection(section.MODO_DE_PESQUISA),
+        new RegularSection(section.INDUSTRIAS),
+        new RegularSection(section.SERVICOS),
+        new RegularSection(section.RESIDUOS),
+        new RegularSection(section.CALCULO_MONTANTE),
+        new RegularSection(section.INFO_PESSOAIS),
+        new RegularSection(section.REVISE_PEDIDO),
+        new RegularSection(section.PEDIDO_ENVIADO)
     )
 
     sectionsController.moveTo(section.MODO_DE_PESQUISA)
