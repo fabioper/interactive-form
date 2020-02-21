@@ -196,7 +196,8 @@
                                     </div>
                                 </a>
 
-                                <a href="#" class="card-residuo" data-card="tratamento-de-residuos" data-action="residuos">
+                                <a href="#" class="card-residuo" data-card="tratamento-de-residuos"
+                                    data-action="residuos">
                                     <div class="card-residuo-conteudo">
                                         <div class="card-residuo-frente">
                                             <img class="card-residuo-icone"
@@ -226,7 +227,8 @@
                                     </div>
                                 </a>
 
-                                <a href="#" class="card-residuo" data-card="limpeza-de-fossa-septica" data-action="residuos">
+                                <a href="#" class="card-residuo" data-card="limpeza-de-fossa-septica"
+                                    data-action="residuos">
                                     <div class="card-residuo-conteudo">
                                         <div class="card-residuo-frente">
                                             <img class="card-residuo-icone"
@@ -269,11 +271,11 @@
                                     <select name="periodo" id="periodo">
                                         <option value="">Selecione a frequência
                                             de sua coleta</option>
-                                        <option value="semanal">Semana</option>
-                                        <option value="mensal">Mês</option>
-                                        <option value="trimestral">Trimestre</option>
-                                        <option value="semestral">Semestre</option>
-                                        <option value="anual">Ano</option>
+                                        <option value="semana">Semana</option>
+                                        <option value="mes">Mês</option>
+                                        <option value="trimestre">Trimestre</option>
+                                        <option value="semestre">Semestre</option>
+                                        <option value="ano">Ano</option>
                                     </select>
                                     <span class="input__description">Ex: “2” por
                                         “semana”</span>
@@ -288,7 +290,7 @@
                             <aside class="form__aside">
                                 <h4 class="aside__title">Exemplos</h4>
                                 <ul class="aside__list" data-residuo="exemplos"></ul>
-                                <h3 class="aside__title">Destinação</h3>
+                                <h4 class="aside__title">Destinação</h4>
                                 <p class="aside__text" data-residuo="destinacao"></p>
                             </aside>
                         </div>
@@ -321,22 +323,22 @@
 
                                 <div class="form__input">
                                     <label for="cnpj">CNPJ</label>
-                                    <input type="number" name="cnpj" id="cnpj" pattern="[0-9]*" required>
+                                    <input type="number" name="cnpj" id="cnpj">
                                 </div>
 
                                 <div class="form__input">
                                     <label for="email">E-mail</label>
-                                    <input type="email" name="email" id="email" required>
+                                    <input type="email" name="email" id="email" >
                                 </div>
 
                                 <div class="form__input">
                                     <label for="cep">CEP</label>
-                                    <input type="text" name="cep" id="cep" pattern="(d{5}?)" required>
+                                    <input type="text" name="cep" id="cep" pattern="(d{5}?)" >
                                 </div>
 
                                 <div class="form__input">
                                     <label for="endereco">Endereço</label>
-                                    <input type="text" name="endereco" id="endereco" required>
+                                    <input type="text" name="endereco" id="endereco" >
                                 </div>
 
                                 <div class="form__input">
@@ -368,21 +370,21 @@
                             <div>
                                 <div>
                                     <h3>Resíduo:</h3>
-                                    <p data-residuo></p>
+                                    <p data-bind="residuo"></p>
                                 </div>
                                 <div>
                                     <h3>Frequência:</h3>
-                                    <p data-frequencia></p>
+                                    <p data-bind="frequencia"></p>
                                 </div>
                                 <div>
                                     <h3>Recipiente(s):</h3>
-                                    <ul data-frequencia></ul>
+                                    <ul data-bind="recipiente"></ul>
                                     <a href="#" data-action="calculo-montante">Editar</a>
                                     <a href="#">Excluir</a>
                                 </div>
                                 <div>
                                     <h3>Informações de Contato:</h3>
-                                    <div data-contato></div>
+                                    <div data-bind="contato"></div>
                                     <a href="#" data-action="informacoes-pessoais">Editar</a>
                                 </div>
 

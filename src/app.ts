@@ -4,7 +4,9 @@ import { Sections } from './utils/enums'
 import { fetchData } from './utils/helpers'
 
 (async (): Promise<void> => {
-    const manager = new FormManager(new Form(), await fetchData())
+    const form = new Form()
+
+    const manager = new FormManager(form, await fetchData())
     const sectionsController = manager.sectionsController
 
     const sections = sectionsController.querySections(

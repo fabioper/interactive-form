@@ -104,7 +104,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 (async () => {
-    const manager = new _form_FormManager__WEBPACK_IMPORTED_MODULE_0__["default"](new _form_Form__WEBPACK_IMPORTED_MODULE_1__["default"](), await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])());
+    const form = new _form_Form__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    const manager = new _form_FormManager__WEBPACK_IMPORTED_MODULE_0__["default"](form, await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])());
     const sectionsController = manager.sectionsController;
     const sections = sectionsController.querySections(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
     sectionsController.appendSections(...sections);
@@ -143,19 +144,23 @@ class Form {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormController; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormManager; });
 /* harmony import */ var _sections_SectionsController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../sections/SectionsController */ "./src/sections/SectionsController.ts");
 
-class FormController {
+class FormManager {
     constructor(initialForm, data) {
         console.log('Creating [FormController]: constructor()');
-        this.setActive(initialForm);
+        this.forms = [];
         this.sectionsController = new _sections_SectionsController__WEBPACK_IMPORTED_MODULE_0__["default"](this, data);
+        this.setActive(initialForm);
     }
     setActive(form) {
         console.log('\tRunning: setActive() ->');
-        this.formState = form.formState;
-        console.log(this.formState);
+        this.active = form;
+        this.formState = this.active.formState;
+    }
+    add(form) {
+        this.forms.push(form);
     }
 }
 
@@ -173,19 +178,34 @@ class FormController {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormSection; });
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/sections/Section.ts");
-/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/enums */ "./src/utils/enums.ts");
-
 
 class FormSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onMount() {
         super.onMount();
         console.log(`\t\t[ FormSection ] Running: mount() -> ${this.name}`);
+        this.fillPlaceholders();
+        this.bindFields();
+    }
+    bindFields() {
+        const inputFields = this.queryAll('input, select');
+        inputFields.forEach(inputField => {
+            var _a;
+            inputField.value = ((_a = this.controller.formState.get(inputField.name)) === null || _a === void 0 ? void 0 : _a.toString()) || '';
+            inputField.onkeydown = this.updateFormFields(inputField);
+            inputField.onchange = this.updateFormFields(inputField);
+            inputField.onblur = this.updateFormFields(inputField);
+        });
+    }
+    updateFormFields(inputField) {
+        return () => (this.controller.formState.set(inputField.name, inputField.value));
+    }
+    fillPlaceholders() {
         const placeholders = this.queryAll('[data-residuo]');
         placeholders.forEach(placeholder => {
             const key = placeholder.dataset.residuo;
             if (placeholder.nodeName === 'UL') {
                 const contents = this.getSelectedResidue()[key];
-                !contents ? placeholder.remove() :
+                !contents ? placeholder.previousElementSibling.remove() :
                     placeholder.innerHTML = this.toMarkupList(contents);
             }
             else {
@@ -197,10 +217,6 @@ class FormSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
         return args.map(({ exemplo }) => (`
             <li>${exemplo}</li>
         `)).join(' ');
-    }
-    getSelectedResidue() {
-        const slug = this.controller.formState.get(_utils_enums__WEBPACK_IMPORTED_MODULE_1__["Sections"].RESIDUOS).toString();
-        return this.controller.data.find(residuo => residuo.slug === slug);
     }
 }
 
@@ -336,6 +352,8 @@ class ResiduesSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/enums */ "./src/utils/enums.ts");
+
 class Section {
     constructor(name) {
         console.log(`Creating [Section]: constructor() -> ${name}`);
@@ -347,6 +365,31 @@ class Section {
         this.rootElement.classList.add('active');
         this.onMount();
         this.setActionClickEvents();
+        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].REVISE_PEDIDO) {
+            this.bindFormData();
+            this.query('[data-new]').onclick = () => this.newQuote();
+        }
+    }
+    newQuote() {
+        this.controller.addNewQuote();
+    }
+    bindFormData() {
+        var _a;
+        const residuo = this.query('[data-bind="residuo"]');
+        const frequencia = this.query('[data-bind="frequencia"]');
+        const recipiente = this.query('[data-bind="recipiente"]');
+        const contato = this.query('[data-bind="contato"]');
+        const { formState } = this.controller;
+        const selected = this.getSelectedResidue();
+        residuo.innerHTML = selected.nome;
+        frequencia.innerHTML = `${formState.get('frequencia')}x por ${formState.get('periodo')}`;
+        recipiente.innerHTML = ((_a = formState.get('recipiente')) === null || _a === void 0 ? void 0 : _a.toString()) || '';
+        contato.innerHTML = `
+            ${formState.get('nome')}<br>
+            ${formState.get('telefone')}<br>
+            ${formState.get('empresa')}<br>
+            ${formState.get('endereco')}
+        `;
     }
     unmount() {
         console.log(`\tRunning: unmount() -> ${this.name}`);
@@ -378,6 +421,10 @@ class Section {
             });
         });
     }
+    getSelectedResidue() {
+        const slug = this.controller.formState.get(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS).toString();
+        return this.controller.data.find(residuo => residuo.slug === slug);
+    }
 }
 
 
@@ -398,6 +445,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _IndustriesSection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./IndustriesSection */ "./src/sections/IndustriesSection.ts");
 /* harmony import */ var _ResiduesSection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ResiduesSection */ "./src/sections/ResiduesSection.ts");
 /* harmony import */ var _FormSection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FormSection */ "./src/sections/FormSection.ts");
+/* harmony import */ var _form_Form__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../form/Form */ "./src/form/Form.ts");
+
 
 
 
@@ -408,8 +457,10 @@ class SectionsController {
         this.sections = new Map();
         console.log('Creating [SectionsController]: constructor()');
         this.manager = formManager;
-        this.formState = formManager.formState;
         this.data = data;
+    }
+    get formState() {
+        return this.manager.formState;
     }
     set current(section) {
         console.log(`\tRunning: current() setter -> ${section.name}`);
@@ -434,7 +485,8 @@ class SectionsController {
                     return new _IndustriesSection__WEBPACK_IMPORTED_MODULE_2__["default"](name);
                 case _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS:
                     return new _ResiduesSection__WEBPACK_IMPORTED_MODULE_3__["default"](name);
-                case _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE || _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS:
+                case _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE:
+                case _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS:
                     return new _FormSection__WEBPACK_IMPORTED_MODULE_4__["default"](name);
                 default:
                     return new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](name);
@@ -447,6 +499,21 @@ class SectionsController {
             section.controller = this;
             this.sections.set(section.name, section);
         });
+    }
+    addNewQuote() {
+        this.manager.add(this.manager.active);
+        const form = new _form_Form__WEBPACK_IMPORTED_MODULE_5__["default"]();
+        form.formState.set('nome', this.formState.get('nome'));
+        form.formState.set('empresa', this.formState.get('empresa'));
+        form.formState.set('telefone', this.formState.get('telefone'));
+        form.formState.set('cnpj', this.formState.get('cnpj'));
+        form.formState.set('email', this.formState.get('email'));
+        form.formState.set('cep', this.formState.get('cep'));
+        form.formState.set('endereco', this.formState.get('endereco'));
+        form.formState.set('numero', this.formState.get('numero'));
+        form.formState.set('complemento', this.formState.get('complemento'));
+        this.manager.setActive(form);
+        this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS);
     }
 }
 

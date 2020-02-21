@@ -1,4 +1,6 @@
+import { Residuo } from './../utils/Residuo'
 import SectionsController from './SectionsController'
+import { Sections } from '../utils/enums'
 
 export default class Section {
     protected rootElement: HTMLElement;
@@ -16,6 +18,34 @@ export default class Section {
         this.rootElement.classList.add('active')
         this.onMount()
         this.setActionClickEvents()
+        if (this.name === Sections.REVISE_PEDIDO) {
+            this.bindFormData()
+            this.query('[data-new]').onclick = (): void => this.newQuote()
+        }
+    }
+
+    private newQuote(): void {
+        this.controller.addNewQuote()
+    }
+
+    // eslint-disable-next-line max-statements
+    private bindFormData(): void {
+        const residuo = this.query('[data-bind="residuo"]')
+        const frequencia = this.query('[data-bind="frequencia"]')
+        const recipiente = this.query('[data-bind="recipiente"]')
+        const contato = this.query('[data-bind="contato"]')
+        const { formState } = this.controller
+
+        const selected = this.getSelectedResidue()
+        residuo.innerHTML = selected.nome
+        frequencia.innerHTML = `${formState.get('frequencia')}x por ${formState.get('periodo')}`
+        recipiente.innerHTML = formState.get('recipiente')?.toString() || ''
+        contato.innerHTML = `
+            ${formState.get('nome')}<br>
+            ${formState.get('telefone')}<br>
+            ${formState.get('empresa')}<br>
+            ${formState.get('endereco')}
+        `
     }
 
     unmount(): void {
@@ -53,5 +83,10 @@ export default class Section {
                 })
             })
         })
+    }
+
+    protected getSelectedResidue(): Residuo {
+        const slug = this.controller.formState.get(Sections.RESIDUOS).toString()
+        return this.controller.data.find(residuo => residuo.slug === slug)
     }
 }
