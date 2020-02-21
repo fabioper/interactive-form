@@ -27,15 +27,6 @@ export function slug(text: string): string {
     return str
 }
 
-export const extractIndustriesFrom = (residuos: Residuo[]): Map<string, string> => {
-    const extractMap = (acc: Map<string, string>, curr: object): Map<string, string> => {
-        Object.keys(curr).forEach(key => (acc.set(key, curr[key])))
-        return acc
-    }
-    return residuos.map(residuo => residuo.industrias)
-        .reduce(extractMap, new Map()) as Map<string, string>
-}
-
 const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45'
 export const fetchData = async (): Promise<Residuo[]> => {
     const response = await fetch(endpoint)

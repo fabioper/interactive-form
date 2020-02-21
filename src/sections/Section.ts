@@ -1,10 +1,9 @@
-import { Residuo } from '../utils/Residuo'
 import SectionsController from './SectionsController'
 
-export default abstract class Section {
-    private controller: SectionsController;
-    rootElement: HTMLElement;
+export default class Section {
+    protected rootElement: HTMLElement;
     name: string;
+    controller: SectionsController;
 
     constructor(name: string) {
         console.log(`Creating [Section]: constructor() -> ${name}`)
@@ -12,18 +11,11 @@ export default abstract class Section {
         this.rootElement = document.querySelector(`[data-section=${this.name}]`) as HTMLElement
     }
 
-    protected query(selector: string): HTMLElement {
-        return this.rootElement.querySelector(selector) as HTMLElement
-    }
-
-    protected queryAll(selector: string): NodeListOf<HTMLElement> {
-        return this.rootElement.querySelectorAll(selector) as NodeListOf<HTMLElement>
-    }
-
     mount(): void {
         console.log(`\tRunning: mount() -> ${this.name}`)
         this.rootElement.classList.add('active')
         this.onMount()
+        this.setActionClickEvents()
     }
 
     unmount(): void {
@@ -40,7 +32,26 @@ export default abstract class Section {
         console.log(`\tRunning: onUnmount() -> ${this.name}`)
     }
 
-    setController(controller: SectionsController): void {
-        this.controller = controller
+    protected query(selector: string): HTMLElement {
+        return this.rootElement.querySelector(selector) as HTMLElement
+    }
+
+    protected queryAll(selector: string): NodeListOf<HTMLElement> {
+        return this.rootElement.querySelectorAll(selector) as NodeListOf<HTMLElement>
+    }
+
+    private setActionClickEvents(): void {
+        console.log(`\tRunning: addActionsEvent() -> ${this.name}`)
+        this.queryAll('[data-action]').forEach(element => {
+            element.addEventListener('click', event => {
+                event.preventDefault()
+                this.controller.formState.set(this.name, element.dataset.card)
+                this.controller.moveTo(element.dataset.action)
+
+                this.controller.formState.forEach((value, key) => {
+                    console.log(`${key} => ${value}`)
+                })
+            })
+        })
     }
 }

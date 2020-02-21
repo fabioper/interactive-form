@@ -1,4 +1,4 @@
-export enum section {
+export enum Sections {
     MODO_DE_PESQUISA = 'modo-de-pesquisa',
     INDUSTRIAS = 'industrias',
     SERVICOS = 'servicos',
