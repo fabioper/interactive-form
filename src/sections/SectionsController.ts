@@ -71,6 +71,7 @@ export default class SectionsController {
     addNewQuote(): void {
         this.manager.add(this.manager.active)
         const form = new Form()
+
         form.formState.set('nome', this.formState.get('nome'))
         form.formState.set('empresa', this.formState.get('empresa'))
         form.formState.set('telefone', this.formState.get('telefone'))
@@ -80,6 +81,8 @@ export default class SectionsController {
         form.formState.set('endereco', this.formState.get('endereco'))
         form.formState.set('numero', this.formState.get('numero'))
         form.formState.set('complemento', this.formState.get('complemento'))
+        form.formState.set('recipientes', this.formState.get('recipientes'))
+
         this.manager.setActive(form)
         this.moveTo(Sections.RESIDUOS)
     }

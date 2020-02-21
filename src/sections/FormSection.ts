@@ -1,4 +1,5 @@
 import Section from './Section'
+import { Sections } from '../utils/enums'
 
 export default class FormSection extends Section {
     onMount(): void {
@@ -7,6 +8,30 @@ export default class FormSection extends Section {
 
         this.fillPlaceholders()
         this.bindFields()
+
+        if (this.name === Sections.CALCULO_MONTANTE) {
+            const recipientInput = this.query('.recipiente-input__content')
+            const recipients = this.getSelectedResidue().containers
+            const recipientsData = {}
+            recipients.forEach(recipient => {
+                const markup = recipient.container.map(container => (`
+                    <span>
+                        ${container} <input type="number" name="quantidade-recipiente" id="${container}"/>
+                    </span>
+                `)).join(' ')
+                recipientInput.innerHTML = markup
+            })
+            this.queryAll('[name=quantidade-recipiente]').forEach((input: HTMLInputElement) => {
+                input.onchange = (): void => {
+                    recipientsData[input.id] = input.value || '0'
+                    console.log(`recipientes: ${JSON.stringify(recipientsData)}`)
+                    this.controller.formState.set('recipientes', JSON.stringify(recipientsData))
+                    this.controller.formState.forEach((value, key) => {
+                        console.log(`\t__STATE__ \n\t> ${key}->${value}`)
+                    })
+                }
+            })
+        }
     }
 
     private bindFields(): void {

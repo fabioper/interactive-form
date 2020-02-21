@@ -37,9 +37,13 @@ export default class Section {
         const { formState } = this.controller
 
         const selected = this.getSelectedResidue()
+        const recipients = JSON.parse(formState.get('recipientes')?.toString())
         residuo.innerHTML = selected.nome
         frequencia.innerHTML = `${formState.get('frequencia')}x por ${formState.get('periodo')}`
-        recipiente.innerHTML = formState.get('recipiente')?.toString() || ''
+        recipiente.innerHTML = Object.keys(recipients).map(key => (`
+            ${key} (${recipients[key]})<br>
+        `))
+            .join(' ')
         contato.innerHTML = `
             ${formState.get('nome')}<br>
             ${formState.get('telefone')}<br>

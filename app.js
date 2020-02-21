@@ -178,6 +178,8 @@ class FormManager {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormSection; });
 /* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/sections/Section.ts");
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/enums */ "./src/utils/enums.ts");
+
 
 class FormSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
     onMount() {
@@ -185,6 +187,29 @@ class FormSection extends _Section__WEBPACK_IMPORTED_MODULE_0__["default"] {
         console.log(`\t\t[ FormSection ] Running: mount() -> ${this.name}`);
         this.fillPlaceholders();
         this.bindFields();
+        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_1__["Sections"].CALCULO_MONTANTE) {
+            const recipientInput = this.query('.recipiente-input__content');
+            const recipients = this.getSelectedResidue().containers;
+            const recipientsData = {};
+            recipients.forEach(recipient => {
+                const markup = recipient.container.map(container => (`
+                    <span>
+                        ${container} <input type="number" name="quantidade-recipiente" id="${container}"/>
+                    </span>
+                `)).join(' ');
+                recipientInput.innerHTML = markup;
+            });
+            this.queryAll('[name=quantidade-recipiente]').forEach((input) => {
+                input.onchange = () => {
+                    recipientsData[input.id] = input.value || '0';
+                    console.log(`recipientes: ${JSON.stringify(recipientsData)}`);
+                    this.controller.formState.set('recipientes', JSON.stringify(recipientsData));
+                    this.controller.formState.forEach((value, key) => {
+                        console.log(`\t__STATE__ \n\t> ${key}->${value}`);
+                    });
+                };
+            });
+        }
     }
     bindFields() {
         const inputFields = this.queryAll('input, select');
@@ -381,9 +406,13 @@ class Section {
         const contato = this.query('[data-bind="contato"]');
         const { formState } = this.controller;
         const selected = this.getSelectedResidue();
+        const recipients = JSON.parse((_a = formState.get('recipientes')) === null || _a === void 0 ? void 0 : _a.toString());
         residuo.innerHTML = selected.nome;
         frequencia.innerHTML = `${formState.get('frequencia')}x por ${formState.get('periodo')}`;
-        recipiente.innerHTML = ((_a = formState.get('recipiente')) === null || _a === void 0 ? void 0 : _a.toString()) || '';
+        recipiente.innerHTML = Object.keys(recipients).map(key => (`
+            ${key} (${recipients[key]})<br>
+        `))
+            .join(' ');
         contato.innerHTML = `
             ${formState.get('nome')}<br>
             ${formState.get('telefone')}<br>
@@ -512,6 +541,7 @@ class SectionsController {
         form.formState.set('endereco', this.formState.get('endereco'));
         form.formState.set('numero', this.formState.get('numero'));
         form.formState.set('complemento', this.formState.get('complemento'));
+        form.formState.set('recipientes', this.formState.get('recipientes'));
         this.manager.setActive(form);
         this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS);
     }
