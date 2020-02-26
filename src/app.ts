@@ -1,15 +1,14 @@
-import FormManager from './form/FormManager'
-import Form from './form/Form'
+import { fetchData, loadIndustriesCards, loadResiduesCards, extractDropdownOptionsMarkup } from './utils/helpers'
+import SectionsController from './SectionsController'
 import { Sections } from './utils/enums'
-import { fetchData } from './utils/helpers'
+import FormManager from './FormManager'
 
 (async (): Promise<void> => {
-    const form = new Form()
+    const data = await fetchData()
+    const manager = new FormManager()
+    const controller = new SectionsController(manager, data)
 
-    const manager = new FormManager(form, await fetchData())
-    const sectionsController = manager.sectionsController
-
-    const sections = sectionsController.querySections(
+    controller.append(
         Sections.MODO_DE_PESQUISA,
         Sections.INDUSTRIAS,
         Sections.SERVICOS,
@@ -20,8 +19,20 @@ import { fetchData } from './utils/helpers'
         Sections.PEDIDO_ENVIADO
     )
 
-    sectionsController.appendSections(...sections)
+    controller.find(Sections.INDUSTRIAS).onMount(function() {
+        loadIndustriesCards(this.data, this.query('[data-cards]'))
+    })
 
-    sectionsController.moveTo(Sections.MODO_DE_PESQUISA)
+    controller.find(Sections.RESIDUOS).onMount(function() {
+        loadResiduesCards(this.state, this.data, this.query('[data-cards]'))
+    })
+
+    controller.find(Sections.CALCULO_MONTANTE).onMount(function() {
+        const recipients = this.query('.iq__options')
+        const containers = this.state.residuo.containers[0].container
+        recipients.innerHTML = extractDropdownOptionsMarkup(containers)
+    })
+
+    controller.moveTo(Sections.MODO_DE_PESQUISA)
 })()
 

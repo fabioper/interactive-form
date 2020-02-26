@@ -115,287 +115,187 @@
         </button>
     </header>
 
-
     <main class="page-main">
         <article class="mt-2 pl-1 pr-1">
-            <form class="form">
-                <section class="section" data-section="modo-de-pesquisa">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Solicitar orçamento</h2>
-                        </div>
+            <form class="interactive-form">
+                <section data-section="modo-de-pesquisa">
+                    <header>
+                        <h2>Solicitar orçamento</h2>
                     </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <p class="section__description">Você pode optar por
-                                fazer o seu orçamento por:</p>
-                            <div class="section__cards cards-residuos">
-                                <a href="#" class="card-residuo" data-card="industria" data-action="industrias">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Indústria</h3>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="#" class="card-residuo" data-card="servico" data-action="servicos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Serviço</h3>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="#" class="card-residuo" data-card="residuo" data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Resíduo</h3>
-                                        </div>
-                                    </div>
-                                </a>
+                    <div class="content">
+                        <div data-cards>
+                            <button data-action="industrias" data-card="industrias">Indústria</button>
+                            <button data-action="servicos" data-card="servicos">Serviços</button>
+                            <button data-action="residuos" data-card="residuos">Resíduos</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section data-section="industrias">
+                    <header>
+                        <h2>Indústrias</h2>
+                    </header>
+                    <div class="content">
+                        <div data-cards></div>
+                    </div>
+                </section>
+
+                <section data-section="servicos">
+                    <header>
+                        <h2>Serviços</h2>
+                    </header>
+                    <div class="content">
+                        <div data-cards></div>
+                    </div>
+                </section>
+
+                <section data-section="residuos">
+                    <header>
+                        <h2>Resíduos</h2>
+                    </header>
+                    <div class="content">
+                        <div data-cards>
+                            adasdw
+                        </div>
+                    </div>
+                </section>
+
+                <section data-section="calculo-montante">
+                    <header>
+                        <h2 data-bind="residuo:nome"></h2>
+                    </header>
+                    <div class="content">
+                        <h3>Cálculo Montante</h3>
+                        <div>
+                            <label for="frequencia">Frequência</label>
+                            <input type="number" name="frequencia" id="frequencia" min="1" value="1"> por
+                            <select name="periodo" id="periodo">
+                                <option value="">Selecione a frequência de sua coleta</option>
+                                <option value="semana">Semana</option>
+                                <option value="mes">Mês</option>
+                                <option value="trimestre">Trimestre</option>
+                                <option value="semestre">Semestre</option>
+                                <option value="ano">Ano</option>
+                            </select>
+                            <p>Ex: “2” por “semana”</p>
+                        </div>
+
+                        <div>
+                            <label for="recipiente">Recipiente</label>
+                            <div class="iq-dropdown">
+                                <div class="iq__title">Selecione um recipiente</div>
+                                <div class="iq__options"></div>
                             </div>
+                            <p>Os recipientes disponíveis são definidos pelo tipo de resíduo.</p>
+                        </div>
+
+                        <div>
+                            <button data-action="informacoes-pessoais">Avançar</button>
+                        </div>
+                    </div>
+                    <aside>
+                        <div>
+                            <h3>Exemplos:</h3>
+                            <ul data-bind="residuo:exemplos" data-transform></ul>
+                        </div>
+
+                        <div>
+                            <h3>Destinação</h3>
+                            <p data-bind="residuo:destinacao"></p>
+                        </div>
+                    </aside>
+                </section>
+                <section data-section="informacoes-pessoais">
+                    <header>
+                        <h2>Informações Pessoais</h2>
+                    </header>
+                    <div class="content">
+                        <div>
+                            <label for="nome">Nome:</label>
+                            <input type="text" name="nome" id="nome">
+                        </div>
+                        
+                        <div>
+                            <label for="telefone">Telefone com DDD</label>
+                            <input type="tel" name="telefone" id="telefone">
+                        </div>
+
+                        <div>
+                            <label for="email">E-mail</label>
+                            <input type="email" name="email" id="email">
+                        </div>
+
+                        <div>
+                            <label for="empresa">Empresa</label>
+                            <input type="text" name="empresa" id="empresa">
+                        </div>
+
+                        <div>
+                            <label for="cnpj">CNPJ</label>
+                            <input type="text" name="cnpj" id="cnpj">
+                        </div>
+
+                        <div>
+                            <label for="cep">CEP</label>
+                            <input type="text" name="cep" id="cep">
+                        </div>
+
+                        <div>
+                            <label for="endereco">Endereço</label>
+                            <input type="text" name="endereco" id="endereco">
+                        </div>
+
+                        <div>
+                            <label for="numero">Nº</label>
+                            <input type="text" name="numero" id="numero">
+                        </div>
+
+                        <div>
+                            <label for="complemento">Complemento</label>
+                            <input type="text" name="complemento" id="complemento">
+                        </div>
+
+                        <div>
+                            <button data-action="revise-seu-pedido">Avançar</button>
                         </div>
                     </div>
                 </section>
 
-                <section class="section" data-section="industrias">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Indústrias</h2>
-                        </div>
+                <section data-section="revise-seu-pedido">
+                    <header>
+                        <h2>Revise seu pedido</h2>
                     </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <p class="section__description"></p>
-                            <div class="section__cards cards-residuos" data-cards="industrias"></div>
+                    <div class="content">
+                        <div>
+                            <h3>Resíduo</h3>
+                            <p data-bind="residuo:nome"></p>
                         </div>
-                    </div>
-                </section>
-
-                <section class="section" data-section="servicos">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Serviços</h2>
+                        <div>
+                            <h3>Frequência</h3>
+                            <p data-bind="frequencia"></p>
                         </div>
-                    </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <p class="section__description"></p>
-                            <div class="section__cards cards-residuos cards-residuos">
-                                <a href="#" class="card-residuo" data-card="gestao-de-residuos" data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Gestão de Resíduos</h3>
-                                        </div>
-                                    </div>
-                                </a>
-
-                                <a href="#" class="card-residuo" data-card="tratamento-de-residuos"
-                                    data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Tratamento de Resíduos</h3>
-                                        </div>
-                                    </div>
-                                </a>
-
-                                <a href="#" class="card-residuo" data-card="pgrs" data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>PGRS</h3>
-                                        </div>
-                                    </div>
-                                </a>
-
-                                <a href="#" class="card-residuo" data-card="remocao-de-lodo" data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Remoção de Lodo</h3>
-                                        </div>
-                                    </div>
-                                </a>
-
-                                <a href="#" class="card-residuo" data-card="limpeza-de-fossa-septica"
-                                    data-action="residuos">
-                                    <div class="card-residuo-conteudo">
-                                        <div class="card-residuo-frente">
-                                            <img class="card-residuo-icone"
-                                                src="http://gruporodocon.com.br/residuos3/wp-content/uploads/2020/01/comum.svg">
-                                            <h3>Limpeza de Fossa Séptica</h3>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section" data-section="residuos">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Resíduos</h2>
-                        </div>
-                    </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <div class="section__cards cards-residuos" data-cards="residuos"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section" data-section="calculo-montante">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title" data-residuo="nome"></h2>
-                        </div>
-                    </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <div class="form__content">
-                                <h3 class="form__title">Cálculo Montante</h3>
-                                <div class="form__input">
-                                    <label for="frequencia">Frequêcia</label>
-                                    <input type="number" name="frequencia" id="frequencia"> por
-                                    <select name="periodo" id="periodo">
-                                        <option value="">Selecione a frequência
-                                            de sua coleta</option>
-                                        <option value="semana">Semana</option>
-                                        <option value="mes">Mês</option>
-                                        <option value="trimestre">Trimestre</option>
-                                        <option value="semestre">Semestre</option>
-                                        <option value="ano">Ano</option>
-                                    </select>
-                                    <span class="input__description">Ex: “2” por
-                                        “semana”</span>
-                                </div>
-                                <div class="form__input">
-                                    <label for="recipiente">Recipiente</label>
-                                    <div class="recipiente-input">Selecione um recipiente</div>
-                                    <div class="recipiente-input__content"></div>
-                                </div>
-                                <a href="#" data-action="informacoes-pessoais">
-                                    Avançar
-                                </a>
-                            </div>
-                            <aside class="form__aside">
-                                <h4 class="aside__title">Exemplos</h4>
-                                <ul class="aside__list" data-residuo="exemplos"></ul>
-                                <h4 class="aside__title">Destinação</h4>
-                                <p class="aside__text" data-residuo="destinacao"></p>
-                            </aside>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section" data-section="informacoes-pessoais">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Informações Pessoais</h2>
-                        </div>
-                    </header>
-                    <div class="section__content">
-                        <div class="container">
-                            <div class="form__content">
-                                <div class="form__input">
-                                    <label for="nome">Nome</label>
-                                    <input type="text" name="nome" id="nome">
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="Empresa">Empresa</label>
-                                    <input type="text" name="empresa" id="empresa">
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="telefone">Telefone com DDD</label>
-                                    <input type="tel" name="telefone" id="telefone">
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="cnpj">CNPJ</label>
-                                    <input type="number" name="cnpj" id="cnpj">
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="email">E-mail</label>
-                                    <input type="email" name="email" id="email" >
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="cep">CEP</label>
-                                    <input type="text" name="cep" id="cep" pattern="(d{5}?)" >
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="endereco">Endereço</label>
-                                    <input type="text" name="endereco" id="endereco" >
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="numero">Nº</label>
-                                    <input type="text" name="numero" id="numero">
-                                </div>
-
-                                <div class="form__input">
-                                    <label for="complemento">Complemento</label>
-                                    <input type="text" name="complemento" id="complemento">
-                                </div>
-
-                                <a href="#" data-action="revise-seu-pedido">
-                                    Avançar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section" data-section="revise-seu-pedido">
-                    <header class="section__header">
-                        <div class="container">
-                            <h2 class="section__title">Revise seu pedido</h2>
-                        </div>
-                    </header>
-                    <div class="section__content">
-                        <div class="container">
+                        <div>
+                            <h3>Recipientes</h3>
+                            <p data-bind="recipientes"></p>
                             <div>
-                                <div>
-                                    <h3>Resíduo:</h3>
-                                    <p data-bind="residuo"></p>
-                                </div>
-                                <div>
-                                    <h3>Frequência:</h3>
-                                    <p data-bind="frequencia"></p>
-                                </div>
-                                <div>
-                                    <h3>Recipiente(s):</h3>
-                                    <ul data-bind="recipiente"></ul>
-                                    <a href="#" data-action="calculo-montante">Editar</a>
-                                    <a href="#">Excluir</a>
-                                </div>
-                                <div>
-                                    <h3>Informações de Contato:</h3>
-                                    <div data-bind="contato"></div>
-                                    <a href="#" data-action="informacoes-pessoais">Editar</a>
-                                </div>
-
-                                <a href="#" data-new>Acrescentar resíduo</a>
-                                <a href="#" data-send>Enviar pedido</a>
+                                <button data-action="calculo-montante">Editar</button>
                             </div>
+                        </div>
+                        <div>
+                            <h3>Informações de Contato</h3>
+                            <p data-bind="contato"></p>
+                            <div>
+                                <button data-action="informacoes-pessoais">Editar</button>
+                            </div>
+                        </div>
+                        <div>
+                            <button data-save>Acrescentar resíduo</button>
+                            <button type="submit">Enviar pedido</button>
                         </div>
                     </div>
                 </section>
+
+                <aside data-aside></aside>
             </form>
         </article>
 
@@ -434,7 +334,6 @@
                 </a>
             </div>
         </div>
-
     </main>
 
     <footer id="siteRodape" class="pl-1 pr-1">
