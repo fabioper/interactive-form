@@ -91,11 +91,18 @@ export default class Section {
 
     private addBindings(): void {
         const bindings = this.queryAll('[data-bind]')
+        // eslint-disable-next-line max-statements
         bindings.forEach(binding => {
             let value
             if (binding.dataset.bind.includes(':')) {
                 const [state, key] = binding.dataset.bind.split(':')
                 value = this.state[state][key]
+                /* if (state === 'residuo' && key === 'nome') {
+                    const icon = document.createElement('img')
+                    icon.classList.add('residuo-icon')
+                    icon.src = this.state.residuo.icone
+                    binding.insertAdjacentElement('beforebegin', icon)
+                } */
             } else {
                 value = this.state[binding.dataset.bind]
             }
@@ -167,8 +174,8 @@ export default class Section {
                         <h3>Recipiente(s)</h3>
                         <p>${state.recipientes}</p>
                         <div>
-                            <button data-edit="${idx}">Editar</button>
-                            <button data-remove="${idx}">Excluir</button>
+                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">Editar</button>
+                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">Excluir</button>
                         </div>
                     </div>
                 `).join(' ')
@@ -194,6 +201,7 @@ export default class Section {
                 btn.onclick = (event): void => {
                     event.preventDefault()
                     this.controller.removeState(btn.dataset.remove)
+                    this.controller.moveTo(this.name)
                 }
             })
         } else { aside.innerHTML = '' }

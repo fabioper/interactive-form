@@ -283,8 +283,8 @@ class Section {
                         <h3>Recipiente(s)</h3>
                         <p>${state.recipientes}</p>
                         <div>
-                            <button data-edit="${idx}">Editar</button>
-                            <button data-remove="${idx}">Excluir</button>
+                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">Editar</button>
+                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">Excluir</button>
                         </div>
                     </div>
                 `).join(' ');
@@ -307,6 +307,7 @@ class Section {
                 btn.onclick = (event) => {
                     event.preventDefault();
                     this.controller.removeState(btn.dataset.remove);
+                    this.controller.moveTo(this.name);
                 };
             });
         }
@@ -461,16 +462,15 @@ __webpack_require__.r(__webpack_exports__);
     const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_3__["default"]();
     const controller = new _SectionsController__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
     controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
-    controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS).onMount(function () {
-        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadIndustriesCards"])(this.data, this.query('[data-cards]'));
-    });
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
         Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, this.query('[data-cards]'));
     });
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE).onMount(function () {
         const recipients = this.query('.iq__options');
+        const activator = recipients.previousElementSibling;
         const containers = this.state.residuo.containers[0].container;
         recipients.innerHTML = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractDropdownOptionsMarkup"])(containers);
+        activator.onclick = () => recipients.parentElement.classList.toggle('active');
     });
     controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA);
 })();
@@ -507,7 +507,7 @@ var Sections;
 /*!******************************!*\
   !*** ./src/utils/helpers.ts ***!
   \******************************/
-/*! exports provided: addSlugProps, slug, fetchData, hasTreatment, belongsTo, loadResiduesCards, loadIndustriesCards, extractIndustriesFrom, toMarkup, chooseFilter, extractDropdownOptionsMarkup */
+/*! exports provided: addSlugProps, slug, fetchData, hasTreatment, belongsTo, loadResiduesCards, toMarkup, chooseFilter, extractDropdownOptionsMarkup */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -518,8 +518,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasTreatment", function() { return hasTreatment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "belongsTo", function() { return belongsTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadResiduesCards", function() { return loadResiduesCards; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadIndustriesCards", function() { return loadIndustriesCards; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toMarkup", function() { return toMarkup; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "chooseFilter", function() { return chooseFilter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractDropdownOptionsMarkup", function() { return extractDropdownOptionsMarkup; });
@@ -563,25 +561,12 @@ function belongsTo(industry) {
 }
 function loadResiduesCards(state, data, cards) {
     const filteredResidues = data.filter(chooseFilter(state));
-    cards.innerHTML = filteredResidues.map(residuo => (toMarkup(residuo.slug, residuo.nome, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE))).join(' ');
+    cards.innerHTML = filteredResidues.map(residuo => (toMarkup(residuo.slug, residuo.nome, residuo.icone, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE))).join(' ');
 }
-function loadIndustriesCards(data, cards) {
-    const industries = extractIndustriesFrom(data);
-    cards.innerHTML = Array.from(industries)
-        .map(([key, name]) => toMarkup(key, name, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS))
-        .join(' ');
-}
-function extractIndustriesFrom(data) {
-    const extractMap = (acc, curr) => {
-        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
-        return acc;
-    };
-    return data.map(residuo => residuo.industrias)
-        .reduce(extractMap, new Map());
-}
-function toMarkup(key, name, action) {
+function toMarkup(key, name, icon, action) {
     return (`
         <button data-card="${key}" data-action="${action}">
+            <img src="${icon}" alt="${name}"/>
             <h3>${name}</h3>
         </button>
     `);

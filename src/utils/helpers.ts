@@ -53,15 +53,16 @@ export function loadResiduesCards(state: State, data: Residuo[], cards: HTMLElem
         toMarkup(
             residuo.slug,
             residuo.nome,
+            residuo.icone,
             Sections.CALCULO_MONTANTE
         )
     )).join(' ')
 }
 
-export function loadIndustriesCards(data: Residuo[], cards: HTMLElement): void {
+/* export function loadIndustriesCards(data: Residuo[], cards: HTMLElement): void {
     const industries = extractIndustriesFrom(data)
     cards.innerHTML = Array.from(industries)
-        .map(([key, name]) => toMarkup(key, name, Sections.RESIDUOS))
+        .map(([key, name]) => toMarkup(key, name, null, Sections.RESIDUOS))
         .join(' ')
 }
 
@@ -72,11 +73,12 @@ export function extractIndustriesFrom(data: Residuo[]): Map<string, string> {
     }
     return data.map(residuo => residuo.industrias)
         .reduce(extractMap, new Map()) as Map<string, string>
-}
+} */
 
-export function toMarkup(key: string, name: string, action: Sections): string {
+export function toMarkup(key: string, name: string, icon: string, action: Sections): string {
     return (`
         <button data-card="${key}" data-action="${action}">
+            <img src="${icon}" alt="${name}"/>
             <h3>${name}</h3>
         </button>
     `)

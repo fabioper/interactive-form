@@ -124,9 +124,15 @@
                     </header>
                     <div class="content">
                         <div data-cards>
-                            <button data-action="industrias" data-card="industrias">Indústria</button>
-                            <button data-action="servicos" data-card="servicos">Serviços</button>
-                            <button data-action="residuos" data-card="residuos">Resíduos</button>
+                        <button data-action="industrias" data-card="industrias">
+                            <h3>Indústria</h3>
+                        </button>
+                        <button data-action="servicos" data-card="servicos">
+                            <h3>Serviços</h3>
+                        </button>
+                        <button data-action="residuos" data-card="residuos">
+                            <h3>Resíduos</h3>
+                        </button>
                         </div>
                     </div>
                 </section>
@@ -150,60 +156,63 @@
                 </section>
 
                 <section data-section="residuos">
-                    <header>
-                        <h2>Resíduos</h2>
-                    </header>
-                    <div class="content">
-                        <div data-cards>
-                            adasdw
+                        <header>
+                            <h2>Resíduos</h2>
+                        </header>
+                        <div class="container">
+                            <div class="content">
+                                <div data-cards></div>
+                            </div>
+                            <aside data-aside><div></div></aside>
                         </div>
-                    </div>
                 </section>
 
                 <section data-section="calculo-montante">
                     <header>
                         <h2 data-bind="residuo:nome"></h2>
                     </header>
-                    <div class="content">
-                        <h3>Cálculo Montante</h3>
-                        <div>
-                            <label for="frequencia">Frequência</label>
-                            <input type="number" name="frequencia" id="frequencia" min="1" value="1"> por
-                            <select name="periodo" id="periodo">
-                                <option value="">Selecione a frequência de sua coleta</option>
-                                <option value="semana">Semana</option>
-                                <option value="mes">Mês</option>
-                                <option value="trimestre">Trimestre</option>
-                                <option value="semestre">Semestre</option>
-                                <option value="ano">Ano</option>
-                            </select>
-                            <p>Ex: “2” por “semana”</p>
-                        </div>
-
-                        <div>
-                            <label for="recipiente">Recipiente</label>
-                            <div class="iq-dropdown">
-                                <div class="iq__title">Selecione um recipiente</div>
-                                <div class="iq__options"></div>
+                    <div class="container">
+                        <div class="content">
+                            <h3>Cálculo Montante</h3>
+                            <div>
+                                <label for="frequencia">Frequência</label>
+                                <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
+                                <select name="periodo" id="periodo" required>
+                                    <option value="">Selecione a frequência de sua coleta</option>
+                                    <option value="semana">Semana</option>
+                                    <option value="mes">Mês</option>
+                                    <option value="trimestre">Trimestre</option>
+                                    <option value="semestre">Semestre</option>
+                                    <option value="ano">Ano</option>
+                                </select>
+                                <p class="helper-message">Ex: “2” por “semana”</p>
                             </div>
-                            <p>Os recipientes disponíveis são definidos pelo tipo de resíduo.</p>
+    
+                            <div>
+                                <label for="recipiente">Recipiente</label>
+                                <div class="iq-dropdown">
+                                    <div class="iq__title">Selecione um recipiente</div>
+                                    <div class="iq__options"></div>
+                                </div>
+                                <p class="helper-message">Os recipientes disponíveis são definidos pelo tipo de resíduo.</p>
+                            </div>
+    
+                            <div class="nav-buttons">
+                                <button data-action="informacoes-pessoais" class="submit">Avançar</button>
+                            </div>
                         </div>
-
-                        <div>
-                            <button data-action="informacoes-pessoais">Avançar</button>
-                        </div>
+                        <aside>
+                            <div>
+                                <h3>Exemplos:</h3>
+                                <ul data-bind="residuo:exemplos" data-transform></ul>
+                            </div>
+    
+                            <div>
+                                <h3>Destinação</h3>
+                                <p data-bind="residuo:destinacao"></p>
+                            </div>
+                        </aside>
                     </div>
-                    <aside>
-                        <div>
-                            <h3>Exemplos:</h3>
-                            <ul data-bind="residuo:exemplos" data-transform></ul>
-                        </div>
-
-                        <div>
-                            <h3>Destinação</h3>
-                            <p data-bind="residuo:destinacao"></p>
-                        </div>
-                    </aside>
                 </section>
                 <section data-section="informacoes-pessoais">
                     <header>
@@ -255,8 +264,8 @@
                             <input type="text" name="complemento" id="complemento">
                         </div>
 
-                        <div>
-                            <button data-action="revise-seu-pedido">Avançar</button>
+                        <div class="nav-buttons">
+                            <button data-action="revise-seu-pedido" class="submit">Avançar</button>
                         </div>
                     </div>
                 </section>
@@ -278,24 +287,22 @@
                             <h3>Recipientes</h3>
                             <p data-bind="recipientes"></p>
                             <div>
-                                <button data-action="calculo-montante">Editar</button>
+                                <button data-action="calculo-montante" class="btn__secondary btn__secondary--edit">Editar</button>
                             </div>
                         </div>
                         <div>
                             <h3>Informações de Contato</h3>
                             <p data-bind="contato"></p>
                             <div>
-                                <button data-action="informacoes-pessoais">Editar</button>
+                                <button data-action="informacoes-pessoais" class="btn__secondary btn__secondary--edit">Editar</button>
                             </div>
                         </div>
-                        <div>
-                            <button data-save>Acrescentar resíduo</button>
-                            <button type="submit">Enviar pedido</button>
+                        <div class="nav-buttons">
+                            <button type="submit" class="submit">Enviar pedido</button>
+                            <button data-save class="save">Acrescentar resíduo</button>
                         </div>
                     </div>
                 </section>
-
-                <aside data-aside></aside>
             </form>
         </article>
 
