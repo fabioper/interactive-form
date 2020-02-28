@@ -55,7 +55,7 @@ section h2 {
     border-bottom: 1px solid #ccc;
     padding-bottom: .85rem;
 }
-[data-section="informacoes-pessoais"] .content h3 {
+[data-section="informacoes-pessoais"] .content label {
     font-size: 1rem;
 }
 
@@ -446,11 +446,11 @@ aside p {
 }
 
 aside ul li {
-    list-style: circle;
+    list-style: disc;
 }
 
 aside ul li::before {
-    display: none;
+    display: none !important;
 }
 
 .loading {
