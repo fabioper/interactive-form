@@ -84,7 +84,16 @@ export default class Section {
         this.queryAll('[data-action]').forEach(action => {
             action.onclick = (event): void => {
                 event.preventDefault()
-                this.controller.moveTo(action.dataset.action)
+                const inputs = this.queryAll('input, select') as HTMLInputElement[]
+                const isValid = inputs.every(input => {
+                    input.reportValidity()
+                    return input.checkValidity()
+                })
+                if (isValid)
+                    this.controller.moveTo(action.dataset.action)
+
+                // if (this.name === Sections.CALCULO_MONTANTE || this.name === Sections.INFO_PESSOAIS) {
+                // }
             }
         })
     }

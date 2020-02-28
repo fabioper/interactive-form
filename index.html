@@ -118,9 +118,14 @@
     <main class="page-main">
         <article class="mt-2 pl-1 pr-1">
             <form class="interactive-form">
+                <div class="loading">
+                    <p class="loading__message">Aguarde um instante...</p>
+                </div>
+                
                 <section data-section="modo-de-pesquisa">
                     <header>
                         <h2>Solicitar orçamento</h2>
+                        <div class="progress" data-value="0"></div>
                     </header>
                     <div class="content">
                         <div data-cards>
@@ -140,24 +145,87 @@
                 <section data-section="industrias">
                     <header>
                         <h2>Indústrias</h2>
+                        <div class="progress" data-value="1">
+                            <div class="progress__value"></div>
+                        </div>
                     </header>
                     <div class="content">
-                        <div data-cards></div>
+                        <div data-cards>
+                            <button data-card="alimenticia" data-action="residuos">
+                                <img src="" alt="Alimentícia"/>
+                                <h3>Alimentícia</h3>
+                            </button>
+                            <button data-card="construcao-civil" data-action="residuos">
+                                <img src="" alt="Construção Civil"/>
+                                <h3>Construção Civil</h3>
+                            </button>
+                            <button data-card="educacao" data-action="residuos">
+                                <img src="" alt="Educação"/>
+                                <h3>Educação</h3>
+                            </button>
+                            <button data-card="empresarial" data-action="residuos">
+                                <img src="" alt="Empresarial"/>
+                                <h3>Empresarial</h3>
+                            </button>
+                            <button data-card="industria" data-action="residuos">
+                                <img src="" alt="Indústria"/>
+                                <h3>Indústria</h3>
+                            </button>
+                            <button data-card="lazer" data-action="residuos">
+                                <img src="" alt="Lazer"/>
+                                <h3>Lazer</h3>
+                            </button>
+                            <button data-card="saude" data-action="residuos">
+                                <img src="" alt="Saúde"/>
+                                <h3>Saúde</h3>
+                            </button>
+                            <button data-card="varejo" data-action="residuos">
+                                <img src="" alt="Varejo"/>
+                                <h3>Varejo</h3>
+                            </button>
+                        </div>
                     </div>
                 </section>
 
                 <section data-section="servicos">
                     <header>
                         <h2>Serviços</h2>
+                        <div class="progress" data-value="1">
+                            <div class="progress__value"></div>
+                        </div>
                     </header>
                     <div class="content">
-                        <div data-cards></div>
+                        <div data-cards>
+                            <button data-card="gestao-de-residuos" data-action="residuos">
+                                <img src="" alt="Gestão de resíduos"/>
+                                <h3>Gestão de resíduos</h3>
+                            </button>
+                            <button data-card="tratamento-de-residuos" data-action="residuos">
+                                <img src="" alt="Tratamento de resíduos"/>
+                                <h3>Tratamento de resíduos</h3>
+                            </button>
+                            <button data-card="pgrs" data-action="informacoes-pessoais">
+                                <img src="" alt="PGRS"/>
+                                <h3>PGRS</h3>
+                            </button>
+                            <button data-card="remocao-de-lodo" data-action="informacoes-pessoais">
+                                <img src="" alt="Remoção de lodo"/>
+                                <h3>Remoção de lodo</h3>
+                            </button>
+                            <button data-card="limpeza-de-fossa-septica" data-action="informacoes-pessoais">
+                                <img src="" alt="Limpeza de fossa séptica"/>
+                                <h3>Limpeza de fossa séptica</h3>
+                            </button>
+                        </div>
                     </div>
                 </section>
 
                 <section data-section="residuos">
                         <header>
                             <h2>Resíduos</h2>
+                            <div class="progress" data-value="2">
+                                <div class="progress__value"></div>
+                            </div>
                         </header>
                         <div class="container">
                             <div class="content">
@@ -170,13 +238,16 @@
                 <section data-section="calculo-montante">
                     <header>
                         <h2 data-bind="residuo:nome"></h2>
+                        <div class="progress" data-value="3">
+                            <div class="progress__value"></div>
+                        </div>
                     </header>
                     <div class="container">
                         <div class="content">
                             <h3>Cálculo Montante</h3>
                             <div>
                                 <label for="frequencia">Frequência</label>
-                                <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
+                                <input type="number" name="frequencia" id="frequencia" min="1" value="1" required> <span>por</span>
                                 <select name="periodo" id="periodo" required>
                                     <option value="">Selecione a frequência de sua coleta</option>
                                     <option value="semana">Semana</option>
@@ -217,21 +288,24 @@
                 <section data-section="informacoes-pessoais">
                     <header>
                         <h2>Informações Pessoais</h2>
+                        <div class="progress" data-value="4">
+                            <div class="progress__value"></div>
+                        </div>
                     </header>
                     <div class="content">
                         <div>
                             <label for="nome">Nome:</label>
-                            <input type="text" name="nome" id="nome">
+                            <input type="text" name="nome" id="nome" required>
                         </div>
                         
                         <div>
                             <label for="telefone">Telefone com DDD</label>
-                            <input type="tel" name="telefone" id="telefone">
+                            <input type="tel" name="telefone" id="telefone" required>
                         </div>
 
                         <div>
                             <label for="email">E-mail</label>
-                            <input type="email" name="email" id="email">
+                            <input type="email" name="email" id="email" required>
                         </div>
 
                         <div>
@@ -246,17 +320,17 @@
 
                         <div>
                             <label for="cep">CEP</label>
-                            <input type="text" name="cep" id="cep">
+                            <input type="text" name="cep" id="cep" required>
                         </div>
 
                         <div>
                             <label for="endereco">Endereço</label>
-                            <input type="text" name="endereco" id="endereco">
+                            <input type="text" name="endereco" id="endereco" required>
                         </div>
 
                         <div>
                             <label for="numero">Nº</label>
-                            <input type="text" name="numero" id="numero">
+                            <input type="text" name="numero" id="numero" required>
                         </div>
 
                         <div>
@@ -273,6 +347,9 @@
                 <section data-section="revise-seu-pedido">
                     <header>
                         <h2>Revise seu pedido</h2>
+                        <div class="progress" data-value="5">
+                            <div class="progress__value"></div>
+                        </div>
                     </header>
                     <div class="content">
                         <div>
@@ -299,7 +376,7 @@
                         </div>
                         <div class="nav-buttons">
                             <button type="submit" class="submit">Enviar pedido</button>
-                            <button data-save class="save">Acrescentar resíduo</button>
+                            <button data-save class="save" data-action>Acrescentar resíduo</button>
                         </div>
                     </div>
                 </section>

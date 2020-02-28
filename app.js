@@ -210,7 +210,13 @@ class Section {
         this.queryAll('[data-action]').forEach(action => {
             action.onclick = (event) => {
                 event.preventDefault();
-                this.controller.moveTo(action.dataset.action);
+                const inputs = this.queryAll('input, select');
+                const isValid = inputs.every(input => {
+                    input.reportValidity();
+                    return input.checkValidity();
+                });
+                if (isValid)
+                    this.controller.moveTo(action.dataset.action);
             };
         });
     }
@@ -457,10 +463,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const loading = document.querySelector('.loading');
 (async () => {
     const data = await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["fetchData"])();
     const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_3__["default"]();
     const controller = new _SectionsController__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
+    loading.remove();
     controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
         Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, this.query('[data-cards]'));

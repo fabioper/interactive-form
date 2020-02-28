@@ -3,10 +3,13 @@ import SectionsController from './SectionsController'
 import { Sections } from './utils/enums'
 import FormManager from './FormManager'
 
+const loading = document.querySelector('.loading') as HTMLDivElement
+
 (async (): Promise<void> => {
     const data = await fetchData()
     const manager = new FormManager()
     const controller = new SectionsController(manager, data)
+    loading.remove()
 
     controller.append(
         Sections.MODO_DE_PESQUISA,
