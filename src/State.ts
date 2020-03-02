@@ -12,7 +12,7 @@ export default class State {
             [x: string]: number;
         };
     }
-    userInfo: {
+    static userInfo: {
         nome: string;
         telefone: string;
         email: string;
@@ -30,17 +30,18 @@ export default class State {
             periodo: '',
             recipientes: {}
         }
-        this.userInfo = {
-            nome: '',
-            telefone: '',
-            email: '',
-            empresa: '',
-            cnpj: '',
-            cep: '',
-            endereco: '',
-            numero: '',
-            complemento: ''
-        }
+        if (State.userInfo)
+            State.userInfo = {
+                nome: '',
+                telefone: '',
+                email: '',
+                empresa: '',
+                cnpj: '',
+                cep: '',
+                endereco: '',
+                numero: '',
+                complemento: ''
+            }
     }
 
     get frequencia(): string {
@@ -56,7 +57,7 @@ export default class State {
     }
 
     get contato(): string {
-        const { nome, telefone, empresa, endereco, numero } = this.userInfo
+        const { nome, telefone, empresa, endereco, numero } = State.userInfo
         return `
             ${nome}<br>
             ${telefone}<br>

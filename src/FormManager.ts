@@ -21,7 +21,7 @@ export default class FormManager {
         if (!this._states.includes(state)) {
             this._states.push(state)
             const newState = new State()
-            newState.userInfo = state.userInfo
+            // newState.userInfo = state.userInfo
             this.state = newState
         }
     }

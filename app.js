@@ -113,7 +113,6 @@ class FormManager {
         if (!this._states.includes(state)) {
             this._states.push(state);
             const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
-            newState.userInfo = state.userInfo;
             this.state = newState;
         }
     }
@@ -145,6 +144,8 @@ class FormManager {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
 /* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./State */ "./src/State.ts");
+
 
 class Section {
     constructor(name) {
@@ -259,8 +260,8 @@ class Section {
         if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS) {
             const inputs = this.queryAll('input');
             inputs.forEach(input => {
-                input.value = this.state.userInfo[input.name];
-                input.onchange = () => this.state.userInfo[input.name] = input.value;
+                input.value = _State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo[input.name];
+                input.onchange = () => _State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo[input.name] = input.value;
             });
         }
     }
@@ -447,17 +448,18 @@ class State {
             periodo: '',
             recipientes: {}
         };
-        this.userInfo = {
-            nome: '',
-            telefone: '',
-            email: '',
-            empresa: '',
-            cnpj: '',
-            cep: '',
-            endereco: '',
-            numero: '',
-            complemento: ''
-        };
+        if (State.userInfo)
+            State.userInfo = {
+                nome: '',
+                telefone: '',
+                email: '',
+                empresa: '',
+                cnpj: '',
+                cep: '',
+                endereco: '',
+                numero: '',
+                complemento: ''
+            };
     }
     get frequencia() {
         const { frequencia, periodo } = this.calculoMontante;
@@ -470,7 +472,7 @@ class State {
             .join(' ');
     }
     get contato() {
-        const { nome, telefone, empresa, endereco, numero } = this.userInfo;
+        const { nome, telefone, empresa, endereco, numero } = State.userInfo;
         return `
             ${nome}<br>
             ${telefone}<br>

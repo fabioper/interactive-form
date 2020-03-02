@@ -153,8 +153,8 @@ export default class Section {
         if (this.name === Sections.INFO_PESSOAIS) {
             const inputs = this.queryAll('input') as HTMLInputElement[]
             inputs.forEach(input => {
-                input.value = this.state.userInfo[input.name]
-                input.onchange = (): string => this.state.userInfo[input.name] = input.value
+                input.value = State.userInfo[input.name]
+                input.onchange = (): string => State.userInfo[input.name] = input.value
             })
         }
     }
