@@ -1,4 +1,4 @@
-import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup, loadIndustriesCards, extractIndustriesFrom } from './utils/helpers'
+import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup, extractIndustriesFrom } from './utils/helpers'
 import SectionsController from './SectionsController'
 import { Sections } from './utils/enums'
 import FormManager from './FormManager'
