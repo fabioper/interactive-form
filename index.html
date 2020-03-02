@@ -121,21 +121,24 @@
                 <div class="loading">
                     <p class="loading__message">Aguarde um instante...</p>
                 </div>
-                
+
                 <section data-section="modo-de-pesquisa">
                     <header>
                         <h2>Solicitar orçamento</h2>
-                        <div class="progress" data-value="0"></div>
+                        <div class="progress" data-value="1" data-max="6">
                     </header>
                     <div class="content">
                         <div data-cards>
                         <button data-action="industrias" data-card="industrias">
+                            <img src="./img/industria.svg" alt="Indústria">
                             <h3>Indústria</h3>
                         </button>
                         <button data-action="servicos" data-card="servicos">
+                            <img src="./img/servico.svg" alt="Serviço">
                             <h3>Serviços</h3>
                         </button>
                         <button data-action="residuos" data-card="residuos">
+                            <img src="./img/residuos.svg" alt="Resíduos">
                             <h3>Resíduos</h3>
                         </button>
                         </div>
@@ -145,42 +148,41 @@
                 <section data-section="industrias">
                     <header>
                         <h2>Indústrias</h2>
-                        <div class="progress" data-value="1">
-                            <div class="progress__value"></div>
+                        <div class="progress" data-value="2" data-max="6">
                         </div>
                     </header>
                     <div class="content">
                         <div data-cards>
                             <button data-card="alimenticia" data-action="residuos">
-                                <img src="" alt="Alimentícia"/>
+                                <img src="./img/industrias/alimenticia.svg" alt="Alimentícia"/>
                                 <h3>Alimentícia</h3>
                             </button>
                             <button data-card="construcao-civil" data-action="residuos">
-                                <img src="" alt="Construção Civil"/>
+                                <img src="./img/industrias/contrucao-civil.svg" alt="Construção Civil"/>
                                 <h3>Construção Civil</h3>
                             </button>
                             <button data-card="educacao" data-action="residuos">
-                                <img src="" alt="Educação"/>
+                                <img src="./img/industrias/educacao.svg" alt="Educação"/>
                                 <h3>Educação</h3>
                             </button>
                             <button data-card="empresarial" data-action="residuos">
-                                <img src="" alt="Empresarial"/>
+                                <img src="./img/industrias/empresarial.svg" alt="Empresarial"/>
                                 <h3>Empresarial</h3>
                             </button>
                             <button data-card="industria" data-action="residuos">
-                                <img src="" alt="Indústria"/>
+                                <img src="./img/industrias/industria.svg" alt="Indústria"/>
                                 <h3>Indústria</h3>
                             </button>
                             <button data-card="lazer" data-action="residuos">
-                                <img src="" alt="Lazer"/>
+                                <img src="./img/industrias/lazer.svg" alt="Lazer"/>
                                 <h3>Lazer</h3>
                             </button>
                             <button data-card="saude" data-action="residuos">
-                                <img src="" alt="Saúde"/>
+                                <img src="./img/industrias/saude.svg" alt="Saúde"/>
                                 <h3>Saúde</h3>
                             </button>
                             <button data-card="varejo" data-action="residuos">
-                                <img src="" alt="Varejo"/>
+                                <img src="./img/industrias/varejo.svg" alt="Varejo"/>
                                 <h3>Varejo</h3>
                             </button>
                         </div>
@@ -190,30 +192,28 @@
                 <section data-section="servicos">
                     <header>
                         <h2>Serviços</h2>
-                        <div class="progress" data-value="1">
-                            <div class="progress__value"></div>
-                        </div>
+                        <div class="progress" data-value="2" data-max="6"></div>
                     </header>
                     <div class="content">
                         <div data-cards>
                             <button data-card="gestao-de-residuos" data-action="residuos">
-                                <img src="" alt="Gestão de resíduos"/>
+                                <img src="./img/servicos/gestao-residuos.svg" alt="Gestão de resíduos"/>
                                 <h3>Gestão de resíduos</h3>
                             </button>
                             <button data-card="tratamento-de-residuos" data-action="residuos">
-                                <img src="" alt="Tratamento de resíduos"/>
+                                <img src="./img/servicos/tratamento.svg" alt="Tratamento de resíduos"/>
                                 <h3>Tratamento de resíduos</h3>
                             </button>
                             <button data-card="pgrs" data-action="informacoes-pessoais">
-                                <img src="" alt="PGRS"/>
+                                <img src="./img/servicos/pgrs.svg" alt="PGRS"/>
                                 <h3>PGRS</h3>
                             </button>
                             <button data-card="remocao-de-lodo" data-action="informacoes-pessoais">
-                                <img src="" alt="Remoção de lodo"/>
+                                <img src="./img/servicos/lodo.svg" alt="Remoção de lodo"/>
                                 <h3>Remoção de lodo</h3>
                             </button>
                             <button data-card="limpeza-de-fossa-septica" data-action="informacoes-pessoais">
-                                <img src="" alt="Limpeza de fossa séptica"/>
+                                <img src="./img/servicos/limpeza.svg" alt="Limpeza de fossa séptica"/>
                                 <h3>Limpeza de fossa séptica</h3>
                             </button>
                         </div>
@@ -223,8 +223,7 @@
                 <section data-section="residuos">
                         <header>
                             <h2>Resíduos</h2>
-                            <div class="progress" data-value="2">
-                                <div class="progress__value"></div>
+                            <div class="progress" data-value="3" data-max="6">
                             </div>
                         </header>
                         <div class="container">
@@ -238,8 +237,7 @@
                 <section data-section="calculo-montante">
                     <header>
                         <h2 data-bind="residuo:nome"></h2>
-                        <div class="progress" data-value="3">
-                            <div class="progress__value"></div>
+                        <div class="progress" data-value="3" data-max="6">
                         </div>
                     </header>
                     <div class="container">
@@ -288,8 +286,7 @@
                 <section data-section="informacoes-pessoais">
                     <header>
                         <h2>Informações Pessoais</h2>
-                        <div class="progress" data-value="4">
-                            <div class="progress__value"></div>
+                        <div class="progress" data-value="4" data-max="6">
                         </div>
                     </header>
                     <div class="content">
@@ -347,8 +344,7 @@
                 <section data-section="revise-seu-pedido">
                     <header>
                         <h2>Revise seu pedido</h2>
-                        <div class="progress" data-value="5">
-                            <div class="progress__value"></div>
+                        <div class="progress" data-value="5" data-max="6">
                         </div>
                     </header>
                     <div class="content">
@@ -384,40 +380,6 @@
         </article>
 
         <div class="skewdiv"></div>
-
-
-
-        <!-- mostrar banner -->
-
-        <div class="cta-flutuante">
-            <div class="cta-links"> <a id="whatsapp" href="https://api.whatsapp.com/send?phone=552196857-5899">
-                    <i>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40
-                            41.86">
-                            <title>icone-whatsapp-verde</title>
-                            <path
-                                d="M11,35.22l.6.38A15.87,15.87,0,0,0,20,38c9.08,0,16.66-7.74,16.66-17.25a17.67,17.67,0,0,0-5-12.19A16,16,0,0,0,20,3.5c-9.09,0-16.48,7.74-16.48,17.24A17.73,17.73,0,0,0,6,29.92l.39.65L4.77,36.93Zm.64-23.4A1.79,1.79,0,0,1,13,11.17c.33,0,.66,0,.95,0s.71-.12,1.12.89,1.4,3.59,1.52,3.85a1,1,0,0,1,.05.91c-1,2-2,1.91-1.46,2.83,1.92,3.44,3.83,4.64,6.74,6.16.49.26.79.22,1.08-.13s1.24-1.51,1.57-2,.66-.44,1.11-.27,2.9,1.42,3.39,1.69.82.38.93.61a4.46,4.46,0,0,1-.28,2.47c-.41,1.21-2.39,2.32-3.34,2.46-1.57.25-2.8.13-5.95-1.29-5-2.25-8.21-7.49-8.46-7.83a10.46,10.46,0,0,1-2-5.37A5.94,5.94,0,0,1,11.64,11.82Z"
-                                class="whatsapp-fill" />
-                            <path
-                                d="M29,25.08c-.49-.26-2.93-1.51-3.39-1.68s-.78-.26-1.11.26a25.62,25.62,0,0,1-1.58,2c-.28.35-.57.39-1.07.13-2.91-1.52-4.82-2.72-6.74-6.16-.51-.92.51-.85,1.46-2.83a1,1,0,0,0-.05-.91c-.12-.26-1.11-2.81-1.52-3.85s-.82-.87-1.12-.89-.62,0-.95,0a1.79,1.79,0,0,0-1.32.65,5.94,5.94,0,0,0-1.73,4.32,10.46,10.46,0,0,0,2,5.37c.25.34,3.49,5.57,8.46,7.83,3.15,1.42,4.38,1.54,5.95,1.29.95-.14,2.93-1.25,3.34-2.46A4.46,4.46,0,0,0,30,25.7c-.11-.23-.44-.36-.93-.62M20,38a15.9,15.9,0,0,1-8.39-2.4l-.6-.38L4.77,36.93l1.66-6.36L6,29.92a17.73,17.73,0,0,1-2.52-9.18C3.52,11.24,10.91,3.5,20,3.5A16,16,0,0,1,31.64,8.56a17.67,17.67,0,0,1,5,12.19C36.65,30.26,29.07,38,20,38M34,6.08A19.25,19.25,0,0,0,20,0C9.06,0,.17,9.3.17,20.74A21.54,21.54,0,0,0,2.81,31.11L0,41.86,10.51,39A19.09,19.09,0,0,0,20,41.49h0c10.92,0,20-9.3,20-20.74A21.32,21.32,0,0,0,34,6.08"
-                                class="whatsapp-outline" />
-                        </svg> </i>
-                    <span>
-                        21 96857-5899 </span>
-                </a>
-                <a id="orcamento"
-                    href="https://xd.adobe.com/view/2a6bcbe3-6a31-426f-7436-188ba1a03b09-5c5a/?fullscreen">
-                    <i>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 19.58">
-                            <title>icone-balao</title>
-                            <path
-                                d="M23,7.88C23,3.53,17.85,0,11.5,0S0,3.53,0,7.88s5.15,7.88,11.5,7.88a16.41,16.41,0,0,0,2.12-.14l5.19,4-1.43-4.93C20.74,13.27,23,10.76,23,7.88" />
-                        </svg> </i>
-                    <span>
-                        orçamento </span>
-                </a>
-            </div>
-        </div>
     </main>
 
     <footer id="siteRodape" class="pl-1 pr-1">

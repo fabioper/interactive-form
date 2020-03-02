@@ -26,18 +26,15 @@ export default class Section {
     mount(): void {
         this.rootElement.classList.add('active')
         this._onMount.forEach(onMount => onMount.bind(this)())
+        this.fillProgressBar()
         this.addCardsClickEvent()
-        this.addActionsClickEvent()
         this.addBindings()
-        this.addFormBindings()
-        this.bindSidebar()
+        this.addButtonsClickEvents()
+    }
 
-        const save = this.query('[data-save]')
-        if (save)
-            save.onclick = (event): void => {
-                event.preventDefault()
-                this.controller.save()
-            }
+    removeAllChildrenFrom(progressBar: HTMLElement): void {
+        while (progressBar.firstChild)
+            progressBar.removeChild(progressBar.firstChild)
     }
 
     unmount(): void {
@@ -62,11 +59,12 @@ export default class Section {
         const cards = this.query('[data-cards]')
         if (cards) {
             const cardButtons = cards.querySelectorAll('button')
-            cardButtons.forEach(card => this.onCardClick(card))
+            cardButtons.forEach(card => this.addCardClickEvent(card))
         }
+        this.addActionsClickEvent()
     }
 
-    private onCardClick(card: HTMLButtonElement): void {
+    private addCardClickEvent(card: HTMLButtonElement): void {
         card.addEventListener('click', event => {
             event.preventDefault()
             if (this.name === Sections.MODO_DE_PESQUISA)
@@ -89,18 +87,13 @@ export default class Section {
                     input.reportValidity()
                     return input.checkValidity()
                 })
-                if (isValid)
-                    this.controller.moveTo(action.dataset.action)
-
-                // if (this.name === Sections.CALCULO_MONTANTE || this.name === Sections.INFO_PESSOAIS) {
-                // }
+                if (isValid) this.controller.moveTo(action.dataset.action)
             }
         })
     }
 
     private addBindings(): void {
         const bindings = this.queryAll('[data-bind]')
-        // eslint-disable-next-line max-statements
         bindings.forEach(binding => {
             let value
             if (binding.dataset.bind.includes(':')) {
@@ -127,10 +120,13 @@ export default class Section {
 
             binding.innerHTML = value
         })
+
+        this.bindFormFields()
+        this.bindSidebarFields()
     }
 
     // eslint-disable-next-line max-statements
-    private addFormBindings(): void {
+    private bindFormFields(): void {
         if (this.name === Sections.CALCULO_MONTANTE) {
             const frequencia = this.query('input[name=frequencia]') as HTMLInputElement
             const periodo = this.query('select[name=periodo]') as HTMLSelectElement
@@ -139,23 +135,18 @@ export default class Section {
             frequencia.value = this.state.calculoMontante.frequencia.toString()
             periodo.value = this.state.calculoMontante.periodo.toString()
 
-            frequencia.onchange = (): void => {
+            frequencia.onchange = (): number => (
                 this.state.calculoMontante.frequencia = frequencia.valueAsNumber
-                console.log(this.state)
-            }
-            periodo.onchange = (): void => {
+            )
+            periodo.onchange = (): string => (
                 this.state.calculoMontante.periodo = periodo.value
-                console.log(this.state)
-            }
+            )
             recipientes.forEach(input => {
                 const recipiente = this.state.calculoMontante.recipientes[input.id]
-                if (recipiente)
-                    input.value = recipiente.toString()
-
-                input.onchange = (): void => {
+                if (recipiente) input.value = recipiente.toString()
+                input.onchange = (): number => (
                     this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber
-                    console.log(this.state)
-                }
+                )
             })
         }
 
@@ -163,18 +154,64 @@ export default class Section {
             const inputs = this.queryAll('input') as HTMLInputElement[]
             inputs.forEach(input => {
                 input.value = this.state.userInfo[input.name]
-                input.onchange = (): void => {
-                    this.state.userInfo[input.name] = input.value
-                    console.log(this.state)
-                }
+                input.onchange = (): string => this.state.userInfo[input.name] = input.value
             })
         }
     }
 
-    bindSidebar(): void {
+    private bindSidebarFields(): string {
         const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (this.controller.hasState()) {
-            aside.innerHTML = this.controller.states.map((state, idx) => `
+        if (!this.controller.hasState()) return (aside.innerHTML = '')
+
+        aside.innerHTML = this.getResiduesListingMarkup()
+        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
+
+        this.addEditButtonsClickEvents()
+        this.addRemoveButtonsClickEvents()
+    }
+
+    private addRemoveButtonsClickEvents(): void {
+        const remove = document.querySelectorAll('[data-remove]') as NodeListOf<HTMLButtonElement>
+        remove.forEach(btn => {
+            btn.onclick = (event): void => {
+                event.preventDefault()
+                this.controller.removeState(btn.dataset.remove)
+                this.controller.moveTo(this.name)
+            }
+        })
+    }
+
+    private addEditButtonsClickEvents(): void {
+        const edit = document.querySelectorAll('[data-edit]') as NodeListOf<HTMLButtonElement>
+        edit.forEach(btn => {
+            btn.onclick = (event): void => {
+                event.preventDefault()
+                if (btn.dataset.edit !== '') {
+                    this.controller.editState(btn.dataset.edit)
+                    return this.controller.moveTo(Sections.CALCULO_MONTANTE)
+                }
+                this.controller.moveTo(Sections.INFO_PESSOAIS)
+            }
+        })
+    }
+
+    private getUserInfoListingMarkup(): string {
+        console.log(this.state)
+        return `
+                <div>
+                    <h3>Informações de Contato</h3>
+                    <p>${this.state.contato}</p>
+                    <div>
+                        <button data-edit class="btn__secondary btn__secondary--edit">
+                            Editar
+                        </button>
+                    </div>
+                </div>
+            `
+    }
+
+    private getResiduesListingMarkup(): string {
+        return this.controller.states.map((state, idx) => `
                     <div>
                         <h3>Resíduo</h3>
                         <p>${state.residuo.nome}</p>
@@ -183,36 +220,45 @@ export default class Section {
                         <h3>Recipiente(s)</h3>
                         <p>${state.recipientes}</p>
                         <div>
-                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">Editar</button>
-                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">Excluir</button>
+                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
+                                Editar
+                            </button>
+                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">
+                                Excluir
+                            </button>
                         </div>
                     </div>
                 `).join(' ')
-            aside.insertAdjacentHTML('beforeend', `
-                <div>
-                    <h3>Informações de Contato</h3>
-                    <p>${this.controller.states[0].contato}</p>
-                </div>
-            `)
+    }
 
-            const edit = document.querySelectorAll('[data-edit]') as NodeListOf<HTMLButtonElement>
-            const remove = document.querySelectorAll('[data-remove]') as NodeListOf<HTMLButtonElement>
+    private fillProgressBar(): void {
+        const progressBar = this.query('.progress')
+        this.removeAllChildrenFrom(progressBar)
+        this.setActiveSteps(progressBar)
+    }
 
-            edit.forEach(btn => {
-                btn.onclick = (event): void => {
-                    event.preventDefault()
-                    this.controller.editState(btn.dataset.edit)
-                    this.controller.moveTo(Sections.CALCULO_MONTANTE)
-                }
-            })
+    private setActiveSteps(progressBar: HTMLElement): void {
+        const step = parseInt(progressBar.dataset.value, 10)
+        const max = parseInt(progressBar.dataset.max, 10)
+        for (let i = 1; i <= max; i++) {
+            const progressValue = this.createProgressValue()
+            if (i <= step) progressValue.classList.add('active')
+            progressBar.appendChild(progressValue)
+        }
+    }
 
-            remove.forEach(btn => {
-                btn.onclick = (event): void => {
-                    event.preventDefault()
-                    this.controller.removeState(btn.dataset.remove)
-                    this.controller.moveTo(this.name)
-                }
-            })
-        } else { aside.innerHTML = '' }
+    private createProgressValue(): HTMLElement {
+        const progressValue = document.createElement('div')
+        progressValue.classList.add('progress__value')
+        return progressValue
+    }
+
+    private addButtonsClickEvents(): void {
+        const saveButton = this.query('[data-save]')
+        if (saveButton)
+            saveButton.onclick = (event): void => {
+                event.preventDefault()
+                this.controller.save()
+            }
     }
 }

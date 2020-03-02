@@ -1,4 +1,4 @@
-import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup } from './utils/helpers'
+import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup, loadIndustriesCards, extractIndustriesFrom } from './utils/helpers'
 import SectionsController from './SectionsController'
 import { Sections } from './utils/enums'
 import FormManager from './FormManager'
@@ -21,13 +21,16 @@ const loading = document.querySelector('.loading') as HTMLDivElement
         Sections.REVISE_PEDIDO,
         Sections.PEDIDO_ENVIADO
     )
-    /*
-    controller.find(Sections.INDUSTRIAS).onMount(function() {
-        loadIndustriesCards(this.data, this.query('[data-cards]'))
-    })
-    */
+
     controller.find(Sections.RESIDUOS).onMount(function() {
-        loadResiduesCards(this.state, this.data, this.query('[data-cards]'))
+        const cards = this.query('[data-cards]')
+        const industries = extractIndustriesFrom(this.data)
+        loadResiduesCards(this.state, this.data, cards)
+
+        if (this.state.industry) {
+            const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`
+            cards.insertAdjacentHTML('beforebegin', markup)
+        }
     })
 
     controller.find(Sections.CALCULO_MONTANTE).onMount(function() {

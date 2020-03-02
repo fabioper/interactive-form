@@ -23,7 +23,6 @@ export default class FormManager {
             const newState = new State()
             newState.userInfo = state.userInfo
             this.state = newState
-            console.log(this._states)
         }
     }
 

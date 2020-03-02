@@ -115,7 +115,6 @@ class FormManager {
             const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
             newState.userInfo = state.userInfo;
             this.state = newState;
-            console.log(this._states);
         }
     }
     hasState() {
@@ -162,17 +161,14 @@ class Section {
     mount() {
         this.rootElement.classList.add('active');
         this._onMount.forEach(onMount => onMount.bind(this)());
+        this.fillProgressBar();
         this.addCardsClickEvent();
-        this.addActionsClickEvent();
         this.addBindings();
-        this.addFormBindings();
-        this.bindSidebar();
-        const save = this.query('[data-save]');
-        if (save)
-            save.onclick = (event) => {
-                event.preventDefault();
-                this.controller.save();
-            };
+        this.addButtonsClickEvents();
+    }
+    removeAllChildrenFrom(progressBar) {
+        while (progressBar.firstChild)
+            progressBar.removeChild(progressBar.firstChild);
     }
     unmount() {
         this.rootElement.classList.remove('active');
@@ -190,10 +186,11 @@ class Section {
         const cards = this.query('[data-cards]');
         if (cards) {
             const cardButtons = cards.querySelectorAll('button');
-            cardButtons.forEach(card => this.onCardClick(card));
+            cardButtons.forEach(card => this.addCardClickEvent(card));
         }
+        this.addActionsClickEvent();
     }
-    onCardClick(card) {
+    addCardClickEvent(card) {
         card.addEventListener('click', event => {
             event.preventDefault();
             if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
@@ -240,47 +237,81 @@ class Section {
                     .join(' ');
             binding.innerHTML = value;
         });
+        this.bindFormFields();
+        this.bindSidebarFields();
     }
-    addFormBindings() {
+    bindFormFields() {
         if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
             const frequencia = this.query('input[name=frequencia]');
             const periodo = this.query('select[name=periodo]');
             const recipientes = this.queryAll('input[name=quantidade]');
             frequencia.value = this.state.calculoMontante.frequencia.toString();
             periodo.value = this.state.calculoMontante.periodo.toString();
-            frequencia.onchange = () => {
-                this.state.calculoMontante.frequencia = frequencia.valueAsNumber;
-                console.log(this.state);
-            };
-            periodo.onchange = () => {
-                this.state.calculoMontante.periodo = periodo.value;
-                console.log(this.state);
-            };
+            frequencia.onchange = () => (this.state.calculoMontante.frequencia = frequencia.valueAsNumber);
+            periodo.onchange = () => (this.state.calculoMontante.periodo = periodo.value);
             recipientes.forEach(input => {
                 const recipiente = this.state.calculoMontante.recipientes[input.id];
                 if (recipiente)
                     input.value = recipiente.toString();
-                input.onchange = () => {
-                    this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber;
-                    console.log(this.state);
-                };
+                input.onchange = () => (this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber);
             });
         }
         if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS) {
             const inputs = this.queryAll('input');
             inputs.forEach(input => {
                 input.value = this.state.userInfo[input.name];
-                input.onchange = () => {
-                    this.state.userInfo[input.name] = input.value;
-                    console.log(this.state);
-                };
+                input.onchange = () => this.state.userInfo[input.name] = input.value;
             });
         }
     }
-    bindSidebar() {
+    bindSidebarFields() {
         const aside = document.querySelector('[data-aside]');
-        if (this.controller.hasState()) {
-            aside.innerHTML = this.controller.states.map((state, idx) => `
+        if (!this.controller.hasState())
+            return (aside.innerHTML = '');
+        aside.innerHTML = this.getResiduesListingMarkup();
+        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
+        this.addEditButtonsClickEvents();
+        this.addRemoveButtonsClickEvents();
+    }
+    addRemoveButtonsClickEvents() {
+        const remove = document.querySelectorAll('[data-remove]');
+        remove.forEach(btn => {
+            btn.onclick = (event) => {
+                event.preventDefault();
+                this.controller.removeState(btn.dataset.remove);
+                this.controller.moveTo(this.name);
+            };
+        });
+    }
+    addEditButtonsClickEvents() {
+        const edit = document.querySelectorAll('[data-edit]');
+        edit.forEach(btn => {
+            btn.onclick = (event) => {
+                event.preventDefault();
+                if (btn.dataset.edit !== '') {
+                    this.controller.editState(btn.dataset.edit);
+                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
+                }
+                this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS);
+            };
+        });
+    }
+    getUserInfoListingMarkup() {
+        console.log(this.state);
+        return `
+                <div>
+                    <h3>Informações de Contato</h3>
+                    <p>${this.state.contato}</p>
+                    <div>
+                        <button data-edit class="btn__secondary btn__secondary--edit">
+                            Editar
+                        </button>
+                    </div>
+                </div>
+            `;
+    }
+    getResiduesListingMarkup() {
+        return this.controller.states.map((state, idx) => `
                     <div>
                         <h3>Resíduo</h3>
                         <p>${state.residuo.nome}</p>
@@ -289,37 +320,43 @@ class Section {
                         <h3>Recipiente(s)</h3>
                         <p>${state.recipientes}</p>
                         <div>
-                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">Editar</button>
-                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">Excluir</button>
+                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
+                                Editar
+                            </button>
+                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">
+                                Excluir
+                            </button>
                         </div>
                     </div>
                 `).join(' ');
-            aside.insertAdjacentHTML('beforeend', `
-                <div>
-                    <h3>Informações de Contato</h3>
-                    <p>${this.controller.states[0].contato}</p>
-                </div>
-            `);
-            const edit = document.querySelectorAll('[data-edit]');
-            const remove = document.querySelectorAll('[data-remove]');
-            edit.forEach(btn => {
-                btn.onclick = (event) => {
-                    event.preventDefault();
-                    this.controller.editState(btn.dataset.edit);
-                    this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
-                };
-            });
-            remove.forEach(btn => {
-                btn.onclick = (event) => {
-                    event.preventDefault();
-                    this.controller.removeState(btn.dataset.remove);
-                    this.controller.moveTo(this.name);
-                };
-            });
+    }
+    fillProgressBar() {
+        const progressBar = this.query('.progress');
+        this.removeAllChildrenFrom(progressBar);
+        this.setActiveSteps(progressBar);
+    }
+    setActiveSteps(progressBar) {
+        const step = parseInt(progressBar.dataset.value, 10);
+        const max = parseInt(progressBar.dataset.max, 10);
+        for (let i = 1; i <= max; i++) {
+            const progressValue = this.createProgressValue();
+            if (i <= step)
+                progressValue.classList.add('active');
+            progressBar.appendChild(progressValue);
         }
-        else {
-            aside.innerHTML = '';
-        }
+    }
+    createProgressValue() {
+        const progressValue = document.createElement('div');
+        progressValue.classList.add('progress__value');
+        return progressValue;
+    }
+    addButtonsClickEvents() {
+        const saveButton = this.query('[data-save]');
+        if (saveButton)
+            saveButton.onclick = (event) => {
+                event.preventDefault();
+                this.controller.save();
+            };
     }
 }
 
@@ -471,7 +508,13 @@ const loading = document.querySelector('.loading');
     loading.remove();
     controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
-        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, this.query('[data-cards]'));
+        const cards = this.query('[data-cards]');
+        const industries = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractIndustriesFrom"])(this.data);
+        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, cards);
+        if (this.state.industry) {
+            const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`;
+            cards.insertAdjacentHTML('beforebegin', markup);
+        }
     });
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE).onMount(function () {
         const recipients = this.query('.iq__options');
@@ -515,7 +558,7 @@ var Sections;
 /*!******************************!*\
   !*** ./src/utils/helpers.ts ***!
   \******************************/
-/*! exports provided: addSlugProps, slug, fetchData, hasTreatment, belongsTo, loadResiduesCards, toMarkup, chooseFilter, extractDropdownOptionsMarkup */
+/*! exports provided: addSlugProps, slug, fetchData, hasTreatment, belongsTo, loadResiduesCards, loadIndustriesCards, extractIndustriesFrom, toMarkup, chooseFilter, extractDropdownOptionsMarkup */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -526,6 +569,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasTreatment", function() { return hasTreatment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "belongsTo", function() { return belongsTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadResiduesCards", function() { return loadResiduesCards; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadIndustriesCards", function() { return loadIndustriesCards; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toMarkup", function() { return toMarkup; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "chooseFilter", function() { return chooseFilter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractDropdownOptionsMarkup", function() { return extractDropdownOptionsMarkup; });
@@ -570,6 +615,20 @@ function belongsTo(industry) {
 function loadResiduesCards(state, data, cards) {
     const filteredResidues = data.filter(chooseFilter(state));
     cards.innerHTML = filteredResidues.map(residuo => (toMarkup(residuo.slug, residuo.nome, residuo.icone, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE))).join(' ');
+}
+function loadIndustriesCards(data, cards) {
+    const industries = extractIndustriesFrom(data);
+    cards.innerHTML = Array.from(industries)
+        .map(([key, name]) => toMarkup(key, name, null, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS))
+        .join(' ');
+}
+function extractIndustriesFrom(data) {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
+    };
+    return data.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
 }
 function toMarkup(key, name, icon, action) {
     return (`

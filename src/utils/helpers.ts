@@ -59,7 +59,7 @@ export function loadResiduesCards(state: State, data: Residuo[], cards: HTMLElem
     )).join(' ')
 }
 
-/* export function loadIndustriesCards(data: Residuo[], cards: HTMLElement): void {
+export function loadIndustriesCards(data: Residuo[], cards: HTMLElement): void {
     const industries = extractIndustriesFrom(data)
     cards.innerHTML = Array.from(industries)
         .map(([key, name]) => toMarkup(key, name, null, Sections.RESIDUOS))
@@ -73,7 +73,7 @@ export function extractIndustriesFrom(data: Residuo[]): Map<string, string> {
     }
     return data.map(residuo => residuo.industrias)
         .reduce(extractMap, new Map()) as Map<string, string>
-} */
+}
 
 export function toMarkup(key: string, name: string, icon: string, action: Sections): string {
     return (`
