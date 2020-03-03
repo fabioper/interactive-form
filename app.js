@@ -86,30 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/Form.ts":
-/*!*********************!*\
-  !*** ./src/Form.ts ***!
-  \*********************/
-/*! exports provided: Form */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Form", function() { return Form; });
-/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
-
-class Form {
-    constructor() {
-        this.state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
-    }
-    setState(state) {
-        Object.keys(state).forEach(key => (this.state[key] = state[key]));
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/FormManager.ts":
 /*!****************************!*\
   !*** ./src/FormManager.ts ***!
@@ -120,32 +96,37 @@ class Form {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormManager; });
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
 
 class FormManager {
-    constructor(form) {
-        this.forms = [];
-        this.setActive(form);
+    constructor() {
+        this.state = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this._states = [];
     }
-    setActive(form) {
-        this.active = form;
-        this.state = form.state;
-        this.state.addListener(this);
+    set state(state) {
+        this._state = state;
     }
-    add(form) {
-        this.forms.push(form);
+    get state() {
+        return this._state;
     }
-    remove(formToDelete) {
-        this.forms = this.forms.filter(form => form !== formToDelete);
+    save(state) {
+        if (!this._states.includes(state)) {
+            this._states.push(state);
+            const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+            this.state = newState;
+        }
     }
-    edit(formToEdit) {
-        const form = this.forms.find(form => form !== formToEdit);
-        this.setActive(form);
+    hasState() {
+        return this._states.length > 0;
     }
-    update() {
-        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].update(this.state);
+    get states() {
+        return this._states;
     }
-    send(form) {
+    removeState(index) {
+        this._states = this._states.filter((_value, idx) => idx !== index);
+    }
+    editState(index) {
+        this.state = this._states[index];
     }
 }
 
@@ -162,40 +143,290 @@ class FormManager {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./State */ "./src/State.ts");
+
+
 class Section {
-    static get currentSection() {
-        return Section._currentSection;
+    constructor(name) {
+        this.name = name;
+        this.rootElement = document.querySelector(`[data-section=${name}`);
+        this._onMount = [];
     }
-    static set currentSection(value) {
-        Section._currentSection = value;
-        Section.currentSection.classList.add('active');
+    get state() {
+        return this.controller.state;
     }
-    static get previousSection() {
-        return Section._currentSection;
+    get data() {
+        return this.controller.data;
     }
-    static set previousSection(value) {
-        var _a;
-        Section._previousSection = value;
-        (_a = Section.previousSection) === null || _a === void 0 ? void 0 : _a.classList.remove('active');
+    mount() {
+        this.rootElement.classList.add('active');
+        this._onMount.forEach(onMount => onMount.bind(this)());
+        this.fillProgressBar();
+        this.addCardsClickEvent();
+        this.addBindings();
+        this.addButtonsClickEvents();
     }
-    static find(key) {
-        return Section.sections.get(key);
+    removeAllChildrenFrom(progressBar) {
+        while (progressBar.firstChild)
+            progressBar.removeChild(progressBar.firstChild);
     }
-    static moveTo(key) {
-        Section.previousSection = Section.currentSection;
-        Section.currentSection = Section.sections.get(key);
+    unmount() {
+        this.rootElement.classList.remove('active');
     }
-    static add(...keys) {
-        keys.forEach(key => Section.sections.set(key, document.querySelector(`[data-section=${key}]`)));
+    onMount(...callback) {
+        this._onMount.push(...callback);
     }
-    static update(state) {
-        Section.stateChangeCallback(state);
+    query(selector) {
+        return this.rootElement.querySelector(selector);
     }
-    static onStateChange(callback) {
-        Section.stateChangeCallback = callback;
+    queryAll(selector) {
+        return Array.from(this.rootElement.querySelectorAll(selector));
+    }
+    addCardsClickEvent() {
+        const cards = this.query('[data-cards]');
+        if (cards) {
+            const cardButtons = cards.querySelectorAll('button');
+            cardButtons.forEach(card => this.addCardClickEvent(card));
+        }
+        this.addActionsClickEvent();
+    }
+    addCardClickEvent(card) {
+        card.addEventListener('click', event => {
+            event.preventDefault();
+            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
+                this.state.searchMode = card.dataset.card;
+            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INDUSTRIAS)
+                this.state.industry = card.dataset.card;
+            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].SERVICOS)
+                this.state.service = card.dataset.card;
+            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS)
+                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card));
+        });
+    }
+    addActionsClickEvent() {
+        this.queryAll('[data-action]').forEach(action => {
+            action.onclick = (event) => {
+                event.preventDefault();
+                const inputs = this.queryAll('input, select');
+                const isValid = inputs.every(input => {
+                    input.reportValidity();
+                    return input.checkValidity();
+                });
+                if (isValid)
+                    this.controller.moveTo(action.dataset.action);
+            };
+        });
+    }
+    addBindings() {
+        const bindings = this.queryAll('[data-bind]');
+        bindings.forEach(binding => {
+            let value;
+            if (binding.dataset.bind.includes(':')) {
+                const [state, key] = binding.dataset.bind.split(':');
+                value = this.state[state][key];
+            }
+            else {
+                value = this.state[binding.dataset.bind];
+            }
+            if (!value)
+                return binding.parentElement.remove();
+            if (binding.hasAttribute('data-transform'))
+                value = value
+                    .map(v => Object.values(v))
+                    .map(v => `<li>${v}</li>`)
+                    .join(' ');
+            binding.innerHTML = value;
+        });
+        this.bindFormFields();
+        this.bindSidebarFields();
+    }
+    bindFormFields() {
+        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
+            const frequencia = this.query('input[name=frequencia]');
+            const periodo = this.query('select[name=periodo]');
+            const recipientes = this.queryAll('input[name=quantidade]');
+            frequencia.value = this.state.calculoMontante.frequencia.toString();
+            periodo.value = this.state.calculoMontante.periodo.toString();
+            frequencia.onchange = () => (this.state.calculoMontante.frequencia = frequencia.valueAsNumber);
+            periodo.onchange = () => (this.state.calculoMontante.periodo = periodo.value);
+            recipientes.forEach(input => {
+                const recipiente = this.state.calculoMontante.recipientes[input.id];
+                if (recipiente)
+                    input.value = recipiente.toString();
+                input.onchange = () => (this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber);
+            });
+        }
+        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS) {
+            const inputs = this.queryAll('input');
+            inputs.forEach(input => {
+                input.value = _State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo[input.name];
+                input.onchange = () => _State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo[input.name] = input.value;
+            });
+        }
+    }
+    bindSidebarFields() {
+        const aside = document.querySelector('[data-aside]');
+        if (!this.controller.hasState())
+            return (aside.innerHTML = '');
+        aside.innerHTML = this.getResiduesListingMarkup();
+        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
+        this.addEditButtonsClickEvents();
+        this.addRemoveButtonsClickEvents();
+    }
+    addRemoveButtonsClickEvents() {
+        const remove = document.querySelectorAll('[data-remove]');
+        remove.forEach(btn => {
+            btn.onclick = (event) => {
+                event.preventDefault();
+                this.controller.removeState(btn.dataset.remove);
+                this.controller.moveTo(this.name);
+            };
+        });
+    }
+    addEditButtonsClickEvents() {
+        const edit = document.querySelectorAll('[data-edit]');
+        edit.forEach(btn => {
+            btn.onclick = (event) => {
+                event.preventDefault();
+                if (btn.dataset.edit !== '') {
+                    this.controller.editState(btn.dataset.edit);
+                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
+                }
+                this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS);
+            };
+        });
+    }
+    getUserInfoListingMarkup() {
+        console.log(this.state);
+        return `
+                <div>
+                    <h3>Informações de Contato</h3>
+                    <p>${this.state.contato}</p>
+                    <div>
+                        <button data-edit class="btn__secondary btn__secondary--edit">
+                            Editar
+                        </button>
+                    </div>
+                </div>
+            `;
+    }
+    getResiduesListingMarkup() {
+        return this.controller.states.map((state, idx) => `
+                    <div>
+                        <h3>Resíduo</h3>
+                        <p>${state.residuo.nome}</p>
+                        <h3>Frequência</h3>
+                        <p>${state.frequencia}</p>
+                        <h3>Recipiente(s)</h3>
+                        <p>${state.recipientes}</p>
+                        <div>
+                            <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
+                                Editar
+                            </button>
+                            <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+                `).join(' ');
+    }
+    fillProgressBar() {
+        const progressBar = this.query('.progress');
+        this.removeAllChildrenFrom(progressBar);
+        this.setActiveSteps(progressBar);
+    }
+    setActiveSteps(progressBar) {
+        const step = parseInt(progressBar.dataset.value, 10);
+        const max = parseInt(progressBar.dataset.max, 10);
+        for (let i = 1; i <= max; i++) {
+            const progressValue = this.createProgressValue();
+            if (i <= step)
+                progressValue.classList.add('active');
+            progressBar.appendChild(progressValue);
+        }
+    }
+    createProgressValue() {
+        const progressValue = document.createElement('div');
+        progressValue.classList.add('progress__value');
+        return progressValue;
+    }
+    addButtonsClickEvents() {
+        const saveButton = this.query('[data-save]');
+        if (saveButton)
+            saveButton.onclick = (event) => {
+                event.preventDefault();
+                this.controller.save();
+            };
     }
 }
-Section.sections = new Map();
+
+
+/***/ }),
+
+/***/ "./src/SectionsController.ts":
+/*!***********************************!*\
+  !*** ./src/SectionsController.ts ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SectionController; });
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+
+
+class SectionController {
+    constructor(manager, data) {
+        this._sections = new Map();
+        this.data = data;
+        this.manager = manager;
+    }
+    get state() {
+        return this.manager.state;
+    }
+    set active(section) {
+        this.previous = this._active;
+        this._active = section;
+        this._active.mount();
+    }
+    set previous(section) {
+        this._previous = section;
+        if (this._previous)
+            this._previous.unmount();
+    }
+    append(...keys) {
+        keys.forEach(key => {
+            const section = new _Section__WEBPACK_IMPORTED_MODULE_0__["default"](key);
+            section.controller = this;
+            this._sections.set(key, section);
+        });
+    }
+    find(key) {
+        return this._sections.get(key);
+    }
+    moveTo(key) {
+        this.active = this.find(key);
+    }
+    save() {
+        this.manager.save(this.state);
+        this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_1__["Sections"].RESIDUOS);
+    }
+    hasState() {
+        return this.manager.hasState();
+    }
+    get states() {
+        return this.manager.states;
+    }
+    removeState(index) {
+        this.manager.removeState(parseInt(index, 10));
+    }
+    editState(index) {
+        this.manager.editState(parseInt(index, 10));
+    }
+}
 
 
 /***/ }),
@@ -204,63 +435,50 @@ Section.sections = new Map();
 /*!**********************!*\
   !*** ./src/State.ts ***!
   \**********************/
-/*! exports provided: State */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return State; });
 class State {
     constructor() {
-        this.listeners = [];
+        this.calculoMontante = {
+            frequencia: 1,
+            periodo: '',
+            recipientes: {}
+        };
+        if (State.userInfo)
+            State.userInfo = {
+                nome: '',
+                telefone: '',
+                email: '',
+                empresa: '',
+                cnpj: '',
+                cep: '',
+                endereco: '',
+                numero: '',
+                complemento: ''
+            };
     }
-    get servico() {
-        return this._servico;
+    get frequencia() {
+        const { frequencia, periodo } = this.calculoMontante;
+        return `${frequencia}x por ${periodo}`;
     }
-    set servico(value) {
-        this._servico = value;
-        this.notify();
+    get recipientes() {
+        const { recipientes } = this.calculoMontante;
+        return Object.keys(recipientes)
+            .map(container => `${container} (${recipientes[container]})<br>`)
+            .join(' ');
     }
-    get industria() {
-        return this._industria;
-    }
-    set industria(value) {
-        this._industria = value;
-        this.notify();
-    }
-    get modo() {
-        return this._modo;
-    }
-    set modo(value) {
-        this._modo = value;
-        this.notify();
-    }
-    set dados(value) {
-        this._dados = value;
-        this.notify();
-    }
-    get dados() {
-        return this._dados;
-    }
-    getResiduo() {
-        return this._residuo;
-    }
-    get residuo() {
-        return this._residuo;
-    }
-    set residuo(value) {
-        this._residuo = this.dados.find(res => res.slug === value);
-        this.notify();
-    }
-    asListItem(data) {
-        return !data ?
-            '' : data.map(({ exemplo }) => `<li>${exemplo}</li>`).join(' ');
-    }
-    addListener(listener) {
-        this.listeners.push(listener);
-    }
-    notify() {
-        this.listeners.forEach(listener => listener.update());
+    get contato() {
+        const { nome, telefone, empresa, endereco, numero } = State.userInfo;
+        return `
+            ${nome}<br>
+            ${telefone}<br>
+            ${empresa}<br>
+            ${endereco}, ${numero}
+        `;
     }
 }
 
@@ -276,107 +494,90 @@ class State {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
-/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./src/Form.ts");
-/* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/helpers */ "./src/utils/helpers.ts");
+/* harmony import */ var _SectionsController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SectionsController */ "./src/SectionsController.ts");
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
 
 
 
 
-const sections = [
-    'modo-de-pesquisa',
-    'industrias',
-    'servicos',
-    'residuos',
-    'calculo-montante',
-    'informacoes-pessoais',
-    'revise-seu-pedido'
-];
-const addActionsClickEvents = () => {
-    const actions = document.querySelectorAll('[data-section-action]');
-    actions.forEach(action => action.addEventListener('click', () => {
-        const { sectionAction } = action.dataset;
-        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo(sectionAction);
-    }));
-};
-const renderResiduesWithFilter = (state, residuosData) => {
-    if (state.servico === 'tratamento-de-residuos') {
-        return renderResidues(residuosData, (residuo) => residuo.tratamento);
-    }
-    if (state.industria) {
-        return renderResidues(residuosData, (residuo) => (Object.keys(residuo.industrias).includes(state.industria)));
-    }
-    renderResidues(residuosData, () => true);
-};
-const addCardsClickEvent = (form, ...keys) => (keys.forEach(key => {
-    const cards = document.querySelectorAll(`[data-state-${key}]`);
-    const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
-    cards.forEach(card => card.addEventListener('click', () => (form.setState({ [key]: card.dataset[`state${capitalizedKey}`] }))));
-}));
-const bindResidue = (state) => {
-    const placeholders = document.querySelectorAll('[data-residuo]');
-    const residue = state.getResiduo();
-    placeholders.forEach(placeholder => {
-        if (placeholder.nodeName !== 'UL') {
-            return placeholder.textContent = residue[placeholder.dataset.residuo];
-        }
-        placeholder.innerHTML = state.asListItem(residue[placeholder.dataset.residuo]);
-    });
-};
-const renderIndustries = (data) => {
-    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
-    const cards = section.querySelector('.section__cards');
-    const industrias = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["extractIndustriesFrom"])(data);
-    const markup = Array.from(industrias).map(([key, value]) => `
-        <a href="#" data-state-industria="${key}" data-section-action="residuos">
-            ${value}
-        </a>
-    `);
-    cards.innerHTML = markup.join(' ');
-};
-const renderResidues = (data, filtering) => {
-    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
-    const cards = section.querySelector('.section__cards');
-    const markup = data.filter(filtering).map(residuo => (`
-        <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
-            ${residuo.nome}
-        </a>
-    `));
-    cards.innerHTML = markup.join(' ');
-};
+const loading = document.querySelector('.loading');
 (async () => {
-    const residuosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
-    const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"]();
-    const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"](form);
-    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].add(...sections);
-    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
-        renderIndustries(residuosData);
-        renderResiduesWithFilter(state, residuosData);
-        state.residuo && bindResidue(state);
-        addActionsClickEvents();
-        addCardsClickEvent(manager.active, 'modo', 'industria', 'servico', 'residuo');
+    const data = await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["fetchData"])();
+    const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_3__["default"]();
+    const controller = new _SectionsController__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
+    loading.remove();
+    controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
+    controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
+        const cards = this.query('[data-cards]');
+        const industries = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractIndustriesFrom"])(this.data);
+        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, cards);
+        if (this.state.industry) {
+            const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`;
+            cards.insertAdjacentHTML('beforebegin', markup);
+        }
     });
-    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('modo-de-pesquisa');
-    form.setState({ dados: residuosData });
+    controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE).onMount(function () {
+        const recipients = this.query('.iq__options');
+        const activator = recipients.previousElementSibling;
+        const containers = this.state.residuo.containers[0].container;
+        recipients.innerHTML = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractDropdownOptionsMarkup"])(containers);
+        activator.onclick = () => recipients.parentElement.classList.toggle('active');
+    });
+    controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA);
 })();
 
 
 /***/ }),
 
-/***/ "./src/helpers.ts":
-/*!************************!*\
-  !*** ./src/helpers.ts ***!
-  \************************/
-/*! exports provided: addSlugProps, slug, extractIndustriesFrom, fetchData */
+/***/ "./src/utils/enums.ts":
+/*!****************************!*\
+  !*** ./src/utils/enums.ts ***!
+  \****************************/
+/*! exports provided: Sections */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sections", function() { return Sections; });
+var Sections;
+(function (Sections) {
+    Sections["MODO_DE_PESQUISA"] = "modo-de-pesquisa";
+    Sections["INDUSTRIAS"] = "industrias";
+    Sections["SERVICOS"] = "servicos";
+    Sections["RESIDUOS"] = "residuos";
+    Sections["CALCULO_MONTANTE"] = "calculo-montante";
+    Sections["INFO_PESSOAIS"] = "informacoes-pessoais";
+    Sections["REVISE_PEDIDO"] = "revise-seu-pedido";
+    Sections["PEDIDO_ENVIADO"] = "pedido-enviado";
+})(Sections || (Sections = {}));
+
+
+/***/ }),
+
+/***/ "./src/utils/helpers.ts":
+/*!******************************!*\
+  !*** ./src/utils/helpers.ts ***!
+  \******************************/
+/*! exports provided: addSlugProps, slug, fetchData, hasTreatment, belongsTo, loadResiduesCards, loadIndustriesCards, extractIndustriesFrom, toMarkup, chooseFilter, extractDropdownOptionsMarkup */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addSlugProps", function() { return addSlugProps; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchData", function() { return fetchData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasTreatment", function() { return hasTreatment; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "belongsTo", function() { return belongsTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadResiduesCards", function() { return loadResiduesCards; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadIndustriesCards", function() { return loadIndustriesCards; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toMarkup", function() { return toMarkup; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "chooseFilter", function() { return chooseFilter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractDropdownOptionsMarkup", function() { return extractDropdownOptionsMarkup; });
+/* harmony import */ var _enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enums */ "./src/utils/enums.ts");
+
 const addSlugProps = (residuo) => {
     residuo.slug = slug(residuo.nome);
     residuo.industrias = residuo.industrias.reduce((acc, curr) => {
@@ -390,22 +591,13 @@ function slug(text) {
     str = str.toLowerCase();
     const from = 'ãàáäâèéëêìíïîòóöôùúüûñç·/_,:;';
     const to = 'aaaaaeeeeiiiioooouuuunc------';
-    for (let i = 0, l = from.length; i < l; i++) {
+    for (let i = 0, l = from.length; i < l; i++)
         str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-    }
     str = str.replace(/[^a-z0-9 -]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
     return str;
 }
-const extractIndustriesFrom = (residuos) => {
-    const extractMap = (acc, curr) => {
-        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
-        return acc;
-    };
-    return residuos.map(residuo => residuo.industrias)
-        .reduce(extractMap, new Map());
-};
 const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45';
 const fetchData = async () => {
     const response = await fetch(endpoint);
@@ -413,6 +605,58 @@ const fetchData = async () => {
     const result = data.acf.card_residuo;
     return result.map(addSlugProps);
 };
+function hasTreatment() {
+    return (residuo) => residuo.tratamento;
+}
+function belongsTo(industry) {
+    return (residuo) => {
+        const industrias = Object.keys(residuo.industrias);
+        return industrias.includes(industry);
+    };
+}
+function loadResiduesCards(state, data, cards) {
+    const filteredResidues = data.filter(chooseFilter(state));
+    cards.innerHTML = filteredResidues.map(residuo => (toMarkup(residuo.slug, residuo.nome, residuo.icone, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE))).join(' ');
+}
+function loadIndustriesCards(data, cards) {
+    const industries = extractIndustriesFrom(data);
+    cards.innerHTML = Array.from(industries)
+        .map(([key, name]) => toMarkup(key, name, null, _enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS))
+        .join(' ');
+}
+function extractIndustriesFrom(data) {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
+    };
+    return data.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
+}
+function toMarkup(key, name, icon, action) {
+    return (`
+        <button data-card="${key}" data-action="${action}">
+            <img src="${icon}" alt="${name}"/>
+            <h3>${name}</h3>
+        </button>
+    `);
+}
+function chooseFilter(state) {
+    const { industry, service } = state;
+    let filter = () => true;
+    if (industry)
+        filter = belongsTo(industry);
+    if (service === 'tratamento-de-residuos')
+        filter = hasTreatment();
+    return filter;
+}
+function extractDropdownOptionsMarkup(containers) {
+    return containers.map(container => (`
+        <div class="iq__option">
+            <span class="iq__label">${container}</span>
+            <input type="number" name="quantidade" min="0" value="0" id="${container}">
+        </div>
+    `)).join(' ');
+}
 
 
 /***/ })

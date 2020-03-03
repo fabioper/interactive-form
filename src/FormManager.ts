@@ -1,41 +1,44 @@
-import { State } from './State'
-import { Form } from './Form'
-import { Listener } from './Listener'
-import Section from './Section'
+import State from './State'
 
-export default class FormManager implements Listener {
-    private forms: Form[] = []
-    private state: State
-    active: Form
+export default class FormManager {
+    private _state: State;
+    private _states: State[];
 
-    constructor(form: Form) {
-        this.setActive(form)
+    constructor() {
+        this.state = new State()
+        this._states = []
     }
 
-    setActive(form: Form): void {
-        this.active = form
-        this.state = form.state
-        this.state.addListener(this)
+    set state(state: State) {
+        this._state = state
     }
 
-    add(form: Form): void {
-        this.forms.push(form)
+    get state(): State {
+        return this._state
     }
 
-    remove(formToDelete: Form): void {
-        this.forms = this.forms.filter(form => form !== formToDelete)
+    save(state: State): void {
+        if (!this._states.includes(state)) {
+            this._states.push(state)
+            const newState = new State()
+            // newState.userInfo = state.userInfo
+            this.state = newState
+        }
     }
 
-    edit(formToEdit: Form): void {
-        const form = this.forms.find(form => form !== formToEdit)
-        this.setActive(form)
+    hasState(): boolean {
+        return this._states.length > 0
     }
 
-    update(): void {
-        Section.update(this.state)
+    get states(): State[] {
+        return this._states
     }
 
-    send(form: Form): void {
-        // send all forms
+    removeState(index: number): void {
+        this._states = this._states.filter((_value, idx) => idx !== index)
+    }
+
+    editState(index: number): void {
+        this.state = this._states[index]
     }
 }

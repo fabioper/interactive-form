@@ -1,73 +1,68 @@
-import { Residuo } from './Residuo'
-import { Listener } from './Listener'
+import Residuo from './utils/Residuo'
 
-export class State {
-    private _residuo: Residuo;
-    private _dados: Residuo[];
-    private _modo: string;
-    private _industria: string;
-    private _servico: string;
-    private listeners: Listener[] = [];
-
-    get servico(): string {
-        return this._servico
+export default class State {
+    searchMode: string
+    industry: string
+    service: string
+    residuo: Residuo
+    calculoMontante: {
+        frequencia: number;
+        periodo: string;
+        recipientes: {
+            [x: string]: number;
+        };
+    }
+    static userInfo: {
+        nome: string;
+        telefone: string;
+        email: string;
+        empresa: string;
+        cnpj: string;
+        cep: string;
+        endereco: string;
+        numero: string;
+        complemento: string;
     }
 
-    set servico(value: string) {
-        this._servico = value
-        this.notify()
+    constructor() {
+        this.calculoMontante = {
+            frequencia: 1,
+            periodo: '',
+            recipientes: {}
+        }
+        if (State.userInfo)
+            State.userInfo = {
+                nome: '',
+                telefone: '',
+                email: '',
+                empresa: '',
+                cnpj: '',
+                cep: '',
+                endereco: '',
+                numero: '',
+                complemento: ''
+            }
     }
 
-    get industria(): string {
-        return this._industria
+    get frequencia(): string {
+        const { frequencia, periodo } = this.calculoMontante
+        return `${frequencia}x por ${periodo}`
     }
 
-    set industria(value: string) {
-        this._industria = value
-        this.notify()
+    get recipientes(): string {
+        const { recipientes } = this.calculoMontante
+        return Object.keys(recipientes)
+            .map(container => `${container} (${recipientes[container]})<br>`)
+            .join(' ')
     }
 
-    get modo(): string {
-        return this._modo
-    }
-
-    set modo(value: string) {
-        this._modo = value
-        this.notify()
-    }
-
-    set dados(value: Residuo[]) {
-        this._dados = value
-        this.notify()
-    }
-
-    get dados(): Residuo[] {
-        return this._dados
-    }
-
-    getResiduo(): Residuo {
-        return this._residuo
-    }
-
-    get residuo(): Residuo | string {
-        return this._residuo
-    }
-
-    set residuo(value: Residuo | string) {
-        this._residuo = this.dados.find(res => res.slug === value)
-        this.notify()
-    }
-
-    asListItem(data: any[]): string {
-        return !data ?
-            '' : data.map(({ exemplo }) => `<li>${exemplo}</li>`).join(' ')
-    }
-
-    addListener(listener: Listener): void {
-        this.listeners.push(listener)
-    }
-
-    notify(): void {
-        this.listeners.forEach(listener => listener.update())
+    get contato(): string {
+        const { nome, telefone, empresa, endereco, numero } = State.userInfo
+        return `
+            ${nome}<br>
+            ${telefone}<br>
+            ${empresa}<br>
+            ${endereco}, ${numero}
+        `
     }
 }
