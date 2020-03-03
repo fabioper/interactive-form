@@ -42,31 +42,10 @@ body {
     margin: auto;
 }
 
-section[data-secao] {
+section {
     display: none;
 }
 
-section[data-secao].active {
+section.active {
     display: block;
-}
-
-.residuos-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-}
-
-.residuo {
-    cursor: pointer;
-    padding: 2rem;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.residuo.active {
-    background-color: black;
-    color: #fff;
 }

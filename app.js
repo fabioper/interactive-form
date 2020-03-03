@@ -86,6 +86,187 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/Form.ts":
+/*!*********************!*\
+  !*** ./src/Form.ts ***!
+  \*********************/
+/*! exports provided: Form */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Form", function() { return Form; });
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
+
+class Form {
+    constructor() {
+        this.state = new _State__WEBPACK_IMPORTED_MODULE_0__["State"]();
+    }
+    setState(state) {
+        Object.keys(state).forEach(key => (this.state[key] = state[key]));
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/FormManager.ts":
+/*!****************************!*\
+  !*** ./src/FormManager.ts ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormManager; });
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
+class FormManager {
+    constructor(form) {
+        this.forms = [];
+        this.setActive(form);
+    }
+    setActive(form) {
+        this.active = form;
+        this.state = form.state;
+        this.state.addListener(this);
+    }
+    add(form) {
+        this.forms.push(form);
+    }
+    remove(formToDelete) {
+        this.forms = this.forms.filter(form => form !== formToDelete);
+    }
+    edit(formToEdit) {
+        const form = this.forms.find(form => form !== formToEdit);
+        this.setActive(form);
+    }
+    update() {
+        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].update(this.state);
+    }
+    send(form) {
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/Section.ts":
+/*!************************!*\
+  !*** ./src/Section.ts ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
+class Section {
+    static get currentSection() {
+        return Section._currentSection;
+    }
+    static set currentSection(value) {
+        Section._currentSection = value;
+        Section.currentSection.classList.add('active');
+    }
+    static get previousSection() {
+        return Section._currentSection;
+    }
+    static set previousSection(value) {
+        var _a;
+        Section._previousSection = value;
+        (_a = Section.previousSection) === null || _a === void 0 ? void 0 : _a.classList.remove('active');
+    }
+    static find(key) {
+        return Section.sections.get(key);
+    }
+    static moveTo(key) {
+        Section.previousSection = Section.currentSection;
+        Section.currentSection = Section.sections.get(key);
+    }
+    static add(...keys) {
+        keys.forEach(key => Section.sections.set(key, document.querySelector(`[data-section=${key}]`)));
+    }
+    static update(state) {
+        Section.stateChangeCallback(state);
+    }
+    static onStateChange(callback) {
+        Section.stateChangeCallback = callback;
+    }
+}
+Section.sections = new Map();
+
+
+/***/ }),
+
+/***/ "./src/State.ts":
+/*!**********************!*\
+  !*** ./src/State.ts ***!
+  \**********************/
+/*! exports provided: State */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "State", function() { return State; });
+class State {
+    constructor() {
+        this.listeners = [];
+    }
+    get servico() {
+        return this._servico;
+    }
+    set servico(value) {
+        this._servico = value;
+        this.notify();
+    }
+    get industria() {
+        return this._industria;
+    }
+    set industria(value) {
+        this._industria = value;
+        this.notify();
+    }
+    get modo() {
+        return this._modo;
+    }
+    set modo(value) {
+        this._modo = value;
+        this.notify();
+    }
+    set dados(value) {
+        this._dados = value;
+        this.notify();
+    }
+    get dados() {
+        return this._dados;
+    }
+    getResiduo() {
+        return this._residuo;
+    }
+    get residuo() {
+        return this._residuo;
+    }
+    set residuo(value) {
+        this._residuo = this.dados.find(res => res.slug === value);
+        this.notify();
+    }
+    asListItem(data) {
+        return !data ?
+            '' : data.map(({ exemplo }) => `<li>${exemplo}</li>`).join(' ');
+    }
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+    notify() {
+        this.listeners.forEach(listener => listener.update());
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/app.ts":
 /*!********************!*\
   !*** ./src/app.ts ***!
@@ -95,293 +276,143 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _handlers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handlers */ "./src/handlers.ts");
-/* harmony import */ var _helpers_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers/state */ "./src/helpers/state.ts");
-/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers/helpers */ "./src/helpers/helpers.ts");
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./src/Form.ts");
+/* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
 
 
 
-const state = Object(_helpers_state__WEBPACK_IMPORTED_MODULE_1__["onChange"])(Object(_handlers__WEBPACK_IMPORTED_MODULE_0__["default"])());
-window.addEventListener('load', () => {
-    fetch('http://gruporodocon.com.br/residuos2/wp-json/wp/v2/pages/45')
-        .then(res => res.json())
-        .then(data => state.dados = data.acf.card_residuo)
-        .then(() => console.log('Data loaded successfully'))
-        .catch(err => console.log(err));
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["buttons"].forEach(button => button.addEventListener('click', () => {
-    const { modo: modoSelecionado } = button.dataset;
-    Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["reset"])(state);
-    modoSelecionado === state.filtro ?
-        state.filtro = '' :
-        state.filtro = modoSelecionado;
-}));
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["industriasSeletor"].addEventListener('change', () => {
-    state.industria = _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["industriasSeletor"].value;
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["servicosSeletor"].addEventListener('change', () => {
-    state.servico = _helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["servicosSeletor"].value;
-});
-_helpers_helpers__WEBPACK_IMPORTED_MODULE_2__["residuosItems"].forEach(residuo => {
-    residuo.addEventListener('click', () => {
-        const { residuo: residuoSelecionado } = residuo.dataset;
-        residuoSelecionado === state.residuo ?
-            state.residuo = '' :
-            state.residuo = residuoSelecionado;
-    });
-});
 
-
-/***/ }),
-
-/***/ "./src/handlers.ts":
-/*!*************************!*\
-  !*** ./src/handlers.ts ***!
-  \*************************/
-/*! exports provided: handleContainerVisibility, default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "handleContainerVisibility", function() { return handleContainerVisibility; });
-/* harmony import */ var _helpers_constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helpers/constants */ "./src/helpers/constants.ts");
-/* harmony import */ var _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers/helpers */ "./src/helpers/helpers.ts");
-
-
-function handleContainerVisibility(condition) {
-    return function (currentState) {
-        if (condition(currentState)) {
-            return Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["addActiveClass"])(this);
-        }
-        Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeActiveClass"])(this);
-    };
-}
-/* harmony default export */ __webpack_exports__["default"] = (() => [
-    handleContainerVisibility(dataLoaded()).bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["filterContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].INDUSTRIA, state))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["industriaSeletorContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].SERVICOS, state))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["servicoSeletorContainer"]),
-    handleContainerVisibility(state => isFilteredBy(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].RESIDUOS, state) ||
-        (Boolean(state.industria) || Boolean(state.servico))).bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosContainer"]),
-    handleContainerVisibility(state => Boolean(state.residuo))
-        .bind(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["calculoMontanteContainer"]),
-    handleIndustrias,
-    (state) => {
-        if (state.residuo) {
-            const asideTitle = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__titulo');
-            const asideExemplosList = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__exemplos');
-            const asideDestinacaoList = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["asideResiduoInfo"].querySelector('.residuo-info__destinacao');
-            const residuo = getResiduo(state.residuo, state);
-            asideTitle.textContent = residuo.nome;
-            Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeAllChildren"])(asideExemplosList);
-            if (residuo.exemplos) {
-                asideExemplosList.append(...Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["transformToList"])(residuo.exemplos));
-            }
-            asideDestinacaoList.textContent = residuo.destinacao;
-        }
-    },
-    (state) => {
-        if (state.servico === _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].TRATAMENTO_RESIDUOS) {
-            _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosItems"].forEach(residuo => {
-                const data = getResiduo(residuo.dataset.residuo, state);
-                if (data && data.tratamento) {
-                    residuo.classList.add(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-                }
-                else {
-                    residuo.classList.remove(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-                }
-            });
-        }
-    },
-    (state) => {
-        switch (state.servico) {
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].REMOCAO_LODO:
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].LIMPEZA_FOSSA_SEPTICA:
-            case _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].PGRS:
-                Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["addActiveClass"])(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["informacoesUsuarioContainer"]);
-                break;
-            default:
-                Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeActiveClass"])(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["informacoesUsuarioContainer"]);
-        }
-    },
-    (state) => {
-        if (state.residuo) {
-            const select = _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["calculoMontanteContainer"].querySelector('select#acondicionamento');
-            const residuo = getResiduo(state.residuo, state);
-            const options = residuo.containers[0].container.map(generateContainerOptions);
-            Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["removeAllChildren"])(select);
-            select.append(...options);
-        }
+const sections = [
+    'modo-de-pesquisa',
+    'industrias',
+    'servicos',
+    'residuos',
+    'calculo-montante',
+    'informacoes-pessoais',
+    'revise-seu-pedido'
+];
+const addActionsClickEvents = () => {
+    const actions = document.querySelectorAll('[data-section-action]');
+    actions.forEach(action => action.addEventListener('click', () => {
+        const { sectionAction } = action.dataset;
+        _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo(sectionAction);
+    }));
+};
+const renderResiduesWithFilter = (state, residuosData) => {
+    if (state.servico === 'tratamento-de-residuos') {
+        return renderResidues(residuosData, (residuo) => residuo.tratamento);
     }
-]);
-function generateContainerOptions(container) {
-    const opt = document.createElement('option');
-    opt.value = Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(container);
-    opt.textContent = container;
-    return opt;
-}
-function handleIndustrias(state) {
-    _helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["residuosItems"].forEach(residuo => {
-        const data = getResiduo(residuo.dataset.residuo, state);
-        const industrias = data ? data.industrias.map((i) => Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(i)) : [];
-        if (data && state.industria && industrias.includes(state.industria)) {
-            residuo.classList.add(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
+    if (state.industria) {
+        return renderResidues(residuosData, (residuo) => (Object.keys(residuo.industrias).includes(state.industria)));
+    }
+    renderResidues(residuosData, () => true);
+};
+const addCardsClickEvent = (form, ...keys) => (keys.forEach(key => {
+    const cards = document.querySelectorAll(`[data-state-${key}]`);
+    const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+    cards.forEach(card => card.addEventListener('click', () => (form.setState({ [key]: card.dataset[`state${capitalizedKey}`] }))));
+}));
+const bindResidue = (state) => {
+    const placeholders = document.querySelectorAll('[data-residuo]');
+    const residue = state.getResiduo();
+    placeholders.forEach(placeholder => {
+        if (placeholder.nodeName !== 'UL') {
+            return placeholder.textContent = residue[placeholder.dataset.residuo];
         }
-        else {
-            residuo.classList.remove(_helpers_constants__WEBPACK_IMPORTED_MODULE_0__["types"].ATIVO);
-        }
+        placeholder.innerHTML = state.asListItem(residue[placeholder.dataset.residuo]);
     });
-}
-function getResiduo(residuo, state) {
-    return state.dados.find(r => Object(_helpers_helpers__WEBPACK_IMPORTED_MODULE_1__["slug"])(r.nome) === residuo);
-}
-function dataLoaded() {
-    return (state) => Boolean(state.dados);
-}
-function isFilteredBy(filter, state) {
-    return state.filtro && state.filtro === filter;
-}
+};
+const renderIndustries = (data) => {
+    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('industrias');
+    const cards = section.querySelector('.section__cards');
+    const industrias = Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["extractIndustriesFrom"])(data);
+    const markup = Array.from(industrias).map(([key, value]) => `
+        <a href="#" data-state-industria="${key}" data-section-action="residuos">
+            ${value}
+        </a>
+    `);
+    cards.innerHTML = markup.join(' ');
+};
+const renderResidues = (data, filtering) => {
+    const section = _Section__WEBPACK_IMPORTED_MODULE_0__["default"].find('residuos');
+    const cards = section.querySelector('.section__cards');
+    const markup = data.filter(filtering).map(residuo => (`
+        <a href="#" data-state-residuo="${residuo.slug}" data-section-action="calculo-montante">
+            ${residuo.nome}
+        </a>
+    `));
+    cards.innerHTML = markup.join(' ');
+};
+(async () => {
+    const residuosData = await Object(_helpers__WEBPACK_IMPORTED_MODULE_3__["fetchData"])();
+    const form = new _Form__WEBPACK_IMPORTED_MODULE_1__["Form"]();
+    const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"](form);
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].add(...sections);
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].onStateChange(state => {
+        renderIndustries(residuosData);
+        renderResiduesWithFilter(state, residuosData);
+        state.residuo && bindResidue(state);
+        addActionsClickEvents();
+        addCardsClickEvent(manager.active, 'modo', 'industria', 'servico', 'residuo');
+    });
+    _Section__WEBPACK_IMPORTED_MODULE_0__["default"].moveTo('modo-de-pesquisa');
+    form.setState({ dados: residuosData });
+})();
 
 
 /***/ }),
 
-/***/ "./src/helpers/constants.ts":
-/*!**********************************!*\
-  !*** ./src/helpers/constants.ts ***!
-  \**********************************/
-/*! exports provided: types */
+/***/ "./src/helpers.ts":
+/*!************************!*\
+  !*** ./src/helpers.ts ***!
+  \************************/
+/*! exports provided: addSlugProps, slug, extractIndustriesFrom, fetchData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "types", function() { return types; });
-var types;
-(function (types) {
-    types["INDUSTRIA"] = "industria";
-    types["RESIDUOS"] = "residuos";
-    types["SERVICOS"] = "servicos";
-    types["ATIVO"] = "active";
-    types["GESTAO_RESIDUOS"] = "gestao-de-residuos";
-    types["TRATAMENTO_RESIDUOS"] = "tratamento-de-residuos";
-    types["PGRS"] = "pgrs";
-    types["REMOCAO_LODO"] = "remocao-de-lodo";
-    types["LIMPEZA_FOSSA_SEPTICA"] = "limpeza-de-fossa-septica";
-})(types || (types = {}));
-
-
-/***/ }),
-
-/***/ "./src/helpers/helpers.ts":
-/*!********************************!*\
-  !*** ./src/helpers/helpers.ts ***!
-  \********************************/
-/*! exports provided: removeActiveClass, addActiveClass, filterContainer, industriaSeletorContainer, servicoSeletorContainer, residuosContainer, calculoMontanteContainer, informacoesUsuarioContainer, asideResiduoInfo, industriasSeletor, servicosSeletor, buttons, residuosItems, slug, transformToList, removeAllChildren, reset */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeActiveClass", function() { return removeActiveClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addActiveClass", function() { return addActiveClass; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterContainer", function() { return filterContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "industriaSeletorContainer", function() { return industriaSeletorContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "servicoSeletorContainer", function() { return servicoSeletorContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "residuosContainer", function() { return residuosContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculoMontanteContainer", function() { return calculoMontanteContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "informacoesUsuarioContainer", function() { return informacoesUsuarioContainer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "asideResiduoInfo", function() { return asideResiduoInfo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "industriasSeletor", function() { return industriasSeletor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "servicosSeletor", function() { return servicosSeletor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buttons", function() { return buttons; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "residuosItems", function() { return residuosItems; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addSlugProps", function() { return addSlugProps; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "slug", function() { return slug; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformToList", function() { return transformToList; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeAllChildren", function() { return removeAllChildren; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reset", function() { return reset; });
-function removeActiveClass(element) {
-    element.classList.remove('active');
-}
-function addActiveClass(element) {
-    element.classList.add('active');
-}
-const filterContainer = document.querySelector('[data-secao=modo]');
-const industriaSeletorContainer = document.querySelector('[data-secao=seletor-industria]');
-const servicoSeletorContainer = document.querySelector('[data-secao=seletor-servico]');
-const residuosContainer = document.querySelector('[data-secao=residuos]');
-const calculoMontanteContainer = document.querySelector('[data-secao=calculo-montante]');
-const informacoesUsuarioContainer = document.querySelector('[data-secao=informacoes-usuario]');
-const asideResiduoInfo = document.querySelector('aside.residuo-info');
-const industriasSeletor = document.querySelector('[data-secao=seletor-industria] select');
-const servicosSeletor = document.querySelector('[data-secao=seletor-servico] select');
-const buttons = Array.from(document.querySelectorAll('[data-secao] button'));
-const residuosItems = Array.from(document.querySelectorAll('[data-residuo]'));
-function slug(str) {
-    let result = str.replace(/^\s+|\s+$/g, '');
-    result = result.toLowerCase();
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extractIndustriesFrom", function() { return extractIndustriesFrom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchData", function() { return fetchData; });
+const addSlugProps = (residuo) => {
+    residuo.slug = slug(residuo.nome);
+    residuo.industrias = residuo.industrias.reduce((acc, curr) => {
+        acc[slug(curr)] = curr;
+        return acc;
+    }, {});
+    return residuo;
+};
+function slug(text) {
+    let str = text.replace(/^\s+|\s+$/g, '');
+    str = str.toLowerCase();
     const from = 'ãàáäâèéëêìíïîòóöôùúüûñç·/_,:;';
     const to = 'aaaaaeeeeiiiioooouuuunc------';
     for (let i = 0, l = from.length; i < l; i++) {
-        result = result.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
     }
-    result = result.replace(/[^a-z0-9 -]/g, '')
+    str = str.replace(/[^a-z0-9 -]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
-    return result;
+    return str;
 }
-function transformToList(arr) {
-    if (arr) {
-        const list = arr.map(item => {
-            const li = document.createElement('li');
-            li.textContent = item.exemplo;
-            return li;
-        });
-        return list;
-    }
-}
-function removeAllChildren(asideExemplosList) {
-    if (asideExemplosList.hasChildNodes) {
-        while (asideExemplosList.firstChild) {
-            asideExemplosList.removeChild(asideExemplosList.firstChild);
-        }
-    }
-}
-function reset(state) {
-    state.industria = '';
-    state.servico = '';
-    state.residuo = '';
-}
-
-
-/***/ }),
-
-/***/ "./src/helpers/state.ts":
-/*!******************************!*\
-  !*** ./src/helpers/state.ts ***!
-  \******************************/
-/*! exports provided: onChange */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onChange", function() { return onChange; });
-function onChange(callbacks) {
-    const state = {
-        filtro: '',
-        industria: '',
-        residuo: '',
-        servico: '',
-        dados: []
+const extractIndustriesFrom = (residuos) => {
+    const extractMap = (acc, curr) => {
+        Object.keys(curr).forEach(key => (acc.set(key, curr[key])));
+        return acc;
     };
-    return new Proxy(state, {
-        set(state, key, value) {
-            state[key] = value;
-            callbacks.forEach((cb) => {
-                cb(state);
-            });
-            return true;
-        }
-    });
-}
+    return residuos.map(residuo => residuo.industrias)
+        .reduce(extractMap, new Map());
+};
+const endpoint = 'http://gruporodocon.com.br/residuos3/wp-json/wp/v2/pages/45';
+const fetchData = async () => {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    const result = data.acf.card_residuo;
+    return result.map(addSlugProps);
+};
 
 
 /***/ })
