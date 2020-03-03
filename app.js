@@ -548,8 +548,11 @@ const loading = document.querySelector('.loading');
     controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO);
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
         const cards = this.query('[data-cards]');
+        const description = this.query('.cards-description');
         const industries = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractIndustriesFrom"])(this.data);
         Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, cards);
+        if (description)
+            description.remove();
         if (this.state.industry) {
             const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`;
             cards.insertAdjacentHTML('beforebegin', markup);

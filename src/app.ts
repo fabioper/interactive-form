@@ -24,9 +24,10 @@ const loading = document.querySelector('.loading') as HTMLDivElement
 
     controller.find(Sections.RESIDUOS).onMount(function() {
         const cards = this.query('[data-cards]')
+        const description = this.query('.cards-description')
         const industries = extractIndustriesFrom(this.data)
         loadResiduesCards(this.state, this.data, cards)
-
+        if (description) description.remove()
         if (this.state.industry) {
             const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`
             cards.insertAdjacentHTML('beforebegin', markup)
