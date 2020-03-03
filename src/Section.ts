@@ -254,10 +254,17 @@ export default class Section {
 
     private addButtonsClickEvents(): void {
         const saveButton = this.query('[data-save]')
+        const submitButton = this.query('[type=submit]')
         if (saveButton)
             saveButton.onclick = (event): void => {
                 event.preventDefault()
                 this.controller.save()
+            }
+
+        if (submitButton)
+            submitButton.onclick = event => {
+                event.preventDefault()
+                this.controller.send()
             }
     }
 }

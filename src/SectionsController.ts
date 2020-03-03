@@ -53,6 +53,11 @@ export default class SectionController {
         this.moveTo(Sections.RESIDUOS)
     }
 
+    send(): void {
+        this.manager.save(this.state)
+        this.manager.send()
+    }
+
     hasState(): boolean {
         return this.manager.hasState()
     }
