@@ -41,4 +41,24 @@ export default class FormManager {
     editState(index: number): void {
         this.state = this._states[index]
     }
+
+    send(): void {
+        console.log(this.asJson())
+    }
+
+    private asJson() {
+        const data = {
+            informacoesPessoais: State.userInfo,
+            residuos: this._states.reduce((acc, curr) => {
+                const residuo = {
+                    nome: curr.residuo.nome,
+                    recipientes: curr.calculoMontante.recipientes
+                }
+                acc.push(residuo)
+                return acc
+            }, [])
+        }
+
+        return data
+    }
 }

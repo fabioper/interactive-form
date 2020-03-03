@@ -128,6 +128,23 @@ class FormManager {
     editState(index) {
         this.state = this._states[index];
     }
+    send() {
+        console.log(this.asJson());
+    }
+    asJson() {
+        const data = {
+            informacoesPessoais: _State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo,
+            residuos: this._states.reduce((acc, curr) => {
+                const residuo = {
+                    nome: curr.residuo.nome,
+                    recipientes: curr.calculoMontante.recipientes
+                };
+                acc.push(residuo);
+                return acc;
+            }, [])
+        };
+        return data;
+    }
 }
 
 
@@ -352,10 +369,16 @@ class Section {
     }
     addButtonsClickEvents() {
         const saveButton = this.query('[data-save]');
+        const submitButton = this.query('[type=submit]');
         if (saveButton)
             saveButton.onclick = (event) => {
                 event.preventDefault();
                 this.controller.save();
+            };
+        if (submitButton)
+            submitButton.onclick = event => {
+                event.preventDefault();
+                this.controller.send();
             };
     }
 }
@@ -412,6 +435,10 @@ class SectionController {
     save() {
         this.manager.save(this.state);
         this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_1__["Sections"].RESIDUOS);
+    }
+    send() {
+        this.manager.save(this.state);
+        this.manager.send();
     }
     hasState() {
         return this.manager.hasState();
