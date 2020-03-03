@@ -280,10 +280,6 @@ input[name=frequencia] + * {
     grid-column: span 7;
 }
 
-[data-section="informacoes-pessoais"] .content > div:nth-child(9) {
-    grid-column: span 8;
-}
-
 [data-section="informacoes-pessoais"] .content .nav-buttons {
     grid-column: span 3;
 }
