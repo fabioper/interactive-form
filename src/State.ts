@@ -30,7 +30,7 @@ export default class State {
             periodo: '',
             recipientes: {}
         }
-        if (State.userInfo)
+        if (!State.userInfo)
             State.userInfo = {
                 nome: '',
                 telefone: '',

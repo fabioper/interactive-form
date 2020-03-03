@@ -298,7 +298,6 @@ class Section {
         });
     }
     getUserInfoListingMarkup() {
-        console.log(this.state);
         return `
                 <div>
                     <h3>Informações de Contato</h3>
@@ -448,7 +447,7 @@ class State {
             periodo: '',
             recipientes: {}
         };
-        if (State.userInfo)
+        if (!State.userInfo)
             State.userInfo = {
                 nome: '',
                 telefone: '',
