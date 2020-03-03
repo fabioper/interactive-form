@@ -196,7 +196,6 @@ export default class Section {
     }
 
     private getUserInfoListingMarkup(): string {
-        console.log(this.state)
         return `
                 <div>
                     <h3>Informações de Contato</h3>
