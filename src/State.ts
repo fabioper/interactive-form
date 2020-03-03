@@ -1,9 +1,9 @@
 import Residuo from './utils/Residuo'
 
 export default class State {
-    searchMode: string
-    industry: string
-    service: string
+    static searchMode: string
+    static industry: string
+    static service: string
     residuo: Residuo
     calculoMontante: {
         frequencia: number;
@@ -65,4 +65,16 @@ export default class State {
             ${endereco}, ${numero}
         `
     }
+
+    set industry(value: string) { State.industry = value }
+
+    get industry(): string { return State.industry }
+
+    set searchMode(value: string) { State.searchMode = value }
+
+    get searchMode(): string { return State.searchMode }
+
+    set service(value: string) { State.service = value }
+
+    get service(): string { return State.service }
 }

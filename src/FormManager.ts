@@ -1,5 +1,10 @@
 import State from './State'
 
+type Data = {
+    informacoesPessoais: any;
+    residuos: { nome: string; recipientes: { [x: string]: string } }[];
+}
+
 export default class FormManager {
     private _state: State;
     private _states: State[];
@@ -21,7 +26,6 @@ export default class FormManager {
         if (!this._states.includes(state)) {
             this._states.push(state)
             const newState = new State()
-            // newState.userInfo = state.userInfo
             this.state = newState
         }
     }
@@ -43,22 +47,28 @@ export default class FormManager {
     }
 
     send(): void {
-        console.log(this.asJson())
+        console.log(this.data)
     }
 
-    private asJson() {
+    private get data(): Data {
         const data = {
             informacoesPessoais: State.userInfo,
-            residuos: this._states.reduce((acc, curr) => {
-                const residuo = {
-                    nome: curr.residuo.nome,
-                    recipientes: curr.calculoMontante.recipientes
-                }
-                acc.push(residuo)
-                return acc
-            }, [])
+            servico: State.service || null,
+            industria: State.industry || null,
+            residuos: this.getSelectedResidues()
         }
 
         return data
+    }
+
+    private getSelectedResidues(): any[] {
+        return this._states.reduce((acc, curr) => {
+            const residuo = {
+                nome: curr.residuo.nome,
+                recipientes: curr.calculoMontante.recipientes
+            }
+            acc.push(residuo)
+            return acc
+        }, [])
     }
 }

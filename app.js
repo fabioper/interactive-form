@@ -129,21 +129,26 @@ class FormManager {
         this.state = this._states[index];
     }
     send() {
-        console.log(this.asJson());
+        console.log(this.data);
     }
-    asJson() {
+    get data() {
         const data = {
             informacoesPessoais: _State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo,
-            residuos: this._states.reduce((acc, curr) => {
-                const residuo = {
-                    nome: curr.residuo.nome,
-                    recipientes: curr.calculoMontante.recipientes
-                };
-                acc.push(residuo);
-                return acc;
-            }, [])
+            servico: _State__WEBPACK_IMPORTED_MODULE_0__["default"].service || null,
+            industria: _State__WEBPACK_IMPORTED_MODULE_0__["default"].industry || null,
+            residuos: this.getSelectedResidues()
         };
         return data;
+    }
+    getSelectedResidues() {
+        return this._states.reduce((acc, curr) => {
+            const residuo = {
+                nome: curr.residuo.nome,
+                recipientes: curr.calculoMontante.recipientes
+            };
+            acc.push(residuo);
+            return acc;
+        }, []);
     }
 }
 
@@ -506,6 +511,12 @@ class State {
             ${endereco}, ${numero}
         `;
     }
+    set industry(value) { State.industry = value; }
+    get industry() { return State.industry; }
+    set searchMode(value) { State.searchMode = value; }
+    get searchMode() { return State.searchMode; }
+    set service(value) { State.service = value; }
+    get service() { return State.service; }
 }
 
 
