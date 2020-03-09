@@ -83,12 +83,16 @@ export default class Section {
             action.onclick = (event): void => {
                 event.preventDefault()
                 const inputs = this.queryAll('input, select') as HTMLInputElement[]
-                const isValid = inputs.every(input => {
-                    input.reportValidity()
-                    return input.checkValidity()
-                })
-                if (isValid) this.controller.moveTo(action.dataset.action)
+                if (!action.dataset.ignoreValidation || this.isValid(inputs))
+                    this.controller.moveTo(action.dataset.action)
             }
+        })
+    }
+
+    private isValid(inputs: HTMLInputElement[]): boolean {
+        return inputs.every(input => {
+            input.reportValidity()
+            return input.checkValidity()
         })
     }
 
@@ -98,19 +102,16 @@ export default class Section {
             let value
             if (binding.dataset.bind.includes(':')) {
                 const [state, key] = binding.dataset.bind.split(':')
-                value = this.state[state][key]
-                /* if (state === 'residuo' && key === 'nome') {
-                    const icon = document.createElement('img')
-                    icon.classList.add('residuo-icon')
-                    icon.src = this.state.residuo.icone
-                    binding.insertAdjacentElement('beforebegin', icon)
-                } */
+                if (this.state[state])
+                    value = this.state[state][key]
             } else {
                 value = this.state[binding.dataset.bind]
             }
 
             if (!value)
-                return binding.parentElement.remove()
+                return binding.parentElement.style.display = 'none'
+
+            binding.parentElement.style.display = 'block'
 
             if (binding.hasAttribute('data-transform'))
                 value = value
@@ -196,7 +197,7 @@ export default class Section {
     }
 
     private getUserInfoListingMarkup(): string {
-        return `
+        return /* html */`
                 <div>
                     <h3>Informações de Contato</h3>
                     <p>${this.state.contato}</p>
@@ -210,7 +211,9 @@ export default class Section {
     }
 
     private getResiduesListingMarkup(): string {
-        return this.controller.states.map((state, idx) => `
+        return this.controller.states.map((state, idx) => {
+            if (state.calculoMontante.periodo)
+                return /* html */`
                     <div>
                         <h3>Resíduo</h3>
                         <p>${state.residuo.nome}</p>
@@ -227,7 +230,9 @@ export default class Section {
                             </button>
                         </div>
                     </div>
-                `).join(' ')
+                `
+            return ''
+        }).join(' ')
     }
 
     private fillProgressBar(): void {

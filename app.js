@@ -231,13 +231,15 @@ class Section {
             action.onclick = (event) => {
                 event.preventDefault();
                 const inputs = this.queryAll('input, select');
-                const isValid = inputs.every(input => {
-                    input.reportValidity();
-                    return input.checkValidity();
-                });
-                if (isValid)
+                if (!action.dataset.ignoreValidation || this.isValid(inputs))
                     this.controller.moveTo(action.dataset.action);
             };
+        });
+    }
+    isValid(inputs) {
+        return inputs.every(input => {
+            input.reportValidity();
+            return input.checkValidity();
         });
     }
     addBindings() {
@@ -246,13 +248,15 @@ class Section {
             let value;
             if (binding.dataset.bind.includes(':')) {
                 const [state, key] = binding.dataset.bind.split(':');
-                value = this.state[state][key];
+                if (this.state[state])
+                    value = this.state[state][key];
             }
             else {
                 value = this.state[binding.dataset.bind];
             }
             if (!value)
-                return binding.parentElement.remove();
+                return binding.parentElement.style.display = 'none';
+            binding.parentElement.style.display = 'block';
             if (binding.hasAttribute('data-transform'))
                 value = value
                     .map(v => Object.values(v))
@@ -333,7 +337,9 @@ class Section {
             `;
     }
     getResiduesListingMarkup() {
-        return this.controller.states.map((state, idx) => `
+        return this.controller.states.map((state, idx) => {
+            if (state.calculoMontante.periodo)
+                return `
                     <div>
                         <h3>Resíduo</h3>
                         <p>${state.residuo.nome}</p>
@@ -350,7 +356,9 @@ class Section {
                             </button>
                         </div>
                     </div>
-                `).join(' ');
+                `;
+            return '';
+        }).join(' ');
     }
     fillProgressBar() {
         const progressBar = this.query('.progress');
@@ -479,22 +487,11 @@ class State {
             periodo: '',
             recipientes: {}
         };
-        if (!State.userInfo)
-            State.userInfo = {
-                nome: '',
-                telefone: '',
-                email: '',
-                empresa: '',
-                cnpj: '',
-                cep: '',
-                endereco: '',
-                numero: '',
-                complemento: ''
-            };
     }
     get frequencia() {
         const { frequencia, periodo } = this.calculoMontante;
-        return `${frequencia}x por ${periodo}`;
+        return !periodo ? '' :
+            `${frequencia}x por ${periodo}`;
     }
     get recipientes() {
         const { recipientes } = this.calculoMontante;
@@ -518,6 +515,17 @@ class State {
     set service(value) { State.service = value; }
     get service() { return State.service; }
 }
+State.userInfo = {
+    nome: '',
+    telefone: '',
+    email: '',
+    empresa: '',
+    cnpj: '',
+    cep: '',
+    endereco: '',
+    numero: '',
+    complemento: ''
+};
 
 
 /***/ }),
@@ -554,12 +562,19 @@ const loading = document.querySelector('.loading');
         if (description)
             description.remove();
         if (this.state.industry) {
-            const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`;
+            const markup = `
+                <p class="cards-description">
+                    Normalmente, a <strong>indústria
+                    <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:
+                </p>
+            `;
             cards.insertAdjacentHTML('beforebegin', markup);
         }
     });
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE).onMount(function () {
         const recipients = this.query('.iq__options');
+        const dontKnow = this.query('hr > p a');
+        console.log(dontKnow);
         const activator = recipients.previousElementSibling;
         const containers = this.state.residuo.containers[0].container;
         recipients.innerHTML = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractDropdownOptionsMarkup"])(containers);

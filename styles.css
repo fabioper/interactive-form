@@ -541,3 +541,12 @@ aside ul li::before {
 .cards-description {
     margin-top: 0;
 }
+
+hr {
+    margin: 1rem 0;
+}
+
+hr + p a {
+    color: #262E60;
+    font-weight: bold;
+}

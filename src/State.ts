@@ -12,16 +12,16 @@ export default class State {
             [x: string]: number;
         };
     }
-    static userInfo: {
-        nome: string;
-        telefone: string;
-        email: string;
-        empresa: string;
-        cnpj: string;
-        cep: string;
-        endereco: string;
-        numero: string;
-        complemento: string;
+    static userInfo = {
+        nome: '',
+        telefone: '',
+        email: '',
+        empresa: '',
+        cnpj: '',
+        cep: '',
+        endereco: '',
+        numero: '',
+        complemento: ''
     }
 
     constructor() {
@@ -30,23 +30,12 @@ export default class State {
             periodo: '',
             recipientes: {}
         }
-        if (!State.userInfo)
-            State.userInfo = {
-                nome: '',
-                telefone: '',
-                email: '',
-                empresa: '',
-                cnpj: '',
-                cep: '',
-                endereco: '',
-                numero: '',
-                complemento: ''
-            }
     }
 
     get frequencia(): string {
         const { frequencia, periodo } = this.calculoMontante
-        return `${frequencia}x por ${periodo}`
+        return !periodo ? '' :
+            `${frequencia}x por ${periodo}`
     }
 
     get recipientes(): string {

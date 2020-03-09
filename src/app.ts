@@ -29,13 +29,20 @@ const loading = document.querySelector('.loading') as HTMLDivElement
         loadResiduesCards(this.state, this.data, cards)
         if (description) description.remove()
         if (this.state.industry) {
-            const markup = `<p class="cards-description">Normalmente, a <strong>indústria <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:</p>`
+            const markup = /*html*/`
+                <p class="cards-description">
+                    Normalmente, a <strong>indústria
+                    <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:
+                </p>
+            `
             cards.insertAdjacentHTML('beforebegin', markup)
         }
     })
 
     controller.find(Sections.CALCULO_MONTANTE).onMount(function() {
         const recipients = this.query('.iq__options')
+        const dontKnow = this.query('hr > p a')
+        console.log(dontKnow)
         const activator = recipients.previousElementSibling as HTMLElement
         const containers = this.state.residuo.containers[0].container
         recipients.innerHTML = extractDropdownOptionsMarkup(containers)
