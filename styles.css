@@ -292,11 +292,16 @@ input[name=frequencia] + * {
 }
 
 [data-section="informacoes-pessoais"] .content > div:nth-child(9) {
-    grid-column: span 7;
+    grid-column: span 10;
+}
+
+[data-section="informacoes-pessoais"] .content div:nth-child(10) {
+    grid-column: span 12;
 }
 
 [data-section="informacoes-pessoais"] .content .nav-buttons {
     grid-column: span 3;
+    justify-self: start;
 }
 
 [data-section="revise-seu-pedido"] .content .nav-buttons {
@@ -461,7 +466,7 @@ aside p {
     font-size: 1rem;
 }
 
-.progress[data-value] {
+.progress {
     margin: 0 0 2rem;
     display: grid;
     height: 2.1rem;
@@ -472,12 +477,13 @@ aside p {
     grid-auto-flow: column;
 }
 
-.progress[data-value] .progress__value {
+.progress .progress__value {
+    display: block;
     height: 100%;
     border-right: 1px dashed #262E60;
 }
 
-.progress[data-value] .progress__value.active {
+.progress .progress__value.active {
     background: #F4C000;
 }
 

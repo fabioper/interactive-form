@@ -32,6 +32,10 @@ export default class SectionController {
             this._previous.unmount()
     }
 
+    get sections(): Map<string, Section> {
+        return this._sections
+    }
+
     append(...keys: string[]): void {
         keys.forEach(key => {
             const section = new Section(key)

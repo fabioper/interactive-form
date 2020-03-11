@@ -18,8 +18,8 @@ const loading = document.querySelector('.loading') as HTMLDivElement
         Sections.RESIDUOS,
         Sections.CALCULO_MONTANTE,
         Sections.INFO_PESSOAIS,
-        Sections.REVISE_PEDIDO,
-        Sections.PEDIDO_ENVIADO
+        Sections.REVISE_PEDIDO
+        // Sections.PEDIDO_ENVIADO
     )
 
     controller.find(Sections.RESIDUOS).onMount(function() {
@@ -41,8 +41,6 @@ const loading = document.querySelector('.loading') as HTMLDivElement
 
     controller.find(Sections.CALCULO_MONTANTE).onMount(function() {
         const recipients = this.query('.iq__options')
-        const dontKnow = this.query('hr > p a')
-        console.log(dontKnow)
         const activator = recipients.previousElementSibling as HTMLElement
         const containers = this.state.residuo.containers[0].container
         recipients.innerHTML = extractDropdownOptionsMarkup(containers)

@@ -2,6 +2,7 @@ import SectionsController from './SectionsController'
 import Residuo from './utils/Residuo'
 import { Sections } from './utils/enums'
 import State from './State'
+import ProgressBar from './ProgressBar'
 
 export default class Section {
     name: string
@@ -83,8 +84,7 @@ export default class Section {
             action.onclick = (event): void => {
                 event.preventDefault()
                 const inputs = this.queryAll('input, select') as HTMLInputElement[]
-                if (!action.dataset.ignoreValidation || this.isValid(inputs))
-                    this.controller.moveTo(action.dataset.action)
+                if (this.isValid(inputs)) this.controller.moveTo(action.dataset.action)
             }
         })
     }
@@ -152,7 +152,7 @@ export default class Section {
         }
 
         if (this.name === Sections.INFO_PESSOAIS) {
-            const inputs = this.queryAll('input') as HTMLInputElement[]
+            const inputs = this.queryAll('input, textarea') as HTMLInputElement[]
             inputs.forEach(input => {
                 input.value = State.userInfo[input.name]
                 input.onchange = (): string => State.userInfo[input.name] = input.value
@@ -236,9 +236,16 @@ export default class Section {
     }
 
     private fillProgressBar(): void {
-        const progressBar = this.query('.progress')
-        this.removeAllChildrenFrom(progressBar)
-        this.setActiveSteps(progressBar)
+        // const progressBar = this.query('.progress')
+        // this.removeAllChildrenFrom(progressBar)
+        // this.setActiveSteps(progressBar)
+        const sections = Array.from(this.controller.sections.values())
+        const progressBar = new ProgressBar(sections)
+        progressBar.fillUntil(this)
+        progressBar.renderAt(this.query('.progress'))
+        progressBar.onClick(section => {
+            console.log('clicked')
+        })
     }
 
     private setActiveSteps(progressBar: HTMLElement): void {

@@ -127,8 +127,7 @@
                 <section data-section="modo-de-pesquisa">
                     <header>
                         <h2>Solicitar orçamento</h2>
-                        <div class="progress" data-value="1" data-max="6">
-                    </header>
+                        <div class="progress"></header>
                     <div class="content">
                         <div data-cards>
                         <button data-action="industrias" data-card="industrias">
@@ -150,8 +149,7 @@
                 <section data-section="industrias">
                     <header>
                         <h2>Indústrias</h2>
-                        <div class="progress" data-value="2" data-max="6">
-                        </div>
+                        <div class="progress"></div>
                     </header>
                     <div class="content">
                         <div data-cards>
@@ -194,8 +192,7 @@
                 <section data-section="servicos">
                     <header>
                         <h2>Serviços</h2>
-                        <div class="progress" data-value="2" data-max="6"></div>
-                    </header>
+                        <div class="progress"></header>
                     <div class="content">
                         <div data-cards>
                             <button data-card="gestao-de-residuos" data-action="residuos">
@@ -225,8 +222,7 @@
                 <section data-section="residuos">
                         <header>
                             <h2>Resíduos</h2>
-                            <div class="progress" data-value="3" data-max="6">
-                            </div>
+                            <div class="progress"></div>
                         </header>
                         <div class="container">
                             <div class="content">
@@ -239,16 +235,15 @@
                 <section data-section="calculo-montante">
                     <header>
                         <h2 data-bind="residuo:nome"></h2>
-                        <div class="progress" data-value="3" data-max="6">
-                        </div>
+                        <div class="progress"></div>
                     </header>
                     <div class="container">
                         <div class="content">
                             <h3>Cálculo Montante</h3>
                             <div>
                                 <label for="frequencia">Frequência</label>
-                                <input type="number" name="frequencia" id="frequencia" min="1" value="1" required> <span>por</span>
-                                <select name="periodo" id="periodo" required>
+                                <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
+                                <select name="periodo" id="periodo">
                                     <option value="">Selecione a frequência de sua coleta</option>
                                     <option value="semana">Semana</option>
                                     <option value="mes">Mês</option>
@@ -269,7 +264,7 @@
                             </div>
 
                             <hr>
-                            <p>Caso não tenha certeza, <a href="#" data-action="informacoes-pessoais" data-ignore-validation>clique aqui</a>.</p>
+                            <p>Caso não tenha certeza, <a href="#" data-action="informacoes-pessoais">clique aqui</a>.</p>
 
                             <div class="nav-buttons">
                                 <button data-action="informacoes-pessoais" class="submit">Avançar</button>
@@ -291,8 +286,7 @@
                 <section data-section="informacoes-pessoais">
                     <header>
                         <h2>Informações Pessoais</h2>
-                        <div class="progress" data-value="4" data-max="6">
-                        </div>
+                        <div class="progress"></div>
                     </header>
                     <div class="content">
                         <div>
@@ -339,6 +333,11 @@
                             <label for="complemento">Complemento</label>
                             <input type="text" name="complemento" id="complemento">
                         </div>
+                        
+                        <div>
+                            <label for="observacao">Observação</label>
+                            <textarea name="observacao" id="observacao"></textarea>
+                        </div>
 
                         <div class="nav-buttons">
                             <button data-action="revise-seu-pedido" class="submit">Avançar</button>
@@ -349,8 +348,7 @@
                 <section data-section="revise-seu-pedido">
                     <header>
                         <h2>Revise seu pedido</h2>
-                        <div class="progress" data-value="5" data-max="6">
-                        </div>
+                        <div class="progress"></div>
                     </header>
                     <div class="content">
                         <div>
@@ -478,9 +476,9 @@
             </a>
         </div>
     </footer>
-    <script src="./app.js"></script>
     <script type='text/javascript'
         src='http://gruporodocon.com.br/residuos3/wp-content/themes/wp-tema/scripts.js?v=1582255641&#038;ver=20151215'></script>
+    <script src="./app.js"></script>
 </body>
 
 </html>

@@ -21,7 +21,8 @@ export default class State {
         cep: '',
         endereco: '',
         numero: '',
-        complemento: ''
+        complemento: '',
+        observacao: ''
     }
 
     constructor() {
@@ -46,12 +47,13 @@ export default class State {
     }
 
     get contato(): string {
-        const { nome, telefone, empresa, endereco, numero } = State.userInfo
+        const { nome, telefone, empresa, endereco, numero, observacao } = State.userInfo
         return `
             ${nome}<br>
             ${telefone}<br>
             ${empresa}<br>
-            ${endereco}, ${numero}
+            ${endereco}, ${numero}<br>
+            ${observacao}
         `
     }
 
