@@ -155,73 +155,6 @@ class FormManager {
 
 /***/ }),
 
-/***/ "./src/ProgressBar.ts":
-/*!****************************!*\
-  !*** ./src/ProgressBar.ts ***!
-  \****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ProgressBar; });
-/* harmony import */ var _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProgressBarValue */ "./src/ProgressBarValue.ts");
-
-class ProgressBar {
-    constructor(sections) {
-        this._sections = sections;
-        this._values = this._sections.map(section => new _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__["default"](section));
-    }
-    get markup() {
-        return this._values.map(value => value.element.outerHTML).join(' ');
-    }
-    fillUntil(activeSection) {
-        for (let i = 0; i <= this._sections.indexOf(activeSection); i++)
-            this._values[i].fill();
-    }
-    renderAt(container) {
-        console.log(this.markup);
-        console.log(container);
-        container.innerHTML = this.markup;
-    }
-    onClick(callback) {
-        this._values.forEach(value => value.addOnClickEvent(callback));
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/ProgressBarValue.ts":
-/*!*********************************!*\
-  !*** ./src/ProgressBarValue.ts ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ProgressBarValue; });
-class ProgressBarValue {
-    constructor(section) {
-        this._section = section;
-        this._element = document.createElement('div');
-        this._element.classList.add('progress__value');
-    }
-    get element() {
-        return this._element;
-    }
-    fill() {
-        this._element.classList.add('active');
-    }
-    addOnClickEvent(callback) {
-        this._element.onclick = () => callback(this._section);
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/Section.ts":
 /*!************************!*\
   !*** ./src/Section.ts ***!
@@ -234,15 +167,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Section; });
 /* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
 /* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./State */ "./src/State.ts");
-/* harmony import */ var _ProgressBar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ProgressBar */ "./src/ProgressBar.ts");
+/* harmony import */ var _components_ProgressBar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/ProgressBar */ "./src/components/ProgressBar.ts");
 
 
 
 class Section {
-    constructor(name) {
-        this.name = name;
-        this.rootElement = document.querySelector(`[data-section=${name}`);
+    constructor(name, step) {
+        this._name = name;
+        this._position = step;
+        this._rootElement = document.querySelector(`[data-section=${name}`);
         this._onMount = [];
+        this._isFullfilled = false;
+    }
+    get name() {
+        return this._name;
+    }
+    get position() {
+        return this._position;
     }
     get state() {
         return this.controller.state;
@@ -250,8 +191,14 @@ class Section {
     get data() {
         return this.controller.data;
     }
+    set isFullfilled(value) {
+        this._isFullfilled = value;
+    }
+    get isFullfilled() {
+        return this._isFullfilled;
+    }
     mount() {
-        this.rootElement.classList.add('active');
+        this._rootElement.classList.add('active');
         this._onMount.forEach(onMount => onMount.bind(this)());
         this.fillProgressBar();
         this.addCardsClickEvent();
@@ -263,16 +210,16 @@ class Section {
             progressBar.removeChild(progressBar.firstChild);
     }
     unmount() {
-        this.rootElement.classList.remove('active');
+        this._rootElement.classList.remove('active');
     }
     onMount(...callback) {
         this._onMount.push(...callback);
     }
     query(selector) {
-        return this.rootElement.querySelector(selector);
+        return this._rootElement.querySelector(selector);
     }
     queryAll(selector) {
-        return Array.from(this.rootElement.querySelectorAll(selector));
+        return Array.from(this._rootElement.querySelectorAll(selector));
     }
     addCardsClickEvent() {
         const cards = this.query('[data-cards]');
@@ -285,14 +232,15 @@ class Section {
     addCardClickEvent(card) {
         card.addEventListener('click', event => {
             event.preventDefault();
-            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
                 this.state.searchMode = card.dataset.card;
-            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INDUSTRIAS)
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INDUSTRIAS)
                 this.state.industry = card.dataset.card;
-            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].SERVICOS)
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].SERVICOS)
                 this.state.service = card.dataset.card;
-            if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS)
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS)
                 this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card));
+            this.isFullfilled = true;
         });
     }
     addActionsClickEvent() {
@@ -300,8 +248,10 @@ class Section {
             action.onclick = (event) => {
                 event.preventDefault();
                 const inputs = this.queryAll('input, select');
-                if (this.isValid(inputs))
+                if (this.isValid(inputs)) {
                     this.controller.moveTo(action.dataset.action);
+                    this.isFullfilled = true;
+                }
             };
         });
     }
@@ -337,7 +287,8 @@ class Section {
         this.bindSidebarFields();
     }
     bindFormFields() {
-        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
+        if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
+            this.isFullfilled = true;
             const frequencia = this.query('input[name=frequencia]');
             const periodo = this.query('select[name=periodo]');
             const recipientes = this.queryAll('input[name=quantidade]');
@@ -352,7 +303,7 @@ class Section {
                 input.onchange = () => (this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber);
             });
         }
-        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS) {
+        if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS) {
             const inputs = this.queryAll('input, textarea');
             inputs.forEach(input => {
                 input.value = _State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo[input.name];
@@ -374,8 +325,10 @@ class Section {
         remove.forEach(btn => {
             btn.onclick = (event) => {
                 event.preventDefault();
-                this.controller.removeState(btn.dataset.remove);
-                this.controller.moveTo(this.name);
+                if (window.confirm('Deseja realmente excluir este item?')) {
+                    this.controller.removeState(btn.dataset.remove);
+                    this.controller.moveTo(this._name);
+                }
             };
         });
     }
@@ -430,13 +383,9 @@ class Section {
         }).join(' ');
     }
     fillProgressBar() {
-        const sections = Array.from(this.controller.sections.values());
-        const progressBar = new _ProgressBar__WEBPACK_IMPORTED_MODULE_2__["default"](sections);
+        const progressBar = new _components_ProgressBar__WEBPACK_IMPORTED_MODULE_2__["default"](this.controller);
         progressBar.fillUntil(this);
         progressBar.renderAt(this.query('.progress'));
-        progressBar.onClick(section => {
-            console.log('clicked');
-        });
     }
     setActiveSteps(progressBar) {
         const step = parseInt(progressBar.dataset.value, 10);
@@ -482,37 +431,56 @@ class Section {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SectionController; });
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
-/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
-
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
 
 class SectionController {
     constructor(manager, data) {
         this._sections = new Map();
+        this._history = [];
         this.data = data;
-        this.manager = manager;
+        this._manager = manager;
+        window.addEventListener('popstate', () => {
+            this._history.pop();
+            if (this._history.length > 0)
+                this.moveTo(this._history.pop());
+        });
     }
     get state() {
-        return this.manager.state;
+        return this._manager.state;
+    }
+    get states() {
+        return this._manager.states;
     }
     set active(section) {
         this.previous = this._active;
         this._active = section;
+        this._history.push(section.name);
+        this.changeHistoryState(section);
         this._active.mount();
+    }
+    get active() {
+        return this._active;
     }
     set previous(section) {
         this._previous = section;
         if (this._previous)
             this._previous.unmount();
     }
+    get previous() {
+        return this._previous;
+    }
     get sections() {
         return this._sections;
     }
-    append(...keys) {
-        keys.forEach(key => {
-            const section = new _Section__WEBPACK_IMPORTED_MODULE_0__["default"](key);
+    changeHistoryState(section) {
+        this._history.length > 0 ?
+            history.pushState({ section: section.name }, section.name) :
+            history.replaceState({ section: section.name }, section.name);
+    }
+    append(...sections) {
+        sections.forEach(section => {
             section.controller = this;
-            this._sections.set(key, section);
+            this._sections.set(section.name, section);
         });
     }
     find(key) {
@@ -522,24 +490,26 @@ class SectionController {
         this.active = this.find(key);
     }
     save() {
-        this.manager.save(this.state);
-        this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_1__["Sections"].RESIDUOS);
+        this._manager.save(this.state);
+        this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS);
     }
     send() {
-        this.manager.save(this.state);
-        this.manager.send();
+        this._manager.save(this.state);
+        this._manager.send();
     }
     hasState() {
-        return this.manager.hasState();
-    }
-    get states() {
-        return this.manager.states;
+        return this._manager.hasState();
     }
     removeState(index) {
-        this.manager.removeState(parseInt(index, 10));
+        this._manager.removeState(parseInt(index, 10));
     }
     editState(index) {
-        this.manager.editState(parseInt(index, 10));
+        this._manager.editState(parseInt(index, 10));
+    }
+    clear() {
+        const message = 'Tem certeza que deseja limpar o formulário?';
+        if (window.confirm(message))
+            location.reload();
     }
 }
 
@@ -621,6 +591,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _SectionsController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SectionsController */ "./src/SectionsController.ts");
 /* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
 /* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+
 
 
 
@@ -631,7 +603,8 @@ const loading = document.querySelector('.loading');
     const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_3__["default"]();
     const controller = new _SectionsController__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
     loading.remove();
-    controller.append(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO);
+    const sections = [];
+    controller.append(new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, 1), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, 2), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, 2), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, 3), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, 4), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, 5), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, 6), new _Section__WEBPACK_IMPORTED_MODULE_4__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO, 7));
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
         const cards = this.query('[data-cards]');
         const description = this.query('.cards-description');
@@ -658,6 +631,135 @@ const loading = document.querySelector('.loading');
     });
     controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA);
 })();
+
+
+/***/ }),
+
+/***/ "./src/components/ProgressBar.ts":
+/*!***************************************!*\
+  !*** ./src/components/ProgressBar.ts ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ProgressBar; });
+/* harmony import */ var _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProgressBarValue */ "./src/components/ProgressBarValue.ts");
+
+class ProgressBar {
+    constructor(controller) {
+        this._controller = controller;
+        this._sections = Array.from(this._controller.sections.values());
+        this._values = this._sections.map(section => new _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__["default"](section));
+        this.moveSectionIfActive = this.moveSectionIfActive.bind(this);
+    }
+    get markup() {
+        return this._values.map(value => value.element.outerHTML).join(' ');
+    }
+    fillUntil(activeSection) {
+        this._activeSectionIndex = this._sections.indexOf(activeSection);
+        for (let i = 0; i <= this._activeSectionIndex; i++)
+            this._values[i].fill();
+    }
+    renderAt(container) {
+        container.innerHTML = '';
+        const steps = this.appendStepsDiv(container);
+        this._values.forEach(value => {
+            steps.appendChild(value.element);
+            value.addOnClickEvent(this.moveSectionIfActive);
+        });
+    }
+    appendStepsDiv(container) {
+        const steps = this.createStepsDiv();
+        container.appendChild(steps);
+        this.appendMoveButtons(steps);
+        return steps;
+    }
+    appendMoveButtons(steps) {
+        steps.insertAdjacentElement('beforebegin', this.createPreviousAction());
+        steps.insertAdjacentElement('afterend', this.createClearButton());
+        steps.insertAdjacentElement('afterend', this.createNextButton());
+    }
+    createStepsDiv() {
+        const steps = document.createElement('div');
+        steps.classList.add('steps');
+        return steps;
+    }
+    createPreviousAction() {
+        const previousButton = document.createElement('div');
+        const previousIndex = this._activeSectionIndex - 1;
+        previousButton.classList.add('previous');
+        previousIndex >= 0 ?
+            previousButton.classList.add('active') :
+            previousButton.classList.remove('active');
+        previousButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
+        previousButton.onclick = () => {
+            if (previousIndex >= 0)
+                this._controller.moveTo(this._sections[previousIndex].name);
+        };
+        return previousButton;
+    }
+    createNextButton() {
+        const nextButton = document.createElement('div');
+        const nextIndex = this._activeSectionIndex + 1;
+        nextButton.classList.add('next');
+        const section = this._sections[this._activeSectionIndex];
+        nextIndex < this._values.length && section.isFullfilled ?
+            nextButton.classList.add('active') :
+            nextButton.classList.remove('active');
+        nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
+        nextButton.onclick = () => {
+            if (nextIndex < this._values.length && section.isFullfilled)
+                this._controller.moveTo(this._sections[nextIndex].name);
+        };
+        return nextButton;
+    }
+    createClearButton() {
+        const div = document.createElement('div');
+        div.classList.add('clear');
+        div.innerHTML = 'Limpar';
+        div.onclick = () => this._controller.clear();
+        return div;
+    }
+    moveSectionIfActive(progressValue, section) {
+        if (progressValue.isActive)
+            this._controller.moveTo(section.name);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/components/ProgressBarValue.ts":
+/*!********************************************!*\
+  !*** ./src/components/ProgressBarValue.ts ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ProgressBarValue; });
+class ProgressBarValue {
+    constructor(section) {
+        this._section = section;
+        this._element = document.createElement('div');
+        this._element.classList.add('progress__value');
+    }
+    get element() {
+        return this._element;
+    }
+    get isActive() {
+        return this._element.classList.contains('active');
+    }
+    fill() {
+        this._element.classList.add('active');
+    }
+    addOnClickEvent(callback) {
+        this._element.onclick = () => (callback(this, this._section));
+    }
+}
 
 
 /***/ }),

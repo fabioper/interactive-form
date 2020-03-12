@@ -1,4 +1,4 @@
-import Section from './Section'
+import Section from '../Section'
 
 export default class ProgressBarValue {
     private _element: HTMLElement;
@@ -14,11 +14,17 @@ export default class ProgressBarValue {
         return this._element
     }
 
+    get isActive(): boolean {
+        return this._element.classList.contains('active')
+    }
+
     fill(): void {
         this._element.classList.add('active')
     }
 
-    addOnClickEvent(callback: (section: Section) => void): void {
-        this._element.onclick = (): void => callback(this._section)
+    addOnClickEvent(callback: (progressValue: ProgressBarValue, section: Section) => void): void {
+        this._element.onclick = (): void => (
+            callback(this, this._section)
+        )
     }
 }

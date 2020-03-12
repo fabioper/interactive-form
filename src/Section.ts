@@ -2,18 +2,30 @@ import SectionsController from './SectionsController'
 import Residuo from './utils/Residuo'
 import { Sections } from './utils/enums'
 import State from './State'
-import ProgressBar from './ProgressBar'
+import ProgressBar from './components/ProgressBar'
 
 export default class Section {
-    name: string
+    private _name: string
     controller: SectionsController
-    private rootElement: HTMLElement
+    private _position: number;
+    private _rootElement: HTMLElement
     private _onMount: ((this: this) => void)[]
+    private _isFullfilled: boolean
 
-    constructor(name: string) {
-        this.name = name
-        this.rootElement = document.querySelector(`[data-section=${name}`) as HTMLElement
+    constructor(name: string, step: number) {
+        this._name = name
+        this._position = step
+        this._rootElement = document.querySelector(`[data-section=${name}`) as HTMLElement
         this._onMount = []
+        this._isFullfilled = false
+    }
+
+    get name(): string {
+        return this._name
+    }
+
+    get position(): number {
+        return this._position
     }
 
     get state(): State {
@@ -24,8 +36,16 @@ export default class Section {
         return this.controller.data
     }
 
+    set isFullfilled(value: boolean) {
+        this._isFullfilled = value
+    }
+
+    get isFullfilled(): boolean {
+        return this._isFullfilled
+    }
+
     mount(): void {
-        this.rootElement.classList.add('active')
+        this._rootElement.classList.add('active')
         this._onMount.forEach(onMount => onMount.bind(this)())
         this.fillProgressBar()
         this.addCardsClickEvent()
@@ -39,7 +59,7 @@ export default class Section {
     }
 
     unmount(): void {
-        this.rootElement.classList.remove('active')
+        this._rootElement.classList.remove('active')
     }
 
     onMount(...callback: ((this: this) => void)[]): void {
@@ -47,12 +67,12 @@ export default class Section {
     }
 
     query(selector: string): HTMLElement {
-        return this.rootElement.querySelector(selector) as HTMLElement
+        return this._rootElement.querySelector(selector) as HTMLElement
     }
 
     queryAll(selector: string): HTMLElement[] {
         return Array.from(
-            this.rootElement.querySelectorAll(selector) as NodeListOf<HTMLElement>
+            this._rootElement.querySelectorAll(selector) as NodeListOf<HTMLElement>
         )
     }
 
@@ -68,14 +88,16 @@ export default class Section {
     private addCardClickEvent(card: HTMLButtonElement): void {
         card.addEventListener('click', event => {
             event.preventDefault()
-            if (this.name === Sections.MODO_DE_PESQUISA)
+            if (this._name === Sections.MODO_DE_PESQUISA)
                 this.state.searchMode = card.dataset.card
-            if (this.name === Sections.INDUSTRIAS)
+            if (this._name === Sections.INDUSTRIAS)
                 this.state.industry = card.dataset.card
-            if (this.name === Sections.SERVICOS)
+            if (this._name === Sections.SERVICOS)
                 this.state.service = card.dataset.card
-            if (this.name === Sections.RESIDUOS)
+            if (this._name === Sections.RESIDUOS)
                 this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card))
+
+            this.isFullfilled = true
         })
     }
 
@@ -84,7 +106,10 @@ export default class Section {
             action.onclick = (event): void => {
                 event.preventDefault()
                 const inputs = this.queryAll('input, select') as HTMLInputElement[]
-                if (this.isValid(inputs)) this.controller.moveTo(action.dataset.action)
+                if (this.isValid(inputs)) {
+                    this.controller.moveTo(action.dataset.action)
+                    this.isFullfilled = true
+                }
             }
         })
     }
@@ -128,7 +153,8 @@ export default class Section {
 
     // eslint-disable-next-line max-statements
     private bindFormFields(): void {
-        if (this.name === Sections.CALCULO_MONTANTE) {
+        if (this._name === Sections.CALCULO_MONTANTE) {
+            this.isFullfilled = true
             const frequencia = this.query('input[name=frequencia]') as HTMLInputElement
             const periodo = this.query('select[name=periodo]') as HTMLSelectElement
             const recipientes = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
@@ -151,7 +177,7 @@ export default class Section {
             })
         }
 
-        if (this.name === Sections.INFO_PESSOAIS) {
+        if (this._name === Sections.INFO_PESSOAIS) {
             const inputs = this.queryAll('input, textarea') as HTMLInputElement[]
             inputs.forEach(input => {
                 input.value = State.userInfo[input.name]
@@ -176,8 +202,11 @@ export default class Section {
         remove.forEach(btn => {
             btn.onclick = (event): void => {
                 event.preventDefault()
-                this.controller.removeState(btn.dataset.remove)
-                this.controller.moveTo(this.name)
+                // eslint-disable-next-line no-alert
+                if (window.confirm('Deseja realmente excluir este item?')) {
+                    this.controller.removeState(btn.dataset.remove)
+                    this.controller.moveTo(this._name)
+                }
             }
         })
     }
@@ -236,16 +265,9 @@ export default class Section {
     }
 
     private fillProgressBar(): void {
-        // const progressBar = this.query('.progress')
-        // this.removeAllChildrenFrom(progressBar)
-        // this.setActiveSteps(progressBar)
-        const sections = Array.from(this.controller.sections.values())
-        const progressBar = new ProgressBar(sections)
+        const progressBar = new ProgressBar(this.controller)
         progressBar.fillUntil(this)
         progressBar.renderAt(this.query('.progress'))
-        progressBar.onClick(section => {
-            console.log('clicked')
-        })
     }
 
     private setActiveSteps(progressBar: HTMLElement): void {

@@ -468,6 +468,13 @@ aside p {
 
 .progress {
     margin: 0 0 2rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.steps {
+    flex: 1 0 100%;
     display: grid;
     height: 2.1rem;
     max-width: 27rem;
@@ -477,14 +484,72 @@ aside p {
     grid-auto-flow: column;
 }
 
-.progress .progress__value {
+.steps .progress__value {
     display: block;
     height: 100%;
     border-right: 1px dashed #262E60;
 }
 
-.progress .progress__value.active {
+.steps .progress__value.active {
     background: #F4C000;
+    cursor: pointer;
+}
+
+.steps .progress__value.active:hover {
+    filter: hue-rotate(3deg) saturate(4);
+}
+
+.progress .previous {
+    /* Inactive */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    fill: #c0c0c0;
+    transition: all 0.2s cubic-bezier(1, -0.06, 0, 2.38);
+}
+
+.progress .previous.active {
+    /* Active */
+    fill: #262E60;
+}
+
+.progress .previous.active:hover {
+    fill: #344085;
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.progress .next {
+    /* Inactive */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.75rem;
+    fill: #c0c0c0;
+    transform: rotateY(180deg);
+    transition: all 0.2s cubic-bezier(1, -0.06, 0, 2.38);
+}
+
+.progress .next.active {
+    /* Active */
+    fill: #262E60;
+}
+
+.progress .next.active:hover {
+    fill: #F4C000;
+    cursor: pointer;
+    fill: #262E60;
+    transform: rotateY(180deg) scale(1.1);
+}
+
+.progress .clear {
+    color: #F4C000;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: .85rem;
+    padding: .5rem 1rem;
+    cursor: pointer;
 }
 
 .progress__value:first-child {

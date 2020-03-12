@@ -2,6 +2,7 @@ import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup, extractIndu
 import SectionsController from './SectionsController'
 import { Sections } from './utils/enums'
 import FormManager from './FormManager'
+import Section from './Section'
 
 const loading = document.querySelector('.loading') as HTMLDivElement
 
@@ -11,15 +12,17 @@ const loading = document.querySelector('.loading') as HTMLDivElement
     const controller = new SectionsController(manager, data)
     loading.remove()
 
+    const sections = []
+
     controller.append(
-        Sections.MODO_DE_PESQUISA,
-        Sections.INDUSTRIAS,
-        Sections.SERVICOS,
-        Sections.RESIDUOS,
-        Sections.CALCULO_MONTANTE,
-        Sections.INFO_PESSOAIS,
-        Sections.REVISE_PEDIDO
-        // Sections.PEDIDO_ENVIADO
+        new Section(Sections.MODO_DE_PESQUISA, 1),
+        new Section(Sections.INDUSTRIAS, 2),
+        new Section(Sections.SERVICOS, 2),
+        new Section(Sections.RESIDUOS, 3),
+        new Section(Sections.CALCULO_MONTANTE, 4),
+        new Section(Sections.INFO_PESSOAIS, 5),
+        new Section(Sections.REVISE_PEDIDO, 6),
+        new Section(Sections.PEDIDO_ENVIADO, 7)
     )
 
     controller.find(Sections.RESIDUOS).onMount(function() {
