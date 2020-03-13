@@ -1,13 +1,13 @@
 /* eslint-disable no-alert */
-import SectionsController from './SectionsController'
+import Router from './Router'
 import Residuo from './utils/Residuo'
-import { Sections } from './utils/enums'
 import State from './State'
 import ProgressBar from './components/ProgressBar'
+import { Sections } from './utils/enums'
 
 export default class Section {
     private _name: string
-    controller: SectionsController
+    router: Router
     private _position: number;
     private _rootElement: HTMLElement
     private _onMount: ((this: this) => void)[]
@@ -25,9 +25,9 @@ export default class Section {
 
     get position(): number { return this._position }
 
-    get state(): State { return this.controller.state }
+    get state(): State { return this.router.state }
 
-    get data(): Residuo[] { return this.controller.data }
+    get data(): Residuo[] { return this.router.data }
 
     set isSatisfied(value: boolean) { this._satisfied = value }
 
@@ -97,7 +97,7 @@ export default class Section {
 
     private bindSidebarFields(): string {
         const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (!State.userInfo.nome && !this.controller.hasState()) return (aside.innerHTML = '')
+        if (!State.userInfo.nome && !this.router.hasState()) return (aside.innerHTML = '')
 
         aside.innerHTML = this.getResiduesListingMarkup()
 
@@ -170,7 +170,7 @@ export default class Section {
     }
 
     private getResiduesListingMarkup(): string {
-        return this.controller.states.map((state, idx) => {
+        return this.router.states.map((state, idx) => {
             if (state.calculoMontante.periodo)
                 return /* html */`
                     <div>
@@ -195,7 +195,7 @@ export default class Section {
     }
 
     private fillProgressBar(): void {
-        const progressBar = new ProgressBar(this.controller)
+        const progressBar = new ProgressBar(this.router)
         progressBar.fillUntil(this)
         progressBar.renderAt(this.query('.progress'))
     }
@@ -213,8 +213,8 @@ export default class Section {
         remove.forEach(btn => {
             this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
-                    this.controller.removeState(btn.dataset.remove)
-                    this.controller.moveTo(this._name)
+                    this.router.removeState(btn.dataset.remove)
+                    this.router.moveTo(this._name)
                 }
             })
         })
@@ -226,15 +226,15 @@ export default class Section {
             const redirect = (dest: Section): void => {
                 const confirm = dest.query('.submit') as HTMLButtonElement
                 confirm.textContent = 'Ok'
-                this.onClick(confirm, () => this.controller.moveTo(Sections.REVISE_PEDIDO))
+                this.onClick(confirm, () => this.router.moveTo(Sections.REVISE_PEDIDO))
             }
 
             this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
-                    this.controller.editState(btn.dataset.edit)
-                    return this.controller.moveTo(Sections.CALCULO_MONTANTE, redirect)
+                    this.router.editState(btn.dataset.edit)
+                    return this.router.moveTo(Sections.CALCULO_MONTANTE, redirect)
                 }
-                return this.controller.moveTo(Sections.INFO_PESSOAIS, redirect)
+                return this.router.moveTo(Sections.INFO_PESSOAIS, redirect)
             })
         })
     }
@@ -244,8 +244,8 @@ export default class Section {
         const submitButton = this.query('[type=submit]')
         const clearButton = this.query('.clear')
 
-        this.onClick(saveButton, () => this.controller.save())
-        this.onClick(submitButton, () => this.controller.send())
+        this.onClick(saveButton, () => this.router.save())
+        this.onClick(submitButton, () => this.router.send())
         this.onClick(clearButton, () => this.clearCurrentForm())
     }
 
@@ -279,7 +279,7 @@ export default class Section {
                 event.preventDefault()
                 const inputs = this.queryAll('input, select') as HTMLInputElement[]
                 if (this.isValid(inputs)) {
-                    this.controller.moveTo(action.dataset.action)
+                    this.router.moveTo(action.dataset.action)
                     this.isSatisfied = true
                 }
             }

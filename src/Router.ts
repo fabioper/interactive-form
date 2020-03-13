@@ -4,7 +4,7 @@ import FormManager from './FormManager'
 import State from './State'
 import { Sections } from './utils/enums'
 
-export default class SectionController {
+export default class Router {
     private _active: Section
     private _previous: Section
     private _sections: Map<string, Section> = new Map()
@@ -63,7 +63,7 @@ export default class SectionController {
 
     append(...sections: Section[]): void {
         sections.forEach(section => {
-            section.controller = this
+            section.router = this
             this._sections.set(section.name, section)
         })
     }

@@ -1,15 +1,15 @@
 import { fetchData, loadResiduesCards, extractDropdownOptionsMarkup, extractIndustriesFrom } from './utils/helpers'
-import SectionsController from './SectionsController'
-import { Sections } from './utils/enums'
+import Router from './Router'
 import FormManager from './FormManager'
 import Section from './Section'
+import { Sections } from './utils/enums'
 
 const loading = document.querySelector('.loading') as HTMLDivElement
 
 (async (): Promise<void> => {
     const data = await fetchData()
     const manager = new FormManager()
-    const controller = new SectionsController(manager, data)
+    const controller = new Router(manager, data)
     loading.remove()
 
     const sections = []
