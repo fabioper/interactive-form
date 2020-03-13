@@ -22,6 +22,10 @@ export default class FormManager {
         return this._state
     }
 
+    get states(): State[] {
+        return this._states
+    }
+
     save(state: State): void {
         if (!this._states.includes(state)) {
             this._states.push(state)
@@ -32,10 +36,6 @@ export default class FormManager {
 
     hasState(): boolean {
         return this._states.length > 0
-    }
-
-    get states(): State[] {
-        return this._states
     }
 
     removeState(index: number): void {

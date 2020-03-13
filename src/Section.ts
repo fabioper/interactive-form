@@ -97,10 +97,12 @@ export default class Section {
 
     private bindSidebarFields(): string {
         const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (!this.controller.hasState()) return (aside.innerHTML = '')
+        if (!State.userInfo.nome && !this.controller.hasState()) return (aside.innerHTML = '')
 
         aside.innerHTML = this.getResiduesListingMarkup()
-        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
+
+        if (State.userInfo.nome)
+            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
 
         this.addEditButtonsClickEvents()
         this.addRemoveButtonsClickEvents()
@@ -157,7 +159,7 @@ export default class Section {
         return /* html */`
                 <div>
                     <h3>Informações de Contato</h3>
-                    <p>${this.state.contato}</p>
+                    <p>${State.contato.toString()}</p>
                     <div>
                         <button data-edit class="btn__secondary btn__secondary--edit">
                             Editar
@@ -221,14 +223,19 @@ export default class Section {
     private addEditButtonsClickEvents(): void {
         const edit = document.querySelectorAll('[data-edit]') as NodeListOf<HTMLButtonElement>
         edit.forEach(btn => {
-            btn.onclick = (event): void => {
-                event.preventDefault()
+            const redirect = (dest: Section): void => {
+                const confirm = dest.query('.submit') as HTMLButtonElement
+                confirm.textContent = 'Ok'
+                this.onClick(confirm, () => this.controller.moveTo(Sections.REVISE_PEDIDO))
+            }
+
+            this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
                     this.controller.editState(btn.dataset.edit)
-                    return this.controller.moveTo(Sections.CALCULO_MONTANTE)
+                    return this.controller.moveTo(Sections.CALCULO_MONTANTE, redirect)
                 }
-                this.controller.moveTo(Sections.INFO_PESSOAIS)
-            }
+                return this.controller.moveTo(Sections.INFO_PESSOAIS, redirect)
+            })
         })
     }
 

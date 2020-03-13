@@ -72,8 +72,9 @@ export default class SectionController {
         return this._sections.get(key)
     }
 
-    moveTo(key: string): void {
+    moveTo(key: string, cb?: (destSection: Section) => void): void {
         this.active = this.find(key)
+        if (cb) cb(this.active)
     }
 
     save(): void {

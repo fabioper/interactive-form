@@ -109,6 +109,9 @@ class FormManager {
     get state() {
         return this._state;
     }
+    get states() {
+        return this._states;
+    }
     save(state) {
         if (!this._states.includes(state)) {
             this._states.push(state);
@@ -118,9 +121,6 @@ class FormManager {
     }
     hasState() {
         return this._states.length > 0;
-    }
-    get states() {
-        return this._states;
     }
     removeState(index) {
         this._states = this._states.filter((_value, idx) => idx !== index);
@@ -236,10 +236,11 @@ class Section {
     }
     bindSidebarFields() {
         const aside = document.querySelector('[data-aside]');
-        if (!this.controller.hasState())
+        if (!_State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo.nome && !this.controller.hasState())
             return (aside.innerHTML = '');
         aside.innerHTML = this.getResiduesListingMarkup();
-        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
+        if (_State__WEBPACK_IMPORTED_MODULE_1__["default"].userInfo.nome)
+            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
         this.addEditButtonsClickEvents();
         this.addRemoveButtonsClickEvents();
     }
@@ -282,7 +283,7 @@ class Section {
         return `
                 <div>
                     <h3>Informações de Contato</h3>
-                    <p>${this.state.contato}</p>
+                    <p>${_State__WEBPACK_IMPORTED_MODULE_1__["default"].contato.toString()}</p>
                     <div>
                         <button data-edit class="btn__secondary btn__secondary--edit">
                             Editar
@@ -341,14 +342,18 @@ class Section {
     addEditButtonsClickEvents() {
         const edit = document.querySelectorAll('[data-edit]');
         edit.forEach(btn => {
-            btn.onclick = (event) => {
-                event.preventDefault();
+            const redirect = (dest) => {
+                const confirm = dest.query('.submit');
+                confirm.textContent = 'Ok';
+                this.onClick(confirm, () => this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].REVISE_PEDIDO));
+            };
+            this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
                     this.controller.editState(btn.dataset.edit);
-                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
+                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE, redirect);
                 }
-                this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS);
-            };
+                return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS, redirect);
+            });
         });
     }
     addButtonsClickEvents() {
@@ -463,8 +468,10 @@ class SectionController {
     find(key) {
         return this._sections.get(key);
     }
-    moveTo(key) {
+    moveTo(key, cb) {
         this.active = this.find(key);
+        if (cb)
+            cb(this.active);
     }
     save() {
         this._manager.save(this.state);
@@ -522,7 +529,7 @@ class State {
             .map(container => `${container} (${recipientes[container]})<br>`)
             .join(' ');
     }
-    get contato() {
+    static get contato() {
         const { nome, telefone, empresa, endereco, numero, observacao } = State.userInfo;
         return `
             ${nome}<br>
@@ -532,6 +539,7 @@ class State {
             ${observacao}
         `;
     }
+    get contato() { return State.contato; }
     set industry(value) { State.industry = value; }
     get industry() { return State.industry; }
     set searchMode(value) { State.searchMode = value; }

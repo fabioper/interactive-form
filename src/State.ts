@@ -46,7 +46,7 @@ export default class State {
             .join(' ')
     }
 
-    get contato(): string {
+    static get contato(): string {
         const { nome, telefone, empresa, endereco, numero, observacao } = State.userInfo
         return `
             ${nome}<br>
@@ -56,6 +56,8 @@ export default class State {
             ${observacao}
         `
     }
+
+    get contato(): string { return State.contato }
 
     set industry(value: string) { State.industry = value }
 
