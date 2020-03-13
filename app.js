@@ -177,26 +177,14 @@ class Section {
         this._position = step;
         this._rootElement = document.querySelector(`[data-section=${name}`);
         this._onMount = [];
-        this._isFullfilled = false;
+        this._satisfied = false;
     }
-    get name() {
-        return this._name;
-    }
-    get position() {
-        return this._position;
-    }
-    get state() {
-        return this.controller.state;
-    }
-    get data() {
-        return this.controller.data;
-    }
-    set isFullfilled(value) {
-        this._isFullfilled = value;
-    }
-    get isFullfilled() {
-        return this._isFullfilled;
-    }
+    get name() { return this._name; }
+    get position() { return this._position; }
+    get state() { return this.controller.state; }
+    get data() { return this.controller.data; }
+    set isSatisfied(value) { this._satisfied = value; }
+    get isSatisfied() { return this._satisfied; }
     mount() {
         this._rootElement.classList.add('active');
         this._onMount.forEach(onMount => onMount.bind(this)());
@@ -204,10 +192,6 @@ class Section {
         this.addCardsClickEvent();
         this.addBindings();
         this.addButtonsClickEvents();
-    }
-    removeAllChildrenFrom(progressBar) {
-        while (progressBar.firstChild)
-            progressBar.removeChild(progressBar.firstChild);
     }
     unmount() {
         this._rootElement.classList.remove('active');
@@ -221,45 +205,9 @@ class Section {
     queryAll(selector) {
         return Array.from(this._rootElement.querySelectorAll(selector));
     }
-    addCardsClickEvent() {
-        const cards = this.query('[data-cards]');
-        if (cards) {
-            const cardButtons = cards.querySelectorAll('button');
-            cardButtons.forEach(card => this.addCardClickEvent(card));
-        }
-        this.addActionsClickEvent();
-    }
-    addCardClickEvent(card) {
-        card.addEventListener('click', event => {
-            event.preventDefault();
-            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
-                this.state.searchMode = card.dataset.card;
-            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INDUSTRIAS)
-                this.state.industry = card.dataset.card;
-            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].SERVICOS)
-                this.state.service = card.dataset.card;
-            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS)
-                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card));
-            this.isFullfilled = true;
-        });
-    }
-    addActionsClickEvent() {
-        this.queryAll('[data-action]').forEach(action => {
-            action.onclick = (event) => {
-                event.preventDefault();
-                const inputs = this.queryAll('input, select');
-                if (this.isValid(inputs)) {
-                    this.controller.moveTo(action.dataset.action);
-                    this.isFullfilled = true;
-                }
-            };
-        });
-    }
-    isValid(inputs) {
-        return inputs.every(input => {
-            input.reportValidity();
-            return input.checkValidity();
-        });
+    removeAllChildrenFrom(progressBar) {
+        while (progressBar.firstChild)
+            progressBar.removeChild(progressBar.firstChild);
     }
     addBindings() {
         const bindings = this.queryAll('[data-bind]');
@@ -286,9 +234,18 @@ class Section {
         this.bindFormFields();
         this.bindSidebarFields();
     }
+    bindSidebarFields() {
+        const aside = document.querySelector('[data-aside]');
+        if (!this.controller.hasState())
+            return (aside.innerHTML = '');
+        aside.innerHTML = this.getResiduesListingMarkup();
+        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
+        this.addEditButtonsClickEvents();
+        this.addRemoveButtonsClickEvents();
+    }
     bindFormFields() {
         if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
-            this.isFullfilled = true;
+            this.isSatisfied = true;
             const frequenciaInput = this.query('input[name=frequencia]');
             const periodoSelect = this.query('select[name=periodo]');
             const recipientesInput = this.queryAll('input[name=quantidade]');
@@ -311,37 +268,14 @@ class Section {
             });
         }
     }
-    bindSidebarFields() {
-        const aside = document.querySelector('[data-aside]');
-        if (!this.controller.hasState())
-            return (aside.innerHTML = '');
-        aside.innerHTML = this.getResiduesListingMarkup();
-        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
-        this.addEditButtonsClickEvents();
-        this.addRemoveButtonsClickEvents();
+    clearCurrentForm() {
+        const inputs = this.queryAll('input, select');
+        inputs.forEach(input => input.value = input.defaultValue || '');
     }
-    addRemoveButtonsClickEvents() {
-        const remove = document.querySelectorAll('[data-remove]');
-        remove.forEach(btn => {
-            this.onClick(btn, () => {
-                if (window.confirm('Deseja realmente excluir este item?')) {
-                    this.controller.removeState(btn.dataset.remove);
-                    this.controller.moveTo(this._name);
-                }
-            });
-        });
-    }
-    addEditButtonsClickEvents() {
-        const edit = document.querySelectorAll('[data-edit]');
-        edit.forEach(btn => {
-            btn.onclick = (event) => {
-                event.preventDefault();
-                if (btn.dataset.edit !== '') {
-                    this.controller.editState(btn.dataset.edit);
-                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
-                }
-                this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS);
-            };
+    isValid(inputs) {
+        return inputs.every(input => {
+            input.reportValidity();
+            return input.checkValidity();
         });
     }
     getUserInfoListingMarkup() {
@@ -386,9 +320,36 @@ class Section {
         progressBar.fillUntil(this);
         progressBar.renderAt(this.query('.progress'));
     }
-    clearCurrentForm() {
-        const inputs = this.queryAll('input, select');
-        inputs.forEach(input => input.value = input.defaultValue || '');
+    onClick(element, cb) {
+        if (element)
+            element.onclick = (event) => {
+                event.preventDefault();
+                cb(event);
+            };
+    }
+    addRemoveButtonsClickEvents() {
+        const remove = document.querySelectorAll('[data-remove]');
+        remove.forEach(btn => {
+            this.onClick(btn, () => {
+                if (window.confirm('Deseja realmente excluir este item?')) {
+                    this.controller.removeState(btn.dataset.remove);
+                    this.controller.moveTo(this._name);
+                }
+            });
+        });
+    }
+    addEditButtonsClickEvents() {
+        const edit = document.querySelectorAll('[data-edit]');
+        edit.forEach(btn => {
+            btn.onclick = (event) => {
+                event.preventDefault();
+                if (btn.dataset.edit !== '') {
+                    this.controller.editState(btn.dataset.edit);
+                    return this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE);
+                }
+                this.controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INFO_PESSOAIS);
+            };
+        });
     }
     addButtonsClickEvents() {
         const saveButton = this.query('[data-save]');
@@ -398,12 +359,39 @@ class Section {
         this.onClick(submitButton, () => this.controller.send());
         this.onClick(clearButton, () => this.clearCurrentForm());
     }
-    onClick(element, cb) {
-        if (element)
-            element.onclick = (event) => {
+    addCardsClickEvent() {
+        const cards = this.query('[data-cards]');
+        if (cards) {
+            const cardButtons = cards.querySelectorAll('button');
+            cardButtons.forEach(card => this.addCardClickEvent(card));
+        }
+        this.addActionsClickEvent();
+    }
+    addCardClickEvent(card) {
+        card.addEventListener('click', event => {
+            event.preventDefault();
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].MODO_DE_PESQUISA)
+                this.state.searchMode = card.dataset.card;
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].INDUSTRIAS)
+                this.state.industry = card.dataset.card;
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].SERVICOS)
+                this.state.service = card.dataset.card;
+            if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS)
+                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card));
+            this.isSatisfied = true;
+        });
+    }
+    addActionsClickEvent() {
+        this.queryAll('[data-action]').forEach(action => {
+            action.onclick = (event) => {
                 event.preventDefault();
-                cb(event);
+                const inputs = this.queryAll('input, select');
+                if (this.isValid(inputs)) {
+                    this.controller.moveTo(action.dataset.action);
+                    this.isSatisfied = true;
+                }
             };
+        });
     }
 }
 
@@ -693,12 +681,12 @@ class ProgressBar {
         const nextIndex = this._activeSectionIndex + 1;
         nextButton.classList.add('next');
         const section = this._sections[this._activeSectionIndex];
-        nextIndex < this._values.length && section.isFullfilled ?
+        nextIndex < this._values.length && section.isSatisfied ?
             nextButton.classList.add('active') :
             nextButton.classList.remove('active');
         nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
         nextButton.onclick = () => {
-            if (nextIndex < this._values.length && section.isFullfilled)
+            if (nextIndex < this._values.length && section.isSatisfied)
                 this._controller.moveTo(this._sections[nextIndex].name);
         };
         return nextButton;

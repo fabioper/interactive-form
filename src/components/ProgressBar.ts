@@ -78,13 +78,13 @@ export default class ProgressBar {
         nextButton.classList.add('next')
         const section = this._sections[this._activeSectionIndex]
 
-        nextIndex < this._values.length && section.isFullfilled ?
+        nextIndex < this._values.length && section.isSatisfied ?
             nextButton.classList.add('active') :
             nextButton.classList.remove('active')
 
         nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>'
         nextButton.onclick = (): void => {
-            if (nextIndex < this._values.length && section.isFullfilled)
+            if (nextIndex < this._values.length && section.isSatisfied)
                 this._controller.moveTo(this._sections[nextIndex].name)
         }
         return nextButton

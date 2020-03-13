@@ -11,39 +11,27 @@ export default class Section {
     private _position: number;
     private _rootElement: HTMLElement
     private _onMount: ((this: this) => void)[]
-    private _isFullfilled: boolean
+    private _satisfied: boolean
 
     constructor(name: string, step: number) {
         this._name = name
         this._position = step
         this._rootElement = document.querySelector(`[data-section=${name}`) as HTMLElement
         this._onMount = []
-        this._isFullfilled = false
+        this._satisfied = false
     }
 
-    get name(): string {
-        return this._name
-    }
+    get name(): string { return this._name }
 
-    get position(): number {
-        return this._position
-    }
+    get position(): number { return this._position }
 
-    get state(): State {
-        return this.controller.state
-    }
+    get state(): State { return this.controller.state }
 
-    get data(): Residuo[] {
-        return this.controller.data
-    }
+    get data(): Residuo[] { return this.controller.data }
 
-    set isFullfilled(value: boolean) {
-        this._isFullfilled = value
-    }
+    set isSatisfied(value: boolean) { this._satisfied = value }
 
-    get isFullfilled(): boolean {
-        return this._isFullfilled
-    }
+    get isSatisfied(): boolean { return this._satisfied }
 
     mount(): void {
         this._rootElement.classList.add('active')
@@ -52,11 +40,6 @@ export default class Section {
         this.addCardsClickEvent()
         this.addBindings()
         this.addButtonsClickEvents()
-    }
-
-    removeAllChildrenFrom(progressBar: HTMLElement): void {
-        while (progressBar.firstChild)
-            progressBar.removeChild(progressBar.firstChild)
     }
 
     unmount(): void {
@@ -77,49 +60,9 @@ export default class Section {
         )
     }
 
-    private addCardsClickEvent(): void {
-        const cards = this.query('[data-cards]')
-        if (cards) {
-            const cardButtons = cards.querySelectorAll('button')
-            cardButtons.forEach(card => this.addCardClickEvent(card))
-        }
-        this.addActionsClickEvent()
-    }
-
-    private addCardClickEvent(card: HTMLButtonElement): void {
-        card.addEventListener('click', event => {
-            event.preventDefault()
-            if (this._name === Sections.MODO_DE_PESQUISA)
-                this.state.searchMode = card.dataset.card
-            if (this._name === Sections.INDUSTRIAS)
-                this.state.industry = card.dataset.card
-            if (this._name === Sections.SERVICOS)
-                this.state.service = card.dataset.card
-            if (this._name === Sections.RESIDUOS)
-                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card))
-
-            this.isFullfilled = true
-        })
-    }
-
-    private addActionsClickEvent(): void {
-        this.queryAll('[data-action]').forEach(action => {
-            action.onclick = (event): void => {
-                event.preventDefault()
-                const inputs = this.queryAll('input, select') as HTMLInputElement[]
-                if (this.isValid(inputs)) {
-                    this.controller.moveTo(action.dataset.action)
-                    this.isFullfilled = true
-                }
-            }
-        })
-    }
-
-    private isValid(inputs: HTMLInputElement[]): boolean {
-        return inputs.every(input => {
-            input.reportValidity()
-            return input.checkValidity()
-        })
+    removeAllChildrenFrom(progressBar: HTMLElement): void {
+        while (progressBar.firstChild)
+            progressBar.removeChild(progressBar.firstChild)
     }
 
     private addBindings(): void {
@@ -152,10 +95,21 @@ export default class Section {
         this.bindSidebarFields()
     }
 
+    private bindSidebarFields(): string {
+        const aside = document.querySelector('[data-aside]') as HTMLElement
+        if (!this.controller.hasState()) return (aside.innerHTML = '')
+
+        aside.innerHTML = this.getResiduesListingMarkup()
+        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
+
+        this.addEditButtonsClickEvents()
+        this.addRemoveButtonsClickEvents()
+    }
+
     // eslint-disable-next-line max-statements
     private bindFormFields(): void {
         if (this._name === Sections.CALCULO_MONTANTE) {
-            this.isFullfilled = true
+            this.isSatisfied = true
             const frequenciaInput = this.query('input[name=frequencia]') as HTMLInputElement
             const periodoSelect = this.query('select[name=periodo]') as HTMLSelectElement
             const recipientesInput = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
@@ -187,40 +141,15 @@ export default class Section {
         }
     }
 
-    private bindSidebarFields(): string {
-        const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (!this.controller.hasState()) return (aside.innerHTML = '')
-
-        aside.innerHTML = this.getResiduesListingMarkup()
-        aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
-
-        this.addEditButtonsClickEvents()
-        this.addRemoveButtonsClickEvents()
+    private clearCurrentForm(): void {
+        const inputs = this.queryAll('input, select') as HTMLInputElement[]
+        inputs.forEach(input => input.value = input.defaultValue || '')
     }
 
-    private addRemoveButtonsClickEvents(): void {
-        const remove = document.querySelectorAll('[data-remove]') as NodeListOf<HTMLButtonElement>
-        remove.forEach(btn => {
-            this.onClick(btn, () => {
-                if (window.confirm('Deseja realmente excluir este item?')) {
-                    this.controller.removeState(btn.dataset.remove)
-                    this.controller.moveTo(this._name)
-                }
-            })
-        })
-    }
-
-    private addEditButtonsClickEvents(): void {
-        const edit = document.querySelectorAll('[data-edit]') as NodeListOf<HTMLButtonElement>
-        edit.forEach(btn => {
-            btn.onclick = (event): void => {
-                event.preventDefault()
-                if (btn.dataset.edit !== '') {
-                    this.controller.editState(btn.dataset.edit)
-                    return this.controller.moveTo(Sections.CALCULO_MONTANTE)
-                }
-                this.controller.moveTo(Sections.INFO_PESSOAIS)
-            }
+    private isValid(inputs: HTMLInputElement[]): boolean {
+        return inputs.every(input => {
+            input.reportValidity()
+            return input.checkValidity()
         })
     }
 
@@ -269,9 +198,38 @@ export default class Section {
         progressBar.renderAt(this.query('.progress'))
     }
 
-    private clearCurrentForm(): void {
-        const inputs = this.queryAll('input, select') as HTMLInputElement[]
-        inputs.forEach(input => input.value = input.defaultValue || '')
+    private onClick(element: HTMLElement, cb: (event: Event) => void): void {
+        if (element)
+            element.onclick = (event): void => {
+                event.preventDefault()
+                cb(event)
+            }
+    }
+
+    private addRemoveButtonsClickEvents(): void {
+        const remove = document.querySelectorAll('[data-remove]') as NodeListOf<HTMLButtonElement>
+        remove.forEach(btn => {
+            this.onClick(btn, () => {
+                if (window.confirm('Deseja realmente excluir este item?')) {
+                    this.controller.removeState(btn.dataset.remove)
+                    this.controller.moveTo(this._name)
+                }
+            })
+        })
+    }
+
+    private addEditButtonsClickEvents(): void {
+        const edit = document.querySelectorAll('[data-edit]') as NodeListOf<HTMLButtonElement>
+        edit.forEach(btn => {
+            btn.onclick = (event): void => {
+                event.preventDefault()
+                if (btn.dataset.edit !== '') {
+                    this.controller.editState(btn.dataset.edit)
+                    return this.controller.moveTo(Sections.CALCULO_MONTANTE)
+                }
+                this.controller.moveTo(Sections.INFO_PESSOAIS)
+            }
+        })
     }
 
     private addButtonsClickEvents(): void {
@@ -284,11 +242,40 @@ export default class Section {
         this.onClick(clearButton, () => this.clearCurrentForm())
     }
 
-    private onClick(element: HTMLElement, cb: (event: Event) => void): void {
-        if (element)
-            element.onclick = (event): void => {
+    private addCardsClickEvent(): void {
+        const cards = this.query('[data-cards]')
+        if (cards) {
+            const cardButtons = cards.querySelectorAll('button')
+            cardButtons.forEach(card => this.addCardClickEvent(card))
+        }
+        this.addActionsClickEvent()
+    }
+
+    private addCardClickEvent(card: HTMLButtonElement): void {
+        card.addEventListener('click', event => {
+            event.preventDefault()
+            if (this._name === Sections.MODO_DE_PESQUISA)
+                this.state.searchMode = card.dataset.card
+            if (this._name === Sections.INDUSTRIAS)
+                this.state.industry = card.dataset.card
+            if (this._name === Sections.SERVICOS)
+                this.state.service = card.dataset.card
+            if (this._name === Sections.RESIDUOS)
+                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card))
+            this.isSatisfied = true
+        })
+    }
+
+    private addActionsClickEvent(): void {
+        this.queryAll('[data-action]').forEach(action => {
+            action.onclick = (event): void => {
                 event.preventDefault()
-                cb(event)
+                const inputs = this.queryAll('input, select') as HTMLInputElement[]
+                if (this.isValid(inputs)) {
+                    this.controller.moveTo(action.dataset.action)
+                    this.isSatisfied = true
+                }
             }
+        })
     }
 }
