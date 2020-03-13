@@ -46,7 +46,6 @@ export default class ProgressBar {
 
     private appendMoveButtons(steps: HTMLDivElement): void {
         steps.insertAdjacentElement('beforebegin', this.createPreviousAction())
-        steps.insertAdjacentElement('afterend', this.createClearButton())
         steps.insertAdjacentElement('afterend', this.createNextButton())
     }
 
@@ -89,14 +88,6 @@ export default class ProgressBar {
                 this._controller.moveTo(this._sections[nextIndex].name)
         }
         return nextButton
-    }
-
-    private createClearButton(): HTMLDivElement {
-        const div = document.createElement('div')
-        div.classList.add('clear')
-        div.innerHTML = 'Limpar'
-        div.onclick = (): void => this._controller.clear()
-        return div
     }
 
     private moveSectionIfActive(progressValue: ProgressBarValue, section: Section): void {

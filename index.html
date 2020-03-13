@@ -234,7 +234,10 @@
 
                 <section data-section="calculo-montante">
                     <header>
-                        <h2 data-bind="residuo:nome"></h2>
+                        <div class="title-wrapper">
+                            <h2 data-bind="residuo:nome"></h2>
+                            <div class="clear">Limpar</div>
+                        </div>
                         <div class="progress"></div>
                     </header>
                     <div class="container">
@@ -244,7 +247,7 @@
                                 <label for="frequencia">Frequência</label>
                                 <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
                                 <select name="periodo" id="periodo">
-                                    <option value="">Selecione a frequência de sua coleta</option>
+                                    <option value="" selected>Selecione a frequência de sua coleta</option>
                                     <option value="semana">Semana</option>
                                     <option value="mes">Mês</option>
                                     <option value="trimestre">Trimestre</option>
@@ -285,7 +288,10 @@
                 </section>
                 <section data-section="informacoes-pessoais">
                     <header>
-                        <h2>Informações Pessoais</h2>
+                        <div class="title-wrapper">
+                            <h2>Informações Pessoais</h2>
+                            <div class="clear">Limpar</div>
+                        </div>
                         <div class="progress"></div>
                     </header>
                     <div class="content">

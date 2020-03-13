@@ -289,14 +289,14 @@ class Section {
     bindFormFields() {
         if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].CALCULO_MONTANTE) {
             this.isFullfilled = true;
-            const frequencia = this.query('input[name=frequencia]');
-            const periodo = this.query('select[name=periodo]');
-            const recipientes = this.queryAll('input[name=quantidade]');
-            frequencia.value = this.state.calculoMontante.frequencia.toString();
-            periodo.value = this.state.calculoMontante.periodo.toString();
-            frequencia.onchange = () => (this.state.calculoMontante.frequencia = frequencia.valueAsNumber);
-            periodo.onchange = () => (this.state.calculoMontante.periodo = periodo.value);
-            recipientes.forEach(input => {
+            const frequenciaInput = this.query('input[name=frequencia]');
+            const periodoSelect = this.query('select[name=periodo]');
+            const recipientesInput = this.queryAll('input[name=quantidade]');
+            frequenciaInput.value = this.state.calculoMontante.frequencia.toString();
+            periodoSelect.value = this.state.calculoMontante.periodo.toString();
+            frequenciaInput.onchange = () => (this.state.calculoMontante.frequencia = frequenciaInput.valueAsNumber);
+            periodoSelect.onchange = () => (this.state.calculoMontante.periodo = periodoSelect.value);
+            recipientesInput.forEach(input => {
                 const recipiente = this.state.calculoMontante.recipientes[input.id];
                 if (recipiente)
                     input.value = recipiente.toString();
@@ -323,13 +323,12 @@ class Section {
     addRemoveButtonsClickEvents() {
         const remove = document.querySelectorAll('[data-remove]');
         remove.forEach(btn => {
-            btn.onclick = (event) => {
-                event.preventDefault();
+            this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
                     this.controller.removeState(btn.dataset.remove);
                     this.controller.moveTo(this._name);
                 }
-            };
+            });
         });
     }
     addEditButtonsClickEvents() {
@@ -387,33 +386,23 @@ class Section {
         progressBar.fillUntil(this);
         progressBar.renderAt(this.query('.progress'));
     }
-    setActiveSteps(progressBar) {
-        const step = parseInt(progressBar.dataset.value, 10);
-        const max = parseInt(progressBar.dataset.max, 10);
-        for (let i = 1; i <= max; i++) {
-            const progressValue = this.createProgressValue();
-            if (i <= step)
-                progressValue.classList.add('active');
-            progressBar.appendChild(progressValue);
-        }
-    }
-    createProgressValue() {
-        const progressValue = document.createElement('div');
-        progressValue.classList.add('progress__value');
-        return progressValue;
+    clearCurrentForm() {
+        const inputs = this.queryAll('input, select');
+        inputs.forEach(input => input.value = input.defaultValue || '');
     }
     addButtonsClickEvents() {
         const saveButton = this.query('[data-save]');
         const submitButton = this.query('[type=submit]');
-        if (saveButton)
-            saveButton.onclick = (event) => {
+        const clearButton = this.query('.clear');
+        this.onClick(saveButton, () => this.controller.save());
+        this.onClick(submitButton, () => this.controller.send());
+        this.onClick(clearButton, () => this.clearCurrentForm());
+    }
+    onClick(element, cb) {
+        if (element)
+            element.onclick = (event) => {
                 event.preventDefault();
-                this.controller.save();
-            };
-        if (submitButton)
-            submitButton.onclick = event => {
-                event.preventDefault();
-                this.controller.send();
+                cb(event);
             };
     }
 }
@@ -678,7 +667,6 @@ class ProgressBar {
     }
     appendMoveButtons(steps) {
         steps.insertAdjacentElement('beforebegin', this.createPreviousAction());
-        steps.insertAdjacentElement('afterend', this.createClearButton());
         steps.insertAdjacentElement('afterend', this.createNextButton());
     }
     createStepsDiv() {
@@ -714,13 +702,6 @@ class ProgressBar {
                 this._controller.moveTo(this._sections[nextIndex].name);
         };
         return nextButton;
-    }
-    createClearButton() {
-        const div = document.createElement('div');
-        div.classList.add('clear');
-        div.innerHTML = 'Limpar';
-        div.onclick = () => this._controller.clear();
-        return div;
     }
     moveSectionIfActive(progressValue, section) {
         if (progressValue.isActive)

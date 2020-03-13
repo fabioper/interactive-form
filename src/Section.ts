@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import SectionsController from './SectionsController'
 import Residuo from './utils/Residuo'
 import { Sections } from './utils/enums'
@@ -155,20 +156,20 @@ export default class Section {
     private bindFormFields(): void {
         if (this._name === Sections.CALCULO_MONTANTE) {
             this.isFullfilled = true
-            const frequencia = this.query('input[name=frequencia]') as HTMLInputElement
-            const periodo = this.query('select[name=periodo]') as HTMLSelectElement
-            const recipientes = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
+            const frequenciaInput = this.query('input[name=frequencia]') as HTMLInputElement
+            const periodoSelect = this.query('select[name=periodo]') as HTMLSelectElement
+            const recipientesInput = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
 
-            frequencia.value = this.state.calculoMontante.frequencia.toString()
-            periodo.value = this.state.calculoMontante.periodo.toString()
+            frequenciaInput.value = this.state.calculoMontante.frequencia.toString()
+            periodoSelect.value = this.state.calculoMontante.periodo.toString()
 
-            frequencia.onchange = (): number => (
-                this.state.calculoMontante.frequencia = frequencia.valueAsNumber
+            frequenciaInput.onchange = (): number => (
+                this.state.calculoMontante.frequencia = frequenciaInput.valueAsNumber
             )
-            periodo.onchange = (): string => (
-                this.state.calculoMontante.periodo = periodo.value
+            periodoSelect.onchange = (): string => (
+                this.state.calculoMontante.periodo = periodoSelect.value
             )
-            recipientes.forEach(input => {
+            recipientesInput.forEach(input => {
                 const recipiente = this.state.calculoMontante.recipientes[input.id]
                 if (recipiente) input.value = recipiente.toString()
                 input.onchange = (): number => (
@@ -200,14 +201,12 @@ export default class Section {
     private addRemoveButtonsClickEvents(): void {
         const remove = document.querySelectorAll('[data-remove]') as NodeListOf<HTMLButtonElement>
         remove.forEach(btn => {
-            btn.onclick = (event): void => {
-                event.preventDefault()
-                // eslint-disable-next-line no-alert
+            this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
                     this.controller.removeState(btn.dataset.remove)
                     this.controller.moveTo(this._name)
                 }
-            }
+            })
         })
     }
 
@@ -270,35 +269,26 @@ export default class Section {
         progressBar.renderAt(this.query('.progress'))
     }
 
-    private setActiveSteps(progressBar: HTMLElement): void {
-        const step = parseInt(progressBar.dataset.value, 10)
-        const max = parseInt(progressBar.dataset.max, 10)
-        for (let i = 1; i <= max; i++) {
-            const progressValue = this.createProgressValue()
-            if (i <= step) progressValue.classList.add('active')
-            progressBar.appendChild(progressValue)
-        }
-    }
-
-    private createProgressValue(): HTMLElement {
-        const progressValue = document.createElement('div')
-        progressValue.classList.add('progress__value')
-        return progressValue
+    private clearCurrentForm(): void {
+        const inputs = this.queryAll('input, select') as HTMLInputElement[]
+        inputs.forEach(input => input.value = input.defaultValue || '')
     }
 
     private addButtonsClickEvents(): void {
         const saveButton = this.query('[data-save]')
         const submitButton = this.query('[type=submit]')
-        if (saveButton)
-            saveButton.onclick = (event): void => {
-                event.preventDefault()
-                this.controller.save()
-            }
+        const clearButton = this.query('.clear')
 
-        if (submitButton)
-            submitButton.onclick = event => {
+        this.onClick(saveButton, () => this.controller.save())
+        this.onClick(submitButton, () => this.controller.send())
+        this.onClick(clearButton, () => this.clearCurrentForm())
+    }
+
+    private onClick(element: HTMLElement, cb: (event: Event) => void): void {
+        if (element)
+            element.onclick = (event): void => {
                 event.preventDefault()
-                this.controller.send()
+                cb(event)
             }
     }
 }
