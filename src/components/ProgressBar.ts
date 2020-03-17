@@ -1,37 +1,52 @@
 import Section from '../Section'
 import ProgressBarValue from './ProgressBarValue'
-import SectionsController from '../SectionsController'
+import Router from '../Router'
 
 export default class ProgressBar {
     private _sections: Section[]
-    private _values: ProgressBarValue[]
-    private _controller: SectionsController
-    private _activeSectionIndex: number
+    private _progressBarValues: ProgressBarValue[]
+    private _router: Router
+    private _activeIndex: number
 
-    constructor(controller: SectionsController) {
-        this._controller = controller
-        this._sections = Array.from(this._controller.sections.values())
-        this._values = this._sections.map(section => new ProgressBarValue(section))
+    constructor(controller: Router) {
+        this._router = controller
+        this._sections = Array.from(this._router.sections.values())
+        this._progressBarValues = this._sections.map(section => new ProgressBarValue(section))
         this.moveSectionIfActive = this.moveSectionIfActive.bind(this)
-        // window.addEventListener('popstate', (event): void => {
-        //     event.preventDefault()
-        // })
     }
 
     get markup(): string {
-        return this._values.map(value => value.element.outerHTML).join(' ')
+        return this._progressBarValues.map(value => value.element.outerHTML).join(' ')
+    }
+
+    get currentSection(): Section {
+        return this._sections[this._activeIndex]
+    }
+
+    getNextIndex(index: number): number {
+        if (index > this._progressBarValues.length) return
+        const next = this._sections[index]
+        if (next.condition) return index
+        return this.getNextIndex(index + 1)
+    }
+
+    getPreviousIndex(index: number): number {
+        if (index < 0) return
+        const previous = this._sections[index]
+        if (previous.condition) return index
+        return this.getPreviousIndex(index - 1)
     }
 
     fillUntil(activeSection: Section): void {
-        this._activeSectionIndex = this._sections.indexOf(activeSection)
-        for (let i = 0; i <= this._activeSectionIndex; i++)
-            this._values[i].fill()
+        this._activeIndex = this._sections.indexOf(activeSection)
+        for (let i = 0; i <= this._activeIndex; i++)
+            this._progressBarValues[i].fill()
     }
 
     renderAt(container: HTMLElement): void {
         container.innerHTML = ''
         const steps = this.appendStepsDiv(container)
-        this._values.forEach(value => {
+        this._progressBarValues.forEach(value => {
             steps.appendChild(value.element)
             value.addOnClickEvent(this.moveSectionIfActive)
         })
@@ -57,40 +72,51 @@ export default class ProgressBar {
 
     private createPreviousAction(): HTMLDivElement {
         const previousButton = document.createElement('div')
-        const previousIndex = this._activeSectionIndex - 1
         previousButton.classList.add('previous')
+        previousButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>`
 
-        previousIndex >= 0 ?
+        const previousIndex = this.getPreviousIndex(this._activeIndex - 1)
+        previousIndex || previousIndex === 0 ?
             previousButton.classList.add('active') :
             previousButton.classList.remove('active')
 
-        previousButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>'
         previousButton.onclick = (): void => {
             if (previousIndex >= 0)
-                this._controller.moveTo(this._sections[previousIndex].name)
+                this._router.moveTo(this._sections[previousIndex].name)
         }
         return previousButton
     }
 
     private createNextButton(): HTMLDivElement {
         const nextButton = document.createElement('div')
-        const nextIndex = this._activeSectionIndex + 1
         nextButton.classList.add('next')
-        const section = this._sections[this._activeSectionIndex]
+        nextButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>`
 
-        nextIndex < this._values.length && section.isSatisfied ?
+        const nextIndex = this.getNextIndex(this._activeIndex + 1)
+        console.log(nextIndex)
+
+        nextIndex && this.currentSection.isSatisfied ?
             nextButton.classList.add('active') :
             nextButton.classList.remove('active')
 
-        nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>'
+        const nextSection = this._sections[nextIndex]
+
         nextButton.onclick = (): void => {
-            if (nextIndex < this._values.length && section.isSatisfied)
-                this._controller.moveTo(this._sections[nextIndex].name)
+            if (this.currentSection.isSatisfied && nextSection)
+                this._router.moveTo(nextSection.name)
         }
         return nextButton
     }
 
     private moveSectionIfActive(progressValue: ProgressBarValue, section: Section): void {
-        if (progressValue.isActive) this._controller.moveTo(section.name)
+        if (progressValue.isActive)
+            this._router.moveTo(section.name)
     }
 }

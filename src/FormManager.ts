@@ -6,20 +6,20 @@ type Data = {
 }
 
 export default class FormManager {
-    private _state: State;
+    private _active: State;
     private _states: State[];
 
     constructor() {
-        this.state = new State()
+        this.active = new State()
         this._states = []
     }
 
-    set state(state: State) {
-        this._state = state
+    set active(state: State) {
+        this._active = state
     }
 
-    get state(): State {
-        return this._state
+    get active(): State {
+        return this._active
     }
 
     get states(): State[] {
@@ -27,11 +27,17 @@ export default class FormManager {
     }
 
     save(state: State): void {
-        if (!this._states.includes(state)) {
+        if (!this._states.includes(state))
             this._states.push(state)
-            const newState = new State()
-            this.state = newState
-        }
+        else
+            this._states = this._states.map(st => {
+                if (st === state) return state
+                return st
+            })
+
+        const newState = new State()
+        this.active = newState
+        console.log(this.active)
     }
 
     hasState(): boolean {
@@ -43,7 +49,7 @@ export default class FormManager {
     }
 
     editState(index: number): void {
-        this.state = this._states[index]
+        this.active = this._states[index]
     }
 
     send(): void {

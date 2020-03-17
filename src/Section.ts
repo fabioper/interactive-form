@@ -12,13 +12,15 @@ export default class Section {
     private _rootElement: HTMLElement
     private _onMount: ((this: this) => void)[]
     private _satisfied: boolean
+    private _condition: (state: State) => boolean
 
-    constructor(name: string, step: number) {
+    constructor(name: string, step: number, condition?: (state: State) => boolean) {
         this._name = name
         this._position = step
         this._rootElement = document.querySelector(`[data-section=${name}`) as HTMLElement
         this._onMount = []
         this._satisfied = false
+        this._condition = condition
     }
 
     get name(): string { return this._name }
@@ -32,6 +34,14 @@ export default class Section {
     set isSatisfied(value: boolean) { this._satisfied = value }
 
     get isSatisfied(): boolean { return this._satisfied }
+
+    get condition(): boolean {
+        console.log('called')
+        if (this._condition)
+            return this._condition(this.state)
+
+        return true
+    }
 
     mount(): void {
         this._rootElement.classList.add('active')
@@ -112,6 +122,7 @@ export default class Section {
     private bindFormFields(): void {
         if (this._name === Sections.CALCULO_MONTANTE) {
             this.isSatisfied = true
+            console.log(this.state)
             const frequenciaInput = this.query('input[name=frequencia]') as HTMLInputElement
             const periodoSelect = this.query('select[name=periodo]') as HTMLSelectElement
             const recipientesInput = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
@@ -170,7 +181,9 @@ export default class Section {
     }
 
     private getResiduesListingMarkup(): string {
-        return this.router.states.map((state, idx) => {
+        const startDiv = '<div>'
+        const endDiv = '</div>'
+        const markup = this.router.states.map((state, idx) => {
             if (state.calculoMontante.periodo)
                 return /* html */`
                     <div>
@@ -192,6 +205,8 @@ export default class Section {
                 `
             return ''
         }).join(' ')
+
+        return startDiv + markup + endDiv
     }
 
     private fillProgressBar(): void {
@@ -243,6 +258,8 @@ export default class Section {
         const saveButton = this.query('[data-save]')
         const submitButton = this.query('[type=submit]')
         const clearButton = this.query('.clear')
+
+        if (!this.state.residuo && saveButton) saveButton.remove()
 
         this.onClick(saveButton, () => this.router.save())
         this.onClick(submitButton, () => this.router.send())

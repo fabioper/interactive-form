@@ -12,12 +12,12 @@ const loading = document.querySelector('.loading') as HTMLDivElement
     const controller = new Router(manager, data)
     loading.remove()
 
-    const sections = []
-
     controller.append(
         new Section(Sections.MODO_DE_PESQUISA, 1),
-        new Section(Sections.INDUSTRIAS, 2),
-        new Section(Sections.SERVICOS, 2),
+        new Section(Sections.INDUSTRIAS, 2,
+            state => state.searchMode === 'industrias'),
+        new Section(Sections.SERVICOS, 2,
+            state => state.searchMode === 'servicos'),
         new Section(Sections.RESIDUOS, 3),
         new Section(Sections.CALCULO_MONTANTE, 4),
         new Section(Sections.INFO_PESSOAIS, 5),

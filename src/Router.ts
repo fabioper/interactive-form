@@ -23,7 +23,7 @@ export default class Router {
     }
 
     get state(): State {
-        return this._manager.state
+        return this._manager.active
     }
 
     get states(): State[] {

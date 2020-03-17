@@ -100,24 +100,30 @@ __webpack_require__.r(__webpack_exports__);
 
 class FormManager {
     constructor() {
-        this.state = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this.active = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
         this._states = [];
     }
-    set state(state) {
-        this._state = state;
+    set active(state) {
+        this._active = state;
     }
-    get state() {
-        return this._state;
+    get active() {
+        return this._active;
     }
     get states() {
         return this._states;
     }
     save(state) {
-        if (!this._states.includes(state)) {
+        if (!this._states.includes(state))
             this._states.push(state);
-            const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
-            this.state = newState;
-        }
+        else
+            this._states = this._states.map(st => {
+                if (st === state)
+                    return state;
+                return st;
+            });
+        const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this.active = newState;
+        console.log(this.active);
     }
     hasState() {
         return this._states.length > 0;
@@ -126,7 +132,7 @@ class FormManager {
         this._states = this._states.filter((_value, idx) => idx !== index);
     }
     editState(index) {
-        this.state = this._states[index];
+        this.active = this._states[index];
     }
     send() {
         console.log(this.data);
@@ -180,7 +186,7 @@ class Router {
         });
     }
     get state() {
-        return this._manager.state;
+        return this._manager.active;
     }
     get states() {
         return this._manager.states;
@@ -269,12 +275,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Section {
-    constructor(name, step) {
+    constructor(name, step, condition) {
         this._name = name;
         this._position = step;
         this._rootElement = document.querySelector(`[data-section=${name}`);
         this._onMount = [];
         this._satisfied = false;
+        this._condition = condition;
     }
     get name() { return this._name; }
     get position() { return this._position; }
@@ -282,6 +289,12 @@ class Section {
     get data() { return this.router.data; }
     set isSatisfied(value) { this._satisfied = value; }
     get isSatisfied() { return this._satisfied; }
+    get condition() {
+        console.log('called');
+        if (this._condition)
+            return this._condition(this.state);
+        return true;
+    }
     mount() {
         this._rootElement.classList.add('active');
         this._onMount.forEach(onMount => onMount.bind(this)());
@@ -344,6 +357,7 @@ class Section {
     bindFormFields() {
         if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE) {
             this.isSatisfied = true;
+            console.log(this.state);
             const frequenciaInput = this.query('input[name=frequencia]');
             const periodoSelect = this.query('select[name=periodo]');
             const recipientesInput = this.queryAll('input[name=quantidade]');
@@ -390,7 +404,9 @@ class Section {
             `;
     }
     getResiduesListingMarkup() {
-        return this.router.states.map((state, idx) => {
+        const startDiv = '<div>';
+        const endDiv = '</div>';
+        const markup = this.router.states.map((state, idx) => {
             if (state.calculoMontante.periodo)
                 return `
                     <div>
@@ -412,6 +428,7 @@ class Section {
                 `;
             return '';
         }).join(' ');
+        return startDiv + markup + endDiv;
     }
     fillProgressBar() {
         const progressBar = new _components_ProgressBar__WEBPACK_IMPORTED_MODULE_1__["default"](this.router);
@@ -457,6 +474,8 @@ class Section {
         const saveButton = this.query('[data-save]');
         const submitButton = this.query('[type=submit]');
         const clearButton = this.query('.clear');
+        if (!this.state.residuo && saveButton)
+            saveButton.remove();
         this.onClick(saveButton, () => this.router.save());
         this.onClick(submitButton, () => this.router.send());
         this.onClick(clearButton, () => this.clearCurrentForm());
@@ -588,8 +607,7 @@ const loading = document.querySelector('.loading');
     const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"]();
     const controller = new _Router__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
     loading.remove();
-    const sections = [];
-    controller.append(new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].MODO_DE_PESQUISA, 1), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INDUSTRIAS, 2), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].SERVICOS, 2), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].RESIDUOS, 3), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].CALCULO_MONTANTE, 4), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INFO_PESSOAIS, 5), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].REVISE_PEDIDO, 6), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].PEDIDO_ENVIADO, 7));
+    controller.append(new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].MODO_DE_PESQUISA, 1), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INDUSTRIAS, 2, state => state.searchMode === 'industrias'), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].SERVICOS, 2, state => state.searchMode === 'servicos'), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].RESIDUOS, 3), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].CALCULO_MONTANTE, 4), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INFO_PESSOAIS, 5), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].REVISE_PEDIDO, 6), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].PEDIDO_ENVIADO, 7));
     controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].RESIDUOS).onMount(function () {
         const cards = this.query('[data-cards]');
         const description = this.query('.cards-description');
@@ -634,23 +652,42 @@ __webpack_require__.r(__webpack_exports__);
 
 class ProgressBar {
     constructor(controller) {
-        this._controller = controller;
-        this._sections = Array.from(this._controller.sections.values());
-        this._values = this._sections.map(section => new _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__["default"](section));
+        this._router = controller;
+        this._sections = Array.from(this._router.sections.values());
+        this._progressBarValues = this._sections.map(section => new _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__["default"](section));
         this.moveSectionIfActive = this.moveSectionIfActive.bind(this);
     }
     get markup() {
-        return this._values.map(value => value.element.outerHTML).join(' ');
+        return this._progressBarValues.map(value => value.element.outerHTML).join(' ');
+    }
+    get currentSection() {
+        return this._sections[this._activeIndex];
+    }
+    getNextIndex(index) {
+        if (index > this._progressBarValues.length)
+            return;
+        const next = this._sections[index];
+        if (next.condition)
+            return index;
+        return this.getNextIndex(index + 1);
+    }
+    getPreviousIndex(index) {
+        if (index < 0)
+            return;
+        const previous = this._sections[index];
+        if (previous.condition)
+            return index;
+        return this.getPreviousIndex(index - 1);
     }
     fillUntil(activeSection) {
-        this._activeSectionIndex = this._sections.indexOf(activeSection);
-        for (let i = 0; i <= this._activeSectionIndex; i++)
-            this._values[i].fill();
+        this._activeIndex = this._sections.indexOf(activeSection);
+        for (let i = 0; i <= this._activeIndex; i++)
+            this._progressBarValues[i].fill();
     }
     renderAt(container) {
         container.innerHTML = '';
         const steps = this.appendStepsDiv(container);
-        this._values.forEach(value => {
+        this._progressBarValues.forEach(value => {
             steps.appendChild(value.element);
             value.addOnClickEvent(this.moveSectionIfActive);
         });
@@ -672,36 +709,44 @@ class ProgressBar {
     }
     createPreviousAction() {
         const previousButton = document.createElement('div');
-        const previousIndex = this._activeSectionIndex - 1;
         previousButton.classList.add('previous');
-        previousIndex >= 0 ?
+        previousButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>`;
+        const previousIndex = this.getPreviousIndex(this._activeIndex - 1);
+        previousIndex || previousIndex === 0 ?
             previousButton.classList.add('active') :
             previousButton.classList.remove('active');
-        previousButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
         previousButton.onclick = () => {
             if (previousIndex >= 0)
-                this._controller.moveTo(this._sections[previousIndex].name);
+                this._router.moveTo(this._sections[previousIndex].name);
         };
         return previousButton;
     }
     createNextButton() {
         const nextButton = document.createElement('div');
-        const nextIndex = this._activeSectionIndex + 1;
         nextButton.classList.add('next');
-        const section = this._sections[this._activeSectionIndex];
-        nextIndex < this._values.length && section.isSatisfied ?
+        nextButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>`;
+        const nextIndex = this.getNextIndex(this._activeIndex + 1);
+        console.log(nextIndex);
+        nextIndex && this.currentSection.isSatisfied ?
             nextButton.classList.add('active') :
             nextButton.classList.remove('active');
-        nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
+        const nextSection = this._sections[nextIndex];
         nextButton.onclick = () => {
-            if (nextIndex < this._values.length && section.isSatisfied)
-                this._controller.moveTo(this._sections[nextIndex].name);
+            if (this.currentSection.isSatisfied && nextSection)
+                this._router.moveTo(nextSection.name);
         };
         return nextButton;
     }
     moveSectionIfActive(progressValue, section) {
         if (progressValue.isActive)
-            this._controller.moveTo(section.name);
+            this._router.moveTo(section.name);
     }
 }
 

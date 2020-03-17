@@ -118,275 +118,284 @@
     </header>
 
     <main class="page-main">
-        <article class="mt-2 pl-1 pr-1">
+        <article class="mt-2 pl-1 pr-1 mb-2">
+        
             <form class="interactive-form">
-                <div class="loading">
-                    <p class="loading__message">Aguarde um instante...</p>
-                </div>
-
-                <section data-section="modo-de-pesquisa">
-                    <header>
-                        <h2>Solicitar orçamento</h2>
-                        <div class="progress"></header>
-                    <div class="content">
-                        <div data-cards>
-                        <button data-action="industrias" data-card="industrias">
-                            <img src="./img/industria.svg" alt="Indústria">
-                            <h3>Indústria</h3>
-                        </button>
-                        <button data-action="servicos" data-card="servicos">
-                            <img src="./img/servico.svg" alt="Serviço">
-                            <h3>Serviços</h3>
-                        </button>
-                        <button data-action="residuos" data-card="residuos">
-                            <img src="./img/residuos.svg" alt="Resíduos">
-                            <h3>Resíduos</h3>
-                        </button>
-                        </div>
+                    <div class="loading">
+                        <p class="loading__message">Aguarde um instante...</p>
                     </div>
-                </section>
-
-                <section data-section="industrias">
-                    <header>
-                        <h2>Indústrias</h2>
-                        <div class="progress"></div>
-                    </header>
-                    <div class="content">
-                        <div data-cards>
-                            <button data-card="alimenticia" data-action="residuos">
-                                <img src="./img/industrias/alimenticia.svg" alt="Alimentícia"/>
-                                <h3>Alimentícia</h3>
-                            </button>
-                            <button data-card="construcao-civil" data-action="residuos">
-                                <img src="./img/industrias/contrucao-civil.svg" alt="Construção Civil"/>
-                                <h3>Construção Civil</h3>
-                            </button>
-                            <button data-card="educacao" data-action="residuos">
-                                <img src="./img/industrias/educacao.svg" alt="Educação"/>
-                                <h3>Educação</h3>
-                            </button>
-                            <button data-card="empresarial" data-action="residuos">
-                                <img src="./img/industrias/empresarial.svg" alt="Empresarial"/>
-                                <h3>Empresarial</h3>
-                            </button>
-                            <button data-card="industria" data-action="residuos">
-                                <img src="./img/industrias/industria.svg" alt="Indústria"/>
+        
+                    <section data-section="modo-de-pesquisa">
+                        <header>
+                            <h2>Solicitar orçamento</h2>
+                            <div class="progress" data-value="1" data-max="6">
+                        </header>
+                        <div class="content">
+                            <div data-cards>
+                            <button data-action="industrias" data-card="industrias">
+                                <img src="/img/industria.svg" alt="Indústria">
                                 <h3>Indústria</h3>
                             </button>
-                            <button data-card="lazer" data-action="residuos">
-                                <img src="./img/industrias/lazer.svg" alt="Lazer"/>
-                                <h3>Lazer</h3>
+                            <button data-action="servicos" data-card="servicos">
+                                <img src="/img/servico.svg" alt="Serviço">
+                                <h3>Serviços</h3>
                             </button>
-                            <button data-card="saude" data-action="residuos">
-                                <img src="./img/industrias/saude.svg" alt="Saúde"/>
-                                <h3>Saúde</h3>
+                            <button data-action="residuos" data-card="residuos">
+                                <img src="/img/residuos.svg" alt="Resíduos">
+                                <h3>Resíduos</h3>
                             </button>
-                            <button data-card="varejo" data-action="residuos">
-                                <img src="./img/industrias/varejo.svg" alt="Varejo"/>
-                                <h3>Varejo</h3>
-                            </button>
+                            </div>
                         </div>
-                    </div>
-                </section>
-
-                <section data-section="servicos">
-                    <header>
-                        <h2>Serviços</h2>
-                        <div class="progress"></header>
-                    <div class="content">
-                        <div data-cards>
-                            <button data-card="gestao-de-residuos" data-action="residuos">
-                                <img src="./img/servicos/gestao-residuos.svg" alt="Gestão de resíduos"/>
-                                <h3>Gestão de resíduos</h3>
-                            </button>
-                            <button data-card="tratamento-de-residuos" data-action="residuos">
-                                <img src="./img/servicos/tratamento.svg" alt="Tratamento de resíduos"/>
-                                <h3>Tratamento de resíduos</h3>
-                            </button>
-                            <button data-card="pgrs" data-action="informacoes-pessoais">
-                                <img src="./img/servicos/pgrs.svg" alt="PGRS"/>
-                                <h3>PGRS</h3>
-                            </button>
-                            <button data-card="remocao-de-lodo" data-action="informacoes-pessoais">
-                                <img src="./img/servicos/lodo.svg" alt="Remoção de lodo"/>
-                                <h3>Remoção de lodo</h3>
-                            </button>
-                            <button data-card="limpeza-de-fossa-septica" data-action="informacoes-pessoais">
-                                <img src="./img/servicos/limpeza.svg" alt="Limpeza de fossa séptica"/>
-                                <h3>Limpeza de fossa séptica</h3>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <section data-section="residuos">
+                    </section>
+        
+                    <section data-section="industrias">
                         <header>
-                            <h2>Resíduos</h2>
-                            <div class="progress"></div>
+                            <h2>Indústrias</h2>
+                            <div class="progress" data-value="2" data-max="6">
+                            </div>
+                        </header>
+                        <div class="content">
+                            <div data-cards>
+                                <button data-card="alimenticia" data-action="residuos">
+                                    <img src="/img/industrias/alimenticia.svg" alt="Alimentícia"/>
+                                    <h3>Alimentícia</h3>
+                                </button>
+                                <button data-card="construcao-civil" data-action="residuos">
+                                    <img src="/img/industrias/contrucao-civil.svg" alt="Construção Civil"/>
+                                    <h3>Construção Civil</h3>
+                                </button>
+                                <button data-card="educacao" data-action="residuos">
+                                    <img src="/img/industrias/educacao.svg" alt="Educação"/>
+                                    <h3>Educação</h3>
+                                </button>
+                                <button data-card="empresarial" data-action="residuos">
+                                    <img src="/img/industrias/empresarial.svg" alt="Empresarial"/>
+                                    <h3>Empresarial</h3>
+                                </button>
+                                <button data-card="industria" data-action="residuos">
+                                    <img src="/img/industrias/industria.svg" alt="Indústria"/>
+                                    <h3>Indústria</h3>
+                                </button>
+                                <button data-card="lazer" data-action="residuos">
+                                    <img src="/img/industrias/lazer.svg" alt="Lazer"/>
+                                    <h3>Lazer</h3>
+                                </button>
+                                <button data-card="saude" data-action="residuos">
+                                    <img src="/img/industrias/saude.svg" alt="Saúde"/>
+                                    <h3>Saúde</h3>
+                                </button>
+                                <button data-card="varejo" data-action="residuos">
+                                    <img src="/img/industrias/varejo.svg" alt="Varejo"/>
+                                    <h3>Varejo</h3>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+        
+                    <section data-section="servicos">
+                        <header>
+                            <h2>Serviços</h2>
+                            <div class="progress" data-value="2" data-max="6"></div>
+                        </header>
+                        <div class="content">
+                            <div data-cards>
+                                <button data-card="gestao-de-residuos" data-action="residuos">
+                                    <img src="/img/servicos/gestao-residuos.svg" alt="Gestão de resíduos"/>
+                                    <h3>Gestão de resíduos</h3>
+                                </button>
+                                <button data-card="tratamento-de-residuos" data-action="residuos">
+                                    <img src="/img/servicos/tratamento.svg" alt="Tratamento de resíduos"/>
+                                    <h3>Tratamento de resíduos</h3>
+                                </button>
+                                <button data-card="pgrs" data-action="informacoes-pessoais">
+                                    <img src="/img/servicos/pgrs.svg" alt="PGRS"/>
+                                    <h3>PGRS</h3>
+                                </button>
+                                <button data-card="remocao-de-lodo" data-action="informacoes-pessoais">
+                                    <img src="/img/servicos/lodo.svg" alt="Remoção de lodo"/>
+                                    <h3>Remoção de lodo</h3>
+                                </button>
+                                <button data-card="limpeza-de-fossa-septica" data-action="informacoes-pessoais">
+                                    <img src="/img/servicos/limpeza.svg" alt="Limpeza de fossa séptica"/>
+                                    <h3>Limpeza de fossa séptica</h3>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+        
+                    <section data-section="residuos">
+                            <header>
+                                <h2>Resíduos</h2>
+                                <div class="progress" data-value="3" data-max="6">
+                                </div>
+                            </header>
+                            <div class="container">
+                                <div class="content">
+                                    <div data-cards></div>
+                                </div>
+                                <aside data-aside><div></div></aside>
+                            </div>
+                    </section>
+        
+                    <section data-section="calculo-montante">
+                        <header>
+                            <h2 data-bind="residuo:nome"></h2>
+                            <div class="progress" data-value="3" data-max="6">
+                            </div>
                         </header>
                         <div class="container">
                             <div class="content">
-                                <div data-cards></div>
-                            </div>
-                            <aside data-aside><div></div></aside>
-                        </div>
-                </section>
-
-                <section data-section="calculo-montante">
-                    <header>
-                        <div class="title-wrapper">
-                            <h2 data-bind="residuo:nome"></h2>
-                            <div class="clear">Limpar</div>
-                        </div>
-                        <div class="progress"></div>
-                    </header>
-                    <div class="container">
-                        <div class="content">
-                            <h3>Cálculo Montante</h3>
-                            <div>
-                                <label for="frequencia">Frequência</label>
-                                <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
-                                <select name="periodo" id="periodo">
-                                    <option value="" selected>Selecione a frequência de sua coleta</option>
-                                    <option value="semana">Semana</option>
-                                    <option value="mes">Mês</option>
-                                    <option value="trimestre">Trimestre</option>
-                                    <option value="semestre">Semestre</option>
-                                    <option value="ano">Ano</option>
-                                </select>
-                                <p class="helper-message">Ex: “2” por “semana”</p>
-                            </div>
-    
-                            <div>
-                                <label for="recipiente">Recipiente</label>
-                                <div class="iq-dropdown">
-                                    <div class="iq__title">Selecione um recipiente</div>
-                                    <div class="iq__options"></div>
+                                <h3>Cálculo Montante</h3>
+                                <div>
+                                    <label for="frequencia">Frequência</label>
+                                    <input type="number" name="frequencia" id="frequencia" min="1" value="1"> <span>por</span>
+                                    <select name="periodo" id="periodo">
+                                        <option value="">Selecione a frequência de sua coleta</option>
+                                        <option value="semana">Semana</option>
+                                        <option value="mes">Mês</option>
+                                        <option value="trimestre">Trimestre</option>
+                                        <option value="semestre">Semestre</option>
+                                        <option value="ano">Ano</option>
+                                    </select>
+                                    <p class="helper-message">Ex: “2” por “semana”</p>
                                 </div>
-                                <p class="helper-message">Os recipientes disponíveis são definidos pelo tipo de resíduo.</p>
+        
+                                <div>
+                                    <label for="recipiente">Recipiente</label>
+                                    <div class="iq-dropdown">
+                                        <div class="iq__title">Selecione um recipiente</div>
+                                        <div class="iq__options"></div>
+                                    </div>
+                                    <p class="helper-message">Os recipientes disponíveis são definidos pelo tipo de resíduo.</p>
+                                </div>
+        
+                                <hr>
+                                <p>Caso não tenha certeza, clique em <em>Avançar</em>.</p>
+        
+                                <div class="nav-buttons">
+                                    <button data-action="informacoes-pessoais" class="submit">Avançar</button>
+                                </div>
                             </div>
-
-                            <hr>
-                            <p>Caso não tenha certeza, <a href="#" data-action="informacoes-pessoais">clique aqui</a>.</p>
-
-                            <div class="nav-buttons">
-                                <button data-action="informacoes-pessoais" class="submit">Avançar</button>
-                            </div>
+                            <aside>
+                                <div>
+                                    <h3>Exemplos:</h3>
+                                    <ul data-bind="residuo:exemplos" data-transform></ul>
+                                </div>
+        
+                                <div>
+                                    <h3>Destinação</h3>
+                                    <p data-bind="residuo:destinacao"></p>
+                                </div>
+                            </aside>
                         </div>
-                        <aside>
-                            <div>
-                                <h3>Exemplos:</h3>
-                                <ul data-bind="residuo:exemplos" data-transform></ul>
-                            </div>
-    
-                            <div>
-                                <h3>Destinação</h3>
-                                <p data-bind="residuo:destinacao"></p>
-                            </div>
-                        </aside>
-                    </div>
-                </section>
-                <section data-section="informacoes-pessoais">
-                    <header>
-                        <div class="title-wrapper">
+                    </section>
+                    
+                    <section data-section="informacoes-pessoais">
+                        <header>
                             <h2>Informações Pessoais</h2>
-                            <div class="clear">Limpar</div>
-                        </div>
-                        <div class="progress"></div>
-                    </header>
-                    <div class="content">
-                        <div>
-                            <label for="nome">Nome:</label>
-                            <input type="text" name="nome" id="nome" required>
-                        </div>
-                        
-                        <div>
-                            <label for="telefone">Telefone com DDD</label>
-                            <input type="tel" name="telefone" id="telefone" data-inputmask="'mask': '(99) 9999-9999'" required>
-                        </div>
-
-                        <div>
-                            <label for="email">E-mail</label>
-                            <input type="email" name="email" id="email" required>
-                        </div>
-
-                        <div>
-                            <label for="empresa">Empresa</label>
-                            <input type="text" name="empresa" id="empresa">
-                        </div>
-
-                        <div>
-                            <label for="cnpj">CNPJ</label>
-                            <input type="text" name="cnpj" id="cnpj" data-inputmask="'mask': '99.999.999/9999-99'">
-                        </div>
-
-                        <div>
-                            <label for="cep">CEP</label>
-                            <input type="text" name="cep" id="cep" data-inputmask="'mask': '99999-999'" required>
-                        </div>
-
-                        <div>
-                            <label for="endereco">Endereço</label>
-                            <input type="text" name="endereco" id="endereco" required>
-                        </div>
-
-                        <div>
-                            <label for="numero">Nº</label>
-                            <input type="text" name="numero" id="numero" required>
-                        </div>
-
-                        <div>
-                            <label for="complemento">Complemento</label>
-                            <input type="text" name="complemento" id="complemento">
-                        </div>
-                        
-                        <div>
-                            <label for="observacao">Observação</label>
-                            <textarea name="observacao" id="observacao"></textarea>
-                        </div>
-
-                        <div class="nav-buttons">
-                            <button data-action="revise-seu-pedido" class="submit">Avançar</button>
-                        </div>
-                    </div>
-                </section>
-
-                <section data-section="revise-seu-pedido">
-                    <header>
-                        <h2>Revise seu pedido</h2>
-                        <div class="progress"></div>
-                    </header>
-                    <div class="content">
-                        <div>
-                            <h3>Resíduo</h3>
-                            <p data-bind="residuo:nome"></p>
-                        </div>
-                        <div>
-                            <h3>Frequência</h3>
-                            <p data-bind="frequencia"></p>
-                        </div>
-                        <div>
-                            <h3>Recipientes</h3>
-                            <p data-bind="recipientes"></p>
+                            <div class="progress" data-value="4" data-max="6">
+                            </div>
+                        </header>
+                        <div class="content">
                             <div>
-                                <button data-action="calculo-montante" class="btn__secondary btn__secondary--edit">Editar</button>
+                                <label for="nome">Nome:</label>
+                                <input type="text" name="nome" id="nome" required>
+                            </div>
+                            
+                            <div>
+                                <label for="telefone">Telefone com DDD</label>
+                                <input type="tel" name="telefone" id="telefone" data-inputmask="'mask': '(99) 9999-9999'" required>
+                            </div>
+        
+                            <div>
+                                <label for="email">E-mail</label>
+                                <input type="email" name="email" id="email" required>
+                            </div>
+        
+                            <div>
+                                <label for="empresa">Empresa</label>
+                                <input type="text" name="empresa" id="empresa">
+                            </div>
+        
+                            <div>
+                                <label for="cnpj">CNPJ</label>
+                                <input type="text" name="cnpj" id="cnpj" data-inputmask="'mask': '99.999.999/9999-99'">
+                            </div>
+        
+                            <div>
+                                <label for="cep">CEP</label>
+                                <input type="text" name="cep" id="cep" data-inputmask="'mask': '99999-999'" required>
+                            </div>
+        
+                            <div>
+                                <label for="endereco">Endereço</label>
+                                <input type="text" name="endereco" id="endereco" required>
+                            </div>
+        
+                            <div>
+                                <label for="numero">Nº</label>
+                                <input type="text" name="numero" id="numero" required>
+                            </div>
+        
+                            <div>
+                                <label for="complemento">Complemento</label>
+                                <input type="text" name="complemento" id="complemento">
+                            </div>
+                            
+                            <div>
+                                <label for="observacao">Observação</label>
+                                <textarea name="observacao" id="observacao"></textarea>
+                            </div>
+        
+                            <div class="nav-buttons">
+                                <button data-action="revise-seu-pedido" class="submit">Avançar</button>
                             </div>
                         </div>
-                        <div>
-                            <h3>Informações de Contato</h3>
-                            <p data-bind="contato"></p>
+                    </section>
+        
+                    <section data-section="revise-seu-pedido">
+                        <header>
+                            <h2>Revise seu pedido</h2>
+                            <div class="progress" data-value="5" data-max="6">
+                            </div>
+                        </header>
+                        <div class="content">
                             <div>
-                                <button data-action="informacoes-pessoais" class="btn__secondary btn__secondary--edit">Editar</button>
+                                <div>
+                                    <div>
+                                        <h3>Resíduo</h3>
+                                        <p data-bind="residuo:nome"></p>
+                                    </div>
+                                    <div>
+                                        <h3>Frequência</h3>
+                                        <p data-bind="frequencia"></p>
+                                    </div>
+                                    <div>
+                                        <h3>Recipientes</h3>
+                                        <p data-bind="recipientes"></p>
+                                        <div>
+                                            <button data-action="calculo-montante" class="btn__secondary btn__secondary--edit">Editar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3>Informações de Contato</h3>
+                                    <p data-bind="contato"></p>
+                                    <div>
+                                        <button data-action="informacoes-pessoais" class="btn__secondary btn__secondary--edit">Editar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="nav-buttons">
+                                <button type="submit" class="submit">Enviar pedido</button>
+                                <button data-save class="save" data-action>Acrescentar resíduo</button>
                             </div>
                         </div>
-                        <div class="nav-buttons">
-                            <button type="submit" class="submit">Enviar pedido</button>
-                            <button data-save class="save" data-action>Acrescentar resíduo</button>
-                        </div>
-                    </div>
-                </section>
-            </form>
-        </article>
+                    </section>
+                </form>
+        
+            </article>
 
         <div class="skewdiv"></div>
     </main>
