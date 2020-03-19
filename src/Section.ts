@@ -50,6 +50,50 @@ export default class Section {
         this.addCardsClickEvent()
         this.addBindings()
         this.addButtonsClickEvents()
+
+        if (this.name === 'revise-seu-pedido')
+            this.renderHistory()
+    }
+
+    // eslint-disable-next-line max-statements
+    renderHistory(): void {
+        const orders = [...this.router.states, this.state]
+
+        const editButton = (idx: number): string => `
+                <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
+                    Editar
+                </button>`
+
+        const removeButton = (idx: number): string => `
+                <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">
+                    Excluir
+                </button>`
+
+        const markup = orders.map((state, idx) => `
+            <div>
+                <div>
+                    <div>
+                        <h3>Resíduo</h3>
+                        <p>${state.residuo.nome}</p>
+                    </div>
+                    <div>
+                        <h3>Frequência</h3>
+                        <p>${state.frequencia}</p>
+                    </div>
+                    <div>
+                        <h3>Recipientes</h3>
+                        <p>${state.recipientes}</p>
+                        <div>${editButton(idx)} ${removeButton(idx)}</div>
+                    </div>
+                </div>
+            </div>
+            `)
+
+        const historyPlaceholder = this.query('[data-history]')
+        historyPlaceholder.innerHTML = markup.join(' ')
+
+        this.addEditButtonsClickEvents()
+        this.addRemoveButtonsClickEvents()
     }
 
     unmount(): void {
@@ -228,7 +272,11 @@ export default class Section {
         remove.forEach(btn => {
             this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
+                    console.log(`Removing item: ${btn.dataset.remove}`)
                     this.router.removeState(btn.dataset.remove)
+                    if (this.router.hasState())
+                        return this.router.moveTo(this._name)
+
                     this.router.moveTo(this._name)
                 }
             })
@@ -241,7 +289,10 @@ export default class Section {
             const redirect = (dest: Section): void => {
                 const confirm = dest.query('.submit') as HTMLButtonElement
                 confirm.textContent = 'Ok'
-                this.onClick(confirm, () => this.router.moveTo(Sections.REVISE_PEDIDO))
+                this.onClick(confirm, () => {
+                    this.router.moveTo(Sections.REVISE_PEDIDO)
+                    confirm.textContent = 'Avançar'
+                })
             }
 
             this.onClick(btn, () => {
@@ -249,20 +300,30 @@ export default class Section {
                     this.router.editState(btn.dataset.edit)
                     return this.router.moveTo(Sections.CALCULO_MONTANTE, redirect)
                 }
+
                 return this.router.moveTo(Sections.INFO_PESSOAIS, redirect)
             })
         })
     }
 
     private addButtonsClickEvents(): void {
+        if (this.name === Sections.CALCULO_MONTANTE) {
+            const moveForwardButton = this.query('.submit')
+            if (State.userInfo.nome)
+                this.onClick(moveForwardButton, () => this.router.moveTo(Sections.REVISE_PEDIDO))
+        }
+
         const saveButton = this.query('[data-save]')
-        const submitButton = this.query('[type=submit]')
-        const clearButton = this.query('.clear')
-
         if (!this.state.residuo && saveButton) saveButton.remove()
+        this.onClick(saveButton, () => {
+            this.router.save()
+            this.router.moveTo(Sections.RESIDUOS)
+        })
 
-        this.onClick(saveButton, () => this.router.save())
+        const submitButton = this.query('[type=submit]')
         this.onClick(submitButton, () => this.router.send())
+
+        const clearButton = this.query('.clear')
         this.onClick(clearButton, () => this.clearCurrentForm())
     }
 

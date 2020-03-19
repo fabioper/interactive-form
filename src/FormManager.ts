@@ -45,6 +45,7 @@ export default class FormManager {
     }
 
     removeState(index: number): void {
+        console.log(index, this._states[index])
         this._states = this._states.filter((_value, idx) => idx !== index)
     }
 

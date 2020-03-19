@@ -74,6 +74,10 @@
     margin-bottom: 2rem;
 }
 
+.interactive-form [data-section="revise-seu-pedido"] .content > div:first-child > div {
+    flex-basis: 50%;
+}
+
 .interactive-form [data-section="calculo-montante"] .content h3 {
     border-bottom: 1px solid lighten(black,70);
     padding-bottom: .85rem;
@@ -674,4 +678,8 @@ input[name=frequencia] + * {
 
 .interactive-form [data-section="calculo-montante"] .container > aside {
     justify-content: flex-start !important;
+}
+
+.interactive-form [data-history] > div + div {
+    margin-top: 3.5rem;
 }

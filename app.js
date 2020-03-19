@@ -129,6 +129,7 @@ class FormManager {
         return this._states.length > 0;
     }
     removeState(index) {
+        console.log(index, this._states[index]);
         this._states = this._states.filter((_value, idx) => idx !== index);
     }
     editState(index) {
@@ -171,8 +172,6 @@ class FormManager {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Router; });
-/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
-
 class Router {
     constructor(manager, data) {
         this._sections = new Map();
@@ -233,7 +232,6 @@ class Router {
     }
     save() {
         this._manager.save(this.state);
-        this.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_0__["Sections"].RESIDUOS);
     }
     send() {
         this._manager.save(this.state);
@@ -302,6 +300,42 @@ class Section {
         this.addCardsClickEvent();
         this.addBindings();
         this.addButtonsClickEvents();
+        if (this.name === 'revise-seu-pedido')
+            this.renderHistory();
+    }
+    renderHistory() {
+        const orders = [...this.router.states, this.state];
+        const editButton = (idx) => `
+                <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
+                    Editar
+                </button>`;
+        const removeButton = (idx) => `
+                <button data-remove="${idx}" class="btn__secondary btn__secondary--remove">
+                    Excluir
+                </button>`;
+        const markup = orders.map((state, idx) => `
+            <div>
+                <div>
+                    <div>
+                        <h3>Resíduo</h3>
+                        <p>${state.residuo.nome}</p>
+                    </div>
+                    <div>
+                        <h3>Frequência</h3>
+                        <p>${state.frequencia}</p>
+                    </div>
+                    <div>
+                        <h3>Recipientes</h3>
+                        <p>${state.recipientes}</p>
+                        <div>${editButton(idx)} ${removeButton(idx)}</div>
+                    </div>
+                </div>
+            </div>
+            `);
+        const historyPlaceholder = this.query('[data-history]');
+        historyPlaceholder.innerHTML = markup.join(' ');
+        this.addEditButtonsClickEvents();
+        this.addRemoveButtonsClickEvents();
     }
     unmount() {
         this._rootElement.classList.remove('active');
@@ -447,7 +481,10 @@ class Section {
         remove.forEach(btn => {
             this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
+                    console.log(`Removing item: ${btn.dataset.remove}`);
                     this.router.removeState(btn.dataset.remove);
+                    if (this.router.hasState())
+                        return this.router.moveTo(this._name);
                     this.router.moveTo(this._name);
                 }
             });
@@ -459,7 +496,10 @@ class Section {
             const redirect = (dest) => {
                 const confirm = dest.query('.submit');
                 confirm.textContent = 'Ok';
-                this.onClick(confirm, () => this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO));
+                this.onClick(confirm, () => {
+                    this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO);
+                    confirm.textContent = 'Avançar';
+                });
             };
             this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
@@ -471,13 +511,21 @@ class Section {
         });
     }
     addButtonsClickEvents() {
+        if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE) {
+            const moveForwardButton = this.query('.submit');
+            if (_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome)
+                this.onClick(moveForwardButton, () => this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO));
+        }
         const saveButton = this.query('[data-save]');
-        const submitButton = this.query('[type=submit]');
-        const clearButton = this.query('.clear');
         if (!this.state.residuo && saveButton)
             saveButton.remove();
-        this.onClick(saveButton, () => this.router.save());
+        this.onClick(saveButton, () => {
+            this.router.save();
+            this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS);
+        });
+        const submitButton = this.query('[type=submit]');
         this.onClick(submitButton, () => this.router.send());
+        const clearButton = this.query('.clear');
         this.onClick(clearButton, () => this.clearCurrentForm());
     }
     addCardsClickEvent() {

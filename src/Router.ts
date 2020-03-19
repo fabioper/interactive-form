@@ -79,7 +79,6 @@ export default class Router {
 
     save(): void {
         this._manager.save(this.state)
-        this.moveTo(Sections.RESIDUOS)
     }
 
     send(): void {
