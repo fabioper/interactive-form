@@ -1,4 +1,4 @@
-import Residuo from './utils/Residuo'
+import Residuo from '../utils/Residuo'
 
 export default class State {
     static searchMode: string

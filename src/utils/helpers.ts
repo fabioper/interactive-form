@@ -1,5 +1,5 @@
 import Residuo from './Residuo'
-import State from '../State'
+import State from '../State/State'
 import { Sections } from './enums'
 
 export const addSlugProps = (residuo): object => {
