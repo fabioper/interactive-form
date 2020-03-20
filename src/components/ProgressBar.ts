@@ -1,15 +1,15 @@
 import Section from '../Section'
 import ProgressBarValue from './ProgressBarValue'
-import Router from '../Router'
+import SectionRouter from '../SectionRouter'
 
 export default class ProgressBar {
     private _sections: Section[]
     private _progressBarValues: ProgressBarValue[]
-    private _router: Router
+    private _router: SectionRouter
     private _activeIndex: number
 
-    constructor(controller: Router) {
-        this._router = controller
+    constructor() {
+        this._router = SectionRouter.instance
         this._sections = Array.from(this._router.sections.values())
         this._progressBarValues = this._sections.map(section => new ProgressBarValue(section))
         this.moveSectionIfActive = this.moveSectionIfActive.bind(this)

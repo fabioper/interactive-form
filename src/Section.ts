@@ -1,44 +1,49 @@
 /* eslint-disable no-alert */
-import Router from './Router'
 import Residuo from './utils/Residuo'
 import State from './State'
 import ProgressBar from './components/ProgressBar'
 import { Sections } from './utils/enums'
+import SectionRouter from './SectionRouter'
+import FormRepository from './FormRepository/FormRepository'
+import FormHandler from './FormHandler'
+import InMemoryFormRepository from './FormRepository/InMemoryFormRepository'
 
 export default class Section {
     private _name: string
-    router: Router
     private _position: number;
     private _rootElement: HTMLElement
     private _onMount: ((this: this) => void)[]
     private _satisfied: boolean
     private _condition: (state: State) => boolean
+    private _router: SectionRouter
+    private _repository: FormRepository<State>
+    private _handler: FormHandler
+    private _data: Residuo[]
 
-    constructor(name: string, step: number, condition?: (state: State) => boolean) {
+    constructor(name: string, step: number, data: Residuo[], condition?: (state: State) => boolean) {
         this._name = name
         this._position = step
         this._rootElement = document.querySelector(`[data-section=${name}`) as HTMLElement
         this._onMount = []
         this._satisfied = false
         this._condition = condition
+        this._router = SectionRouter.instance
+        this._repository = InMemoryFormRepository.instance
+        this._handler = FormHandler.instance
+        this._data = data
     }
 
     get name(): string { return this._name }
 
     get position(): number { return this._position }
 
-    get state(): State { return this.router.state }
-
-    get data(): Residuo[] { return this.router.data }
-
     set isSatisfied(value: boolean) { this._satisfied = value }
 
     get isSatisfied(): boolean { return this._satisfied }
 
     get condition(): boolean {
-        console.log('called')
         if (this._condition)
-            return this._condition(this.state)
+            return this._condition(this._repository.active)
 
         return true
     }
@@ -57,7 +62,7 @@ export default class Section {
 
     // eslint-disable-next-line max-statements
     renderHistory(): void {
-        const orders = [...this.router.states, this.state]
+        const orders = [...this._repository.getAll(), this._repository.active]
 
         const editButton = (idx: number): string => `
                 <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
@@ -125,10 +130,10 @@ export default class Section {
             let value
             if (binding.dataset.bind.includes(':')) {
                 const [state, key] = binding.dataset.bind.split(':')
-                if (this.state[state])
-                    value = this.state[state][key]
+                if (this._repository.active[state])
+                    value = this._repository.active[state][key]
             } else {
-                value = this.state[binding.dataset.bind]
+                value = this._repository.active[binding.dataset.bind]
             }
 
             if (!value)
@@ -151,7 +156,7 @@ export default class Section {
 
     private bindSidebarFields(): string {
         const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (!State.userInfo.nome && !this.router.hasState()) return (aside.innerHTML = '')
+        if (!State.userInfo.nome && this._repository.isEmpty()) return (aside.innerHTML = '')
 
         aside.innerHTML = this.getResiduesListingMarkup()
 
@@ -166,25 +171,25 @@ export default class Section {
     private bindFormFields(): void {
         if (this._name === Sections.CALCULO_MONTANTE) {
             this.isSatisfied = true
-            console.log(this.state)
+            console.log(this._repository.active)
             const frequenciaInput = this.query('input[name=frequencia]') as HTMLInputElement
             const periodoSelect = this.query('select[name=periodo]') as HTMLSelectElement
             const recipientesInput = this.queryAll('input[name=quantidade]') as HTMLInputElement[]
 
-            frequenciaInput.value = this.state.calculoMontante.frequencia.toString()
-            periodoSelect.value = this.state.calculoMontante.periodo.toString()
+            frequenciaInput.value = this._repository.active.calculoMontante.frequencia.toString()
+            periodoSelect.value = this._repository.active.calculoMontante.periodo.toString()
 
             frequenciaInput.onchange = (): number => (
-                this.state.calculoMontante.frequencia = frequenciaInput.valueAsNumber
+                this._repository.active.calculoMontante.frequencia = frequenciaInput.valueAsNumber
             )
             periodoSelect.onchange = (): string => (
-                this.state.calculoMontante.periodo = periodoSelect.value
+                this._repository.active.calculoMontante.periodo = periodoSelect.value
             )
             recipientesInput.forEach(input => {
-                const recipiente = this.state.calculoMontante.recipientes[input.id]
+                const recipiente = this._repository.active.calculoMontante.recipientes[input.id]
                 if (recipiente) input.value = recipiente.toString()
                 input.onchange = (): number => (
-                    this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber
+                    this._repository.active.calculoMontante.recipientes[input.id] = input.valueAsNumber
                 )
             })
         }
@@ -227,7 +232,7 @@ export default class Section {
     private getResiduesListingMarkup(): string {
         const startDiv = '<div>'
         const endDiv = '</div>'
-        const markup = this.router.states.map((state, idx) => {
+        const markup = this._repository.getAll().map((state, idx) => {
             if (state.calculoMontante.periodo)
                 return /* html */`
                     <div>
@@ -248,13 +253,14 @@ export default class Section {
                     </div>
                 `
             return ''
-        }).join(' ')
+        })
+            .join(' ')
 
         return startDiv + markup + endDiv
     }
 
     private fillProgressBar(): void {
-        const progressBar = new ProgressBar(this.router)
+        const progressBar = new ProgressBar()
         progressBar.fillUntil(this)
         progressBar.renderAt(this.query('.progress'))
     }
@@ -273,11 +279,11 @@ export default class Section {
             this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
                     console.log(`Removing item: ${btn.dataset.remove}`)
-                    this.router.removeState(btn.dataset.remove)
-                    if (this.router.hasState())
-                        return this.router.moveTo(this._name)
+                    this._repository.remove(parseInt(btn.dataset.remove, 10))
+                    if (!this._repository.isEmpty())
+                        return this._router.moveTo(this._name)
 
-                    this.router.moveTo(this._name)
+                    this._router.moveTo(this._name)
                 }
             })
         })
@@ -290,18 +296,18 @@ export default class Section {
                 const confirm = dest.query('.submit') as HTMLButtonElement
                 confirm.textContent = 'Ok'
                 this.onClick(confirm, () => {
-                    this.router.moveTo(Sections.REVISE_PEDIDO)
+                    this._router.moveTo(Sections.REVISE_PEDIDO)
                     confirm.textContent = 'Avançar'
                 })
             }
 
             this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
-                    this.router.editState(btn.dataset.edit)
-                    return this.router.moveTo(Sections.CALCULO_MONTANTE, redirect)
+                    this._repository.active = this._repository.getById(parseInt(btn.dataset.edit, 10))
+                    return this._router.moveTo(Sections.CALCULO_MONTANTE, redirect)
                 }
 
-                return this.router.moveTo(Sections.INFO_PESSOAIS, redirect)
+                return this._router.moveTo(Sections.INFO_PESSOAIS, redirect)
             })
         })
     }
@@ -310,18 +316,18 @@ export default class Section {
         if (this.name === Sections.CALCULO_MONTANTE) {
             const moveForwardButton = this.query('.submit')
             if (State.userInfo.nome)
-                this.onClick(moveForwardButton, () => this.router.moveTo(Sections.REVISE_PEDIDO))
+                this.onClick(moveForwardButton, () => this._router.moveTo(Sections.REVISE_PEDIDO))
         }
 
         const saveButton = this.query('[data-save]')
-        if (!this.state.residuo && saveButton) saveButton.remove()
+        if (!this._repository.active.residuo && saveButton) saveButton.remove()
         this.onClick(saveButton, () => {
-            this.router.save()
-            this.router.moveTo(Sections.RESIDUOS)
+            this._repository.add(this._repository.active)
+            this._router.moveTo(Sections.RESIDUOS)
         })
 
         const submitButton = this.query('[type=submit]')
-        this.onClick(submitButton, () => this.router.send())
+        this.onClick(submitButton, () => this._handler.sendAll())
 
         const clearButton = this.query('.clear')
         this.onClick(clearButton, () => this.clearCurrentForm())
@@ -340,13 +346,13 @@ export default class Section {
         card.addEventListener('click', event => {
             event.preventDefault()
             if (this._name === Sections.MODO_DE_PESQUISA)
-                this.state.searchMode = card.dataset.card
+                this._repository.active.searchMode = card.dataset.card
             if (this._name === Sections.INDUSTRIAS)
-                this.state.industry = card.dataset.card
+                this._repository.active.industry = card.dataset.card
             if (this._name === Sections.SERVICOS)
-                this.state.service = card.dataset.card
+                this._repository.active.service = card.dataset.card
             if (this._name === Sections.RESIDUOS)
-                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card))
+                this._repository.active.residuo = this._data.find(({ slug }) => (slug === card.dataset.card))
             this.isSatisfied = true
         })
     }
@@ -357,7 +363,7 @@ export default class Section {
                 event.preventDefault()
                 const inputs = this.queryAll('input, select') as HTMLInputElement[]
                 if (this.isValid(inputs)) {
-                    this.router.moveTo(action.dataset.action)
+                    this._router.moveTo(action.dataset.action)
                     this.isSatisfied = true
                 }
             }

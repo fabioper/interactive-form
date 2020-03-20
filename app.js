@@ -86,56 +86,29 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/FormManager.ts":
+/***/ "./src/FormHandler.ts":
 /*!****************************!*\
-  !*** ./src/FormManager.ts ***!
+  !*** ./src/FormHandler.ts ***!
   \****************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormHandler; });
 /* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
+/* harmony import */ var _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FormRepository/InMemoryFormRepository */ "./src/FormRepository/InMemoryFormRepository.ts");
 
-class FormManager {
-    constructor() {
-        this.active = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
-        this._states = [];
+
+class FormHandler {
+    constructor() { this._repository = _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_1__["default"].instance; }
+    static get instance() {
+        if (this._instance)
+            return this._instance;
+        this._instance = new FormHandler();
+        return this._instance;
     }
-    set active(state) {
-        this._active = state;
-    }
-    get active() {
-        return this._active;
-    }
-    get states() {
-        return this._states;
-    }
-    save(state) {
-        if (!this._states.includes(state))
-            this._states.push(state);
-        else
-            this._states = this._states.map(st => {
-                if (st === state)
-                    return state;
-                return st;
-            });
-        const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
-        this.active = newState;
-        console.log(this.active);
-    }
-    hasState() {
-        return this._states.length > 0;
-    }
-    removeState(index) {
-        console.log(index, this._states[index]);
-        this._states = this._states.filter((_value, idx) => idx !== index);
-    }
-    editState(index) {
-        this.active = this._states[index];
-    }
-    send() {
+    sendAll() {
         console.log(this.data);
     }
     get data() {
@@ -148,108 +121,74 @@ class FormManager {
         return data;
     }
     getSelectedResidues() {
-        return this._states.reduce((acc, curr) => {
-            const residuo = {
-                nome: curr.residuo.nome,
-                recipientes: curr.calculoMontante.recipientes
-            };
-            acc.push(residuo);
-            return acc;
-        }, []);
+        const states = this._repository.getAll();
+        return states.reduce(this.format, []);
+    }
+    format(previousValue, currentValue) {
+        previousValue.push({
+            nome: currentValue.residuo.nome,
+            recipientes: currentValue.calculoMontante.recipientes
+        });
+        return previousValue;
     }
 }
 
 
 /***/ }),
 
-/***/ "./src/Router.ts":
-/*!***********************!*\
-  !*** ./src/Router.ts ***!
-  \***********************/
+/***/ "./src/FormRepository/InMemoryFormRepository.ts":
+/*!******************************************************!*\
+  !*** ./src/FormRepository/InMemoryFormRepository.ts ***!
+  \******************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Router; });
-class Router {
-    constructor(manager, data) {
-        this._sections = new Map();
-        this._history = [];
-        this.data = data;
-        this._manager = manager;
-        window.addEventListener('popstate', () => {
-            this._history.pop();
-            if (this._history.length > 0)
-                this.moveTo(this._history.pop());
-        });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return InMemoryFormRepository; });
+/* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../State */ "./src/State.ts");
+
+class InMemoryFormRepository {
+    constructor() {
+        this.active = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this._states = [];
     }
-    get state() {
-        return this._manager.active;
+    static get instance() {
+        if (InMemoryFormRepository._instance)
+            return InMemoryFormRepository._instance;
+        InMemoryFormRepository._instance = new InMemoryFormRepository();
+        return InMemoryFormRepository._instance;
     }
-    get states() {
-        return this._manager.states;
+    get active() { return this._active; }
+    set active(state) { this._active = state; }
+    get states() { return this._states; }
+    getAll() {
+        return this._states;
     }
-    set active(section) {
-        this.previous = this._active;
-        this._active = section;
-        this._history.push(section.name);
-        this.changeHistoryState(section);
-        this._active.mount();
+    getById(id) {
+        return this._states[id];
     }
-    get active() {
-        return this._active;
+    add(state) {
+        if (!this._states.includes(state))
+            this._states.push(state);
+        else
+            this._states = this._states.map(st => {
+                if (st === state)
+                    return state;
+                return st;
+            });
+        const newState = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
+        this.active = newState;
+        return this.active;
     }
-    set previous(section) {
-        this._previous = section;
-        if (this._previous)
-            this._previous.unmount();
+    update(id, state) {
+        throw new Error('Method not implemented.');
     }
-    get previous() {
-        return this._previous;
+    remove(id) {
+        this._states = this._states.filter((_value, idx) => idx !== id);
     }
-    get sections() {
-        return this._sections;
-    }
-    changeHistoryState(section) {
-        this._history.length > 0 ?
-            history.pushState({ section: section.name }, section.name) :
-            history.replaceState({ section: section.name }, section.name);
-    }
-    append(...sections) {
-        sections.forEach(section => {
-            section.router = this;
-            this._sections.set(section.name, section);
-        });
-    }
-    find(key) {
-        return this._sections.get(key);
-    }
-    moveTo(key, cb) {
-        this.active = this.find(key);
-        if (cb)
-            cb(this.active);
-    }
-    save() {
-        this._manager.save(this.state);
-    }
-    send() {
-        this._manager.save(this.state);
-        this._manager.send();
-    }
-    hasState() {
-        return this._manager.hasState();
-    }
-    removeState(index) {
-        this._manager.removeState(parseInt(index, 10));
-    }
-    editState(index) {
-        this._manager.editState(parseInt(index, 10));
-    }
-    clear() {
-        const message = 'Tem certeza que deseja limpar o formulário?';
-        if (window.confirm(message))
-            location.reload();
+    isEmpty() {
+        return Boolean(this._states.length);
     }
 }
 
@@ -269,28 +208,35 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _State__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./State */ "./src/State.ts");
 /* harmony import */ var _components_ProgressBar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/ProgressBar */ "./src/components/ProgressBar.ts");
 /* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _SectionRouter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SectionRouter */ "./src/SectionRouter.ts");
+/* harmony import */ var _FormHandler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FormHandler */ "./src/FormHandler.ts");
+/* harmony import */ var _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./FormRepository/InMemoryFormRepository */ "./src/FormRepository/InMemoryFormRepository.ts");
+
+
+
 
 
 
 class Section {
-    constructor(name, step, condition) {
+    constructor(name, step, data, condition) {
         this._name = name;
         this._position = step;
         this._rootElement = document.querySelector(`[data-section=${name}`);
         this._onMount = [];
         this._satisfied = false;
         this._condition = condition;
+        this._router = _SectionRouter__WEBPACK_IMPORTED_MODULE_3__["default"].instance;
+        this._repository = _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_5__["default"].instance;
+        this._handler = _FormHandler__WEBPACK_IMPORTED_MODULE_4__["default"].instance;
+        this._data = data;
     }
     get name() { return this._name; }
     get position() { return this._position; }
-    get state() { return this.router.state; }
-    get data() { return this.router.data; }
     set isSatisfied(value) { this._satisfied = value; }
     get isSatisfied() { return this._satisfied; }
     get condition() {
-        console.log('called');
         if (this._condition)
-            return this._condition(this.state);
+            return this._condition(this._repository.active);
         return true;
     }
     mount() {
@@ -304,7 +250,7 @@ class Section {
             this.renderHistory();
     }
     renderHistory() {
-        const orders = [...this.router.states, this.state];
+        const orders = [...this._repository.getAll(), this._repository.active];
         const editButton = (idx) => `
                 <button data-edit="${idx}" class="btn__secondary btn__secondary--edit">
                     Editar
@@ -359,11 +305,11 @@ class Section {
             let value;
             if (binding.dataset.bind.includes(':')) {
                 const [state, key] = binding.dataset.bind.split(':');
-                if (this.state[state])
-                    value = this.state[state][key];
+                if (this._repository.active[state])
+                    value = this._repository.active[state][key];
             }
             else {
-                value = this.state[binding.dataset.bind];
+                value = this._repository.active[binding.dataset.bind];
             }
             if (!value)
                 return binding.parentElement.style.display = 'none';
@@ -380,7 +326,7 @@ class Section {
     }
     bindSidebarFields() {
         const aside = document.querySelector('[data-aside]');
-        if (!_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome && !this.router.hasState())
+        if (!_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome && this._repository.isEmpty())
             return (aside.innerHTML = '');
         aside.innerHTML = this.getResiduesListingMarkup();
         if (_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome)
@@ -391,19 +337,19 @@ class Section {
     bindFormFields() {
         if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE) {
             this.isSatisfied = true;
-            console.log(this.state);
+            console.log(this._repository.active);
             const frequenciaInput = this.query('input[name=frequencia]');
             const periodoSelect = this.query('select[name=periodo]');
             const recipientesInput = this.queryAll('input[name=quantidade]');
-            frequenciaInput.value = this.state.calculoMontante.frequencia.toString();
-            periodoSelect.value = this.state.calculoMontante.periodo.toString();
-            frequenciaInput.onchange = () => (this.state.calculoMontante.frequencia = frequenciaInput.valueAsNumber);
-            periodoSelect.onchange = () => (this.state.calculoMontante.periodo = periodoSelect.value);
+            frequenciaInput.value = this._repository.active.calculoMontante.frequencia.toString();
+            periodoSelect.value = this._repository.active.calculoMontante.periodo.toString();
+            frequenciaInput.onchange = () => (this._repository.active.calculoMontante.frequencia = frequenciaInput.valueAsNumber);
+            periodoSelect.onchange = () => (this._repository.active.calculoMontante.periodo = periodoSelect.value);
             recipientesInput.forEach(input => {
-                const recipiente = this.state.calculoMontante.recipientes[input.id];
+                const recipiente = this._repository.active.calculoMontante.recipientes[input.id];
                 if (recipiente)
                     input.value = recipiente.toString();
-                input.onchange = () => (this.state.calculoMontante.recipientes[input.id] = input.valueAsNumber);
+                input.onchange = () => (this._repository.active.calculoMontante.recipientes[input.id] = input.valueAsNumber);
             });
         }
         if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS) {
@@ -440,7 +386,7 @@ class Section {
     getResiduesListingMarkup() {
         const startDiv = '<div>';
         const endDiv = '</div>';
-        const markup = this.router.states.map((state, idx) => {
+        const markup = this._repository.getAll().map((state, idx) => {
             if (state.calculoMontante.periodo)
                 return `
                     <div>
@@ -461,11 +407,12 @@ class Section {
                     </div>
                 `;
             return '';
-        }).join(' ');
+        })
+            .join(' ');
         return startDiv + markup + endDiv;
     }
     fillProgressBar() {
-        const progressBar = new _components_ProgressBar__WEBPACK_IMPORTED_MODULE_1__["default"](this.router);
+        const progressBar = new _components_ProgressBar__WEBPACK_IMPORTED_MODULE_1__["default"]();
         progressBar.fillUntil(this);
         progressBar.renderAt(this.query('.progress'));
     }
@@ -482,10 +429,10 @@ class Section {
             this.onClick(btn, () => {
                 if (window.confirm('Deseja realmente excluir este item?')) {
                     console.log(`Removing item: ${btn.dataset.remove}`);
-                    this.router.removeState(btn.dataset.remove);
-                    if (this.router.hasState())
-                        return this.router.moveTo(this._name);
-                    this.router.moveTo(this._name);
+                    this._repository.remove(parseInt(btn.dataset.remove, 10));
+                    if (!this._repository.isEmpty())
+                        return this._router.moveTo(this._name);
+                    this._router.moveTo(this._name);
                 }
             });
         });
@@ -497,16 +444,16 @@ class Section {
                 const confirm = dest.query('.submit');
                 confirm.textContent = 'Ok';
                 this.onClick(confirm, () => {
-                    this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO);
+                    this._router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO);
                     confirm.textContent = 'Avançar';
                 });
             };
             this.onClick(btn, () => {
                 if (btn.dataset.edit !== '') {
-                    this.router.editState(btn.dataset.edit);
-                    return this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, redirect);
+                    this._repository.active = this._repository.getById(parseInt(btn.dataset.edit, 10));
+                    return this._router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, redirect);
                 }
-                return this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, redirect);
+                return this._router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, redirect);
             });
         });
     }
@@ -514,17 +461,17 @@ class Section {
         if (this.name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE) {
             const moveForwardButton = this.query('.submit');
             if (_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome)
-                this.onClick(moveForwardButton, () => this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO));
+                this.onClick(moveForwardButton, () => this._router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO));
         }
         const saveButton = this.query('[data-save]');
-        if (!this.state.residuo && saveButton)
+        if (!this._repository.active.residuo && saveButton)
             saveButton.remove();
         this.onClick(saveButton, () => {
-            this.router.save();
-            this.router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS);
+            this._repository.add(this._repository.active);
+            this._router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS);
         });
         const submitButton = this.query('[type=submit]');
-        this.onClick(submitButton, () => this.router.send());
+        this.onClick(submitButton, () => this._handler.sendAll());
         const clearButton = this.query('.clear');
         this.onClick(clearButton, () => this.clearCurrentForm());
     }
@@ -540,13 +487,13 @@ class Section {
         card.addEventListener('click', event => {
             event.preventDefault();
             if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA)
-                this.state.searchMode = card.dataset.card;
+                this._repository.active.searchMode = card.dataset.card;
             if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS)
-                this.state.industry = card.dataset.card;
+                this._repository.active.industry = card.dataset.card;
             if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS)
-                this.state.service = card.dataset.card;
+                this._repository.active.service = card.dataset.card;
             if (this._name === _utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS)
-                this.state.residuo = this.data.find(({ slug }) => (slug === card.dataset.card));
+                this._repository.active.residuo = this._data.find(({ slug }) => (slug === card.dataset.card));
             this.isSatisfied = true;
         });
     }
@@ -556,11 +503,72 @@ class Section {
                 event.preventDefault();
                 const inputs = this.queryAll('input, select');
                 if (this.isValid(inputs)) {
-                    this.router.moveTo(action.dataset.action);
+                    this._router.moveTo(action.dataset.action);
                     this.isSatisfied = true;
                 }
             };
         });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/SectionRouter.ts":
+/*!******************************!*\
+  !*** ./src/SectionRouter.ts ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SectionRouter; });
+class SectionRouter {
+    constructor() {
+        this._sections = new Map();
+        this._history = [];
+    }
+    static get instance() {
+        if (this._instance)
+            return this._instance;
+        this._instance = new SectionRouter();
+        return this._instance;
+    }
+    set active(section) {
+        this.previous = this._active;
+        this._active = section;
+        this._history.push(section.name);
+        this.changeHistoryState(section);
+        this._active.mount();
+    }
+    get active() { return this._active; }
+    set previous(section) {
+        this._previous = section;
+        if (this._previous)
+            this._previous.unmount();
+    }
+    get previous() { return this._previous; }
+    get sections() {
+        return this._sections;
+    }
+    append(...sections) {
+        sections.forEach(section => {
+            this._sections.set(section.name, section);
+        });
+    }
+    find(key) {
+        return this._sections.get(key);
+    }
+    moveTo(key, cb) {
+        this.active = this.find(key);
+        if (cb)
+            cb(this.active);
+    }
+    changeHistoryState(section) {
+        this._history.length > 0 ?
+            history.pushState({ section: section.name }, section.name) :
+            history.replaceState({ section: section.name }, section.name);
     }
 }
 
@@ -640,10 +648,10 @@ State.userInfo = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/helpers */ "./src/utils/helpers.ts");
-/* harmony import */ var _Router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Router */ "./src/Router.ts");
-/* harmony import */ var _FormManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FormManager */ "./src/FormManager.ts");
-/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
-/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _Section__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Section */ "./src/Section.ts");
+/* harmony import */ var _utils_enums__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/enums */ "./src/utils/enums.ts");
+/* harmony import */ var _SectionRouter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SectionRouter */ "./src/SectionRouter.ts");
+/* harmony import */ var _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FormRepository/InMemoryFormRepository */ "./src/FormRepository/InMemoryFormRepository.ts");
 
 
 
@@ -652,35 +660,35 @@ __webpack_require__.r(__webpack_exports__);
 const loading = document.querySelector('.loading');
 (async () => {
     const data = await Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["fetchData"])();
-    const manager = new _FormManager__WEBPACK_IMPORTED_MODULE_2__["default"]();
-    const controller = new _Router__WEBPACK_IMPORTED_MODULE_1__["default"](manager, data);
+    const router = _SectionRouter__WEBPACK_IMPORTED_MODULE_3__["default"].instance;
+    const repository = _FormRepository_InMemoryFormRepository__WEBPACK_IMPORTED_MODULE_4__["default"].instance;
     loading.remove();
-    controller.append(new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].MODO_DE_PESQUISA, 1), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INDUSTRIAS, 2, state => state.searchMode === 'industrias'), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].SERVICOS, 2, state => state.searchMode === 'servicos'), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].RESIDUOS, 3), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].CALCULO_MONTANTE, 4), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].INFO_PESSOAIS, 5), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].REVISE_PEDIDO, 6), new _Section__WEBPACK_IMPORTED_MODULE_3__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].PEDIDO_ENVIADO, 7));
-    controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].RESIDUOS).onMount(function () {
+    router.append(new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA, 1, data), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INDUSTRIAS, 2, data, state => state.searchMode === 'industrias'), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].SERVICOS, 2, data, state => state.searchMode === 'servicos'), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS, 3, data), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE, 4, data), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].INFO_PESSOAIS, 5, data), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].REVISE_PEDIDO, 6, data), new _Section__WEBPACK_IMPORTED_MODULE_1__["default"](_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].PEDIDO_ENVIADO, 7, data));
+    router.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].RESIDUOS).onMount(function () {
         const cards = this.query('[data-cards]');
         const description = this.query('.cards-description');
-        const industries = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractIndustriesFrom"])(this.data);
-        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(this.state, this.data, cards);
+        const industries = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractIndustriesFrom"])(data);
+        Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["loadResiduesCards"])(repository.active, data, cards);
         if (description)
             description.remove();
-        if (this.state.industry) {
+        if (repository.active.industry) {
             const markup = `
                 <p class="cards-description">
                     Normalmente, a <strong>indústria
-                    <span>${industries.get(this.state.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:
+                    <span>${industries.get(repository.active.industry).toLowerCase()}</strong> gera os seguintes tipos de resíduos:
                 </p>
             `;
             cards.insertAdjacentHTML('beforebegin', markup);
         }
     });
-    controller.find(_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].CALCULO_MONTANTE).onMount(function () {
+    router.find(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].CALCULO_MONTANTE).onMount(function () {
         const recipients = this.query('.iq__options');
         const activator = recipients.previousElementSibling;
-        const containers = this.state.residuo.containers[0].container;
+        const containers = repository.active.residuo.containers[0].container;
         recipients.innerHTML = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_0__["extractDropdownOptionsMarkup"])(containers);
         activator.onclick = () => recipients.parentElement.classList.toggle('active');
     });
-    controller.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_4__["Sections"].MODO_DE_PESQUISA);
+    router.moveTo(_utils_enums__WEBPACK_IMPORTED_MODULE_2__["Sections"].MODO_DE_PESQUISA);
 })();
 
 
@@ -697,10 +705,12 @@ const loading = document.querySelector('.loading');
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ProgressBar; });
 /* harmony import */ var _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProgressBarValue */ "./src/components/ProgressBarValue.ts");
+/* harmony import */ var _SectionRouter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../SectionRouter */ "./src/SectionRouter.ts");
+
 
 class ProgressBar {
-    constructor(controller) {
-        this._router = controller;
+    constructor() {
+        this._router = _SectionRouter__WEBPACK_IMPORTED_MODULE_1__["default"].instance;
         this._sections = Array.from(this._router.sections.values());
         this._progressBarValues = this._sections.map(section => new _ProgressBarValue__WEBPACK_IMPORTED_MODULE_0__["default"](section));
         this.moveSectionIfActive = this.moveSectionIfActive.bind(this);
