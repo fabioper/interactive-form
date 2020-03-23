@@ -100,7 +100,6 @@ export default class ProgressBar {
             </svg>`
 
         const nextIndex = this.getNextIndex(this._activeIndex + 1)
-        console.log(nextIndex)
 
         nextIndex && this.currentSection.isSatisfied ?
             nextButton.classList.add('active') :

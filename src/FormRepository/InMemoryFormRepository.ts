@@ -9,12 +9,13 @@ export default class InMemoryFormRepository implements FormRepository<State> {
     private constructor() {
         this.active = new State()
         this._states = []
+        InMemoryFormRepository._instance = this
     }
 
     static get instance(): FormRepository<State> {
-        if (InMemoryFormRepository._instance) return InMemoryFormRepository._instance
-        InMemoryFormRepository._instance = new InMemoryFormRepository()
-        return InMemoryFormRepository._instance
+        if (InMemoryFormRepository._instance)
+            return InMemoryFormRepository._instance
+        return new InMemoryFormRepository()
     }
 
     get active(): State { return this._active }
@@ -27,7 +28,11 @@ export default class InMemoryFormRepository implements FormRepository<State> {
     }
 
     getById(id: number): State {
-        return this._states[id]
+        const found = this._states[id]
+        if (!found)
+            throw new Error(`Residue not found => ${id}`)
+
+        return found
     }
 
     add(state: State): State {
@@ -53,6 +58,6 @@ export default class InMemoryFormRepository implements FormRepository<State> {
     }
 
     isEmpty(): boolean {
-        return Boolean(this._states.length)
+        return this._states.length === 0
     }
 }

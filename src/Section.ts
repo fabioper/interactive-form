@@ -7,6 +7,7 @@ import SectionRouter from './SectionRouter'
 import FormRepository from './FormRepository/FormRepository'
 import FormHandler from './FormHandler'
 import InMemoryFormRepository from './FormRepository/InMemoryFormRepository'
+import Sidebar from './components/Sidebar'
 
 export default class Section {
     private _name: string
@@ -154,14 +155,21 @@ export default class Section {
         this.bindSidebarFields()
     }
 
-    private bindSidebarFields(): string {
+    private bindSidebarFields(): void {
+        // const sidebar = new Sidebar()
+        // sidebar.renderAt(document.querySelector('[data-aside]') as HTMLElement)
         const aside = document.querySelector('[data-aside]') as HTMLElement
-        if (!State.userInfo.nome && this._repository.isEmpty()) return (aside.innerHTML = '')
+        if (!State.userInfo.nome && this._repository.isEmpty()) {
+            aside.innerHTML = ''
+            return
+        }
 
         aside.innerHTML = this.getResiduesListingMarkup()
 
-        if (State.userInfo.nome)
-            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
+        // console.log(State.userInfo.nome)
+        // console.log(sidebar.element)
+        // if (State.userInfo.nome)
+        //     sidebar.element.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
 
         this.addEditButtonsClickEvents()
         this.addRemoveButtonsClickEvents()

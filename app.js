@@ -152,12 +152,12 @@ class InMemoryFormRepository {
     constructor() {
         this.active = new _State__WEBPACK_IMPORTED_MODULE_0__["default"]();
         this._states = [];
+        InMemoryFormRepository._instance = this;
     }
     static get instance() {
         if (InMemoryFormRepository._instance)
             return InMemoryFormRepository._instance;
-        InMemoryFormRepository._instance = new InMemoryFormRepository();
-        return InMemoryFormRepository._instance;
+        return new InMemoryFormRepository();
     }
     get active() { return this._active; }
     set active(state) { this._active = state; }
@@ -166,7 +166,10 @@ class InMemoryFormRepository {
         return this._states;
     }
     getById(id) {
-        return this._states[id];
+        const found = this._states[id];
+        if (!found)
+            throw new Error(`Residue not found => ${id}`);
+        return found;
     }
     add(state) {
         if (!this._states.includes(state))
@@ -188,7 +191,7 @@ class InMemoryFormRepository {
         this._states = this._states.filter((_value, idx) => idx !== id);
     }
     isEmpty() {
-        return Boolean(this._states.length);
+        return this._states.length === 0;
     }
 }
 
@@ -326,11 +329,11 @@ class Section {
     }
     bindSidebarFields() {
         const aside = document.querySelector('[data-aside]');
-        if (!_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome && this._repository.isEmpty())
-            return (aside.innerHTML = '');
+        if (!_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome && this._repository.isEmpty()) {
+            aside.innerHTML = '';
+            return;
+        }
         aside.innerHTML = this.getResiduesListingMarkup();
-        if (_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome)
-            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
         this.addEditButtonsClickEvents();
         this.addRemoveButtonsClickEvents();
     }
@@ -791,7 +794,6 @@ class ProgressBar {
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>`;
         const nextIndex = this.getNextIndex(this._activeIndex + 1);
-        console.log(nextIndex);
         nextIndex && this.currentSection.isSatisfied ?
             nextButton.classList.add('active') :
             nextButton.classList.remove('active');

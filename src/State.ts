@@ -1,6 +1,7 @@
 import Residuo from './utils/Residuo'
 
 export default class State {
+    id: number;
     static searchMode: string
     static industry: string
     static service: string
