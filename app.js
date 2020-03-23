@@ -334,6 +334,8 @@ class Section {
             return;
         }
         aside.innerHTML = this.getResiduesListingMarkup();
+        if (_State__WEBPACK_IMPORTED_MODULE_0__["default"].userInfo.nome)
+            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup());
         this.addEditButtonsClickEvents();
         this.addRemoveButtonsClickEvents();
     }

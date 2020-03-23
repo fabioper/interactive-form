@@ -168,8 +168,8 @@ export default class Section {
 
         // console.log(State.userInfo.nome)
         // console.log(sidebar.element)
-        // if (State.userInfo.nome)
-        //     sidebar.element.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
+        if (State.userInfo.nome)
+            aside.insertAdjacentHTML('beforeend', this.getUserInfoListingMarkup())
 
         this.addEditButtonsClickEvents()
         this.addRemoveButtonsClickEvents()
